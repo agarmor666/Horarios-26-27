@@ -4,6 +4,15 @@ window.H={"d":["Lunes","Martes","Miércoles","Jueves","Viernes"],"h":["09:00-09:
   const main=document.querySelector('main');
   if(!nav||!main)return;
 
+  const oldLegend=document.querySelector('header .legend');
+  if(oldLegend)oldLegend.remove();
+
+  const home=document.createElement('a');
+  home.href='https://agarmor666.github.io/Horarios-26-27/';
+  home.textContent='🏠 Inicio';
+  home.style.cssText='display:inline-flex;align-items:center;text-decoration:none;background:linear-gradient(135deg,#2563eb,#7c3aed);color:#fff;padding:11px 17px;border-radius:12px;font-weight:800;box-shadow:0 2px 6px #0001';
+  nav.insertBefore(home,nav.firstChild);
+
   const asuntos=document.createElement('a');
   asuntos.href='https://agarmor666.github.io/asuntos-propios/';
   asuntos.textContent='📝 Asuntos propios';
@@ -58,14 +67,14 @@ window.H={"d":["Lunes","Martes","Miércoles","Jueves","Viernes"],"h":["09:00-09:
         <p class="hint" style="margin-bottom:0">Registro interno del CEIP Bartolomé Flores. El formulario se cumplimenta íntegramente desde este portal.</p>
       </div>
     </div>
-    <div class="support-note">Los datos se guardarán en la pestaña <b>CURSO 26-27</b> de la hoja de registro. Los cursos anteriores permanecen separados y no aparecen en este recurso.</div>
+    <div class="support-note">Los datos se guardarán en la pestaña <b>CURSO 26-27</b> de la hoja de registro.</div>
     <div class="support-grid">
       <div class="support-card">
         <h3>1. Datos de la sesión</h3>
         <div class="support-field"><label for="supGrupo">Grupo</label><select id="supGrupo"><option value="">Seleccionar grupo…</option>${H.g.map(g=>`<option>${g}</option>`).join('')}</select></div>
         <div class="support-field"><label for="supDocente">Maestra/o de apoyo</label><select id="supDocente"><option value="">Seleccionar docente…</option>${docentes.map(d=>`<option>${d}</option>`).join('')}</select></div>
-        <div class="support-field"><label for="supFecha">Fecha</label><input type="date" id="supFecha" min="2026-09-14" max="2027-06-22"></div>
-        <div class="support-field"><label>Sesión / tramo horario</label><div class="support-tramos">${tramos.map((t,i)=>`<label class="support-check"><input type="checkbox" name="supTramo" value="${t}"> ${t}</label>`).join('')}</div></div>
+        <div class="support-field"><label for="supFecha">Fecha</label><input type="date" id="supFecha" min="2026-09-10" max="2027-06-22"></div>
+        <div class="support-field"><label>Sesión / tramo horario</label><div class="support-tramos">${tramos.map(t=>`<label class="support-check"><input type="checkbox" name="supTramo" value="${t}"> ${t}</label>`).join('')}</div></div>
       </div>
       <div class="support-card">
         <h3>2. Organización del apoyo</h3>
@@ -100,7 +109,7 @@ window.H={"d":["Lunes","Martes","Miércoles","Jueves","Viernes"],"h":["09:00-09:
       if(!j.success)throw new Error(j.error||'No se ha podido guardar');
       msg('Registro guardado correctamente en CURSO 26-27.','ok');
       setTimeout(clearForm,1800);
-    }catch(e){msg('El portal ya está preparado, pero falta activar en Apps Script la conexión específica de Apoyo y Refuerzo. No se ha perdido ningún registro porque el envío no se ha dado por válido.','err')}
+    }catch(e){msg('No se ha podido guardar el registro. Revisa la conexión con Apps Script.','err')}
     finally{btn.disabled=false}
   }
   document.getElementById('supGuardar').addEventListener('click',saveSupport);
@@ -108,7 +117,7 @@ window.H={"d":["Lunes","Martes","Miércoles","Jueves","Viernes"],"h":["09:00-09:
 
   function showSupport(){
     document.querySelectorAll('.nav button').forEach(x=>x.classList.remove('active'));
-    apoyo.style.color='#fff';apoyo.style.background='linear-gradient(135deg,#0f766e,#14b8a6)';
+    apoyo.style.color='#fff';apoyo.style.background='linear-gradient(135deg,#2563eb,#7c3aed)';
     const viewer=document.getElementById('viewer'),stats=document.getElementById('stats'),recess=document.getElementById('recess');
     if(viewer)viewer.style.display='none';if(stats)stats.style.display='none';if(recess)recess.style.display='none';sec.style.display='block';
   }
