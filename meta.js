@@ -30,6 +30,19 @@ window.H={"d":["Lunes","Martes","Miércoles","Jueves","Viernes"],"h":["09:00-09:
     <div style="padding:14px 16px;border-radius:14px;background:#ecfeff;border:1px solid #a5f3fc;color:#155e75;margin-bottom:16px;font-weight:700">
       El formulario permite registrar grupo, tramo horario, docente de apoyo, fecha, lugar y tipo de sesión, alumnado atendido, actitud, dificultad, contenidos reforzados y observaciones.
     </div>
+
+    <div style="margin:0 0 20px">
+      <h3 style="margin:0 0 10px;color:#334155">📚 Histórico de registros</h3>
+      <p class="hint" style="margin-bottom:12px">Acceso directo a las hojas originales de cursos anteriores. Los archivos técnicos de AutoCrat se mantienen intactos.</p>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:10px">
+        <a href="https://docs.google.com/spreadsheets/d/1sOtboSlDqya2Sg_m_GtxnAhOK88kjKbpyf0oRa2AiGU/edit?ouid=107263764897817070688" target="_blank" rel="noopener" style="text-decoration:none;padding:14px;border-radius:13px;background:#f8fafc;border:1px solid #cbd5e1;color:#334155;font-weight:800">📘 Curso 21-22<br><span style="font-size:.78rem;font-weight:600;color:#64748b">Abrir hoja de respuestas</span></a>
+        <a href="https://docs.google.com/spreadsheets/d/1op-rlEzxdhZ_lK3vkZrlet06gVrWgk5C/edit?usp=drivesdk&ouid=107263764897817070688&rtpof=true&sd=true" target="_blank" rel="noopener" style="text-decoration:none;padding:14px;border-radius:13px;background:#f8fafc;border:1px solid #cbd5e1;color:#334155;font-weight:800">📘 Curso 22-23<br><span style="font-size:.78rem;font-weight:600;color:#64748b">Abrir archivo Excel</span></a>
+        <a href="https://docs.google.com/spreadsheets/d/1ORR32acD4-8THMvHlio9s2Xk03U-9ToI0v-NLxSMUM4/edit?ouid=107263764897817070688" target="_blank" rel="noopener" style="text-decoration:none;padding:14px;border-radius:13px;background:#f8fafc;border:1px solid #cbd5e1;color:#334155;font-weight:800">📘 Curso 23-24<br><span style="font-size:.78rem;font-weight:600;color:#64748b">Abrir hoja de respuestas</span></a>
+        <a href="https://docs.google.com/spreadsheets/d/12Xfa_oJwC9xsO0bQk4MRlmnQbuu_hYMOQzJQZBwoNGg/edit?ouid=107263764897817070688" target="_blank" rel="noopener" style="text-decoration:none;padding:14px;border-radius:13px;background:#f8fafc;border:1px solid #cbd5e1;color:#334155;font-weight:800">📘 Curso 24-25<br><span style="font-size:.78rem;font-weight:600;color:#64748b">Abrir hoja de respuestas</span></a>
+        <a href="https://docs.google.com/spreadsheets/d/1jLaC4XXVLefgLNq1q7ruyrq3PMrzs8LwqH-lV7IgOKs/edit?ouid=107263764897817070688" target="_blank" rel="noopener" style="text-decoration:none;padding:14px;border-radius:13px;background:#eef2ff;border:1px solid #a5b4fc;color:#3730a3;font-weight:800">📗 Curso 25-26<br><span style="font-size:.78rem;font-weight:600;color:#6366f1">Abrir hoja de respuestas</span></a>
+      </div>
+    </div>
+
     <div style="border:1px solid #dbe3ec;border-radius:16px;overflow:hidden;background:#fff;box-shadow:0 5px 18px #0001">
       <iframe src="https://docs.google.com/forms/d/e/1FAIpQLSeIyNU9O3Kwc-T8AlVTIfcvY3ZDV2C0vN6R1AZNyXevAi_GrQ/viewform?embedded=true" width="100%" height="1350" frameborder="0" marginheight="0" marginwidth="0" title="Registro de apoyo y refuerzo 2026/27">Cargando…</iframe>
     </div>`;
