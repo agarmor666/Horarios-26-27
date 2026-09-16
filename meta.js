@@ -76,7 +76,7 @@ window.H={"d":["Lunes","Martes","Miércoles","Jueves","Viernes"],"h":["09:00-09:
   function allHide(){['viewer','stats','recess','portal-home','apoyo-refuerzo'].forEach(id=>{const e=document.getElementById(id);if(e)e.style.display='none'})}
   function resetNav(){document.querySelectorAll('.nav button').forEach(x=>x.classList.remove('active'));[home,apoyo].forEach(a=>{a.style.color='#475569';a.style.background='#fff'})}
   function showHome(){allHide();resetNav();homeSec.style.display='block';home.style.color='#fff';home.style.background='linear-gradient(135deg,#2563eb,#7c3aed)';history.replaceState(null,'','#inicio')}
-  function showSupport(){allHide();resetNav();sec.style.display='block';apoyo.style.color='#fff';apoyo.style.background='linear-gradient(135deg,#2563eb,#7c3aed)';history.replaceState(null,'','#apoyo-refuerzo')}
+  function showSupport(){allHide();resetNav();sec.style.display='block';apoyo.style.color='#fff';apoyo.style.background='linear-gradient(135deg,#2563eb,#7c3aed)';history.replaceState(null,'','#apoyo-refuerzo');warmStudentCache()}
   home.addEventListener('click',e=>{e.preventDefault();showHome()});apoyo.addEventListener('click',e=>{e.preventDefault();showSupport()});
 
   function blankDropdown(kind){setTimeout(()=>{const sel=document.getElementById('entity'),title=document.getElementById('title'),tbl=document.getElementById('tbl');if(!sel)return;const label=kind==='groups'?'Seleccionar grupo…':'Seleccionar profesor/a…';const o=document.createElement('option');o.value='-1';o.textContent=label;sel.insertBefore(o,sel.firstChild);sel.value='-1';if(title)title.textContent='';if(tbl)tbl.innerHTML='';},0)}
@@ -89,7 +89,8 @@ window.H={"d":["Lunes","Martes","Miércoles","Jueves","Viernes"],"h":["09:00-09:
   function val(id){return(document.getElementById(id)?.value||'').trim()}
   const selectedStudentNames=new Set();
   const studentCache=new Map();
-  let studentRequest=0;
+  const studentPromises=new Map();
+  let studentRequest=0,warmingStudents=false;
   function selectedStudents(){return [...selectedStudentNames]}
   function renderSelectedStudents(){
     const row=document.getElementById('supSeleccionados');
@@ -101,6 +102,23 @@ window.H={"d":["Lunes","Martes","Miércoles","Jueves","Viernes"],"h":["09:00-09:
     s.innerHTML='<option value="">Seleccionar alumno/a…</option>'+names.map(name=>'<option value="'+esc(name)+'">'+esc(name)+'</option>').join('');
     s.disabled=!names.length;
   }
+  function getStudents(group){
+    if(studentCache.has(group))return Promise.resolve(studentCache.get(group));
+    if(studentPromises.has(group))return studentPromises.get(group);
+    const promise=fetch(STUDENTS_API+'?action=students-get&group='+encodeURIComponent(group),{credentials:'omit',redirect:'follow',cache:'force-cache'})
+      .then(r=>{if(!r.ok)throw new Error('Respuesta no válida');return r.json()})
+      .then(j=>{if(!j.success||!Array.isArray(j.students))throw new Error(j.error||'No se pudo cargar');studentCache.set(group,j.students);studentPromises.delete(group);return j.students})
+      .catch(e=>{studentPromises.delete(group);throw e});
+    studentPromises.set(group,promise);
+    return promise;
+  }
+  function warmStudentCache(){
+    if(warmingStudents)return;
+    warmingStudents=true;
+    const pending=H.g.slice();
+    const worker=async()=>{while(pending.length){const group=pending.shift();try{await getStudents(group)}catch(e){}}};
+    Promise.all([worker(),worker(),worker()]);
+  }
   async function loadStudents(group){
     const s=document.getElementById('supAlumnado');
     const request=++studentRequest;
@@ -110,13 +128,9 @@ window.H={"d":["Lunes","Martes","Miércoles","Jueves","Viernes"],"h":["09:00-09:
     if(studentCache.has(group)){fillStudents(s,studentCache.get(group));return}
     s.innerHTML='<option value="">Cargando alumnado…</option>';
     try{
-      const r=await fetch(STUDENTS_API+'?action=students-get&group='+encodeURIComponent(group),{credentials:'omit',redirect:'follow',cache:'force-cache'});
+      const names=await getStudents(group);
       if(request!==studentRequest)return;
-      if(!r.ok)throw new Error('Respuesta no válida');
-      const j=await r.json();
-      if(!j.success||!Array.isArray(j.students))throw new Error(j.error||'No se pudo cargar');
-      studentCache.set(group,j.students);
-      fillStudents(s,j.students);
+      fillStudents(s,names);
     }catch(e){
       if(request!==studentRequest)return;
       s.innerHTML='<option value="">No se pudo cargar el alumnado</option>';
