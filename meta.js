@@ -104,7 +104,7 @@ window.H={"d":["Lunes","Martes","Miércoles","Jueves","Viernes"],"h":["09:00-09:
     }).join('');
   }
   function fillStudents(s,names){
-    s.innerHTML='<option value="">Seleccionar alumno/a…</option>'+names.map(name=>'<option value="'+esc(name)+'">'+esc(name)+'</option>').join('');
+    s.innerHTML='<option value="">Seleccionar alumno/a…</option><option value="Todo el grupo">Todo el grupo</option>'+names.map(name=>'<option value="'+esc(name)+'">'+esc(name)+'</option>').join('');
     s.disabled=!names.length;
   }
   function getStudents(group){
@@ -158,7 +158,7 @@ window.H={"d":["Lunes","Martes","Miércoles","Jueves","Viernes"],"h":["09:00-09:
     finally{btn.disabled=false}
   }
   document.getElementById('supGrupo').addEventListener('change',e=>loadStudents(e.target.value));
-  document.getElementById('supAlumnado').addEventListener('change',e=>{if(e.target.value){selectedStudentNames.add(e.target.value);renderSelectedStudents();e.target.value=''}});
+  document.getElementById('supAlumnado').addEventListener('change',e=>{const name=e.target.value;if(!name)return;if(name==='Todo el grupo'){selectedStudentNames.clear();studentAttitudes.clear();selectedStudentNames.add(name)}else{selectedStudentNames.delete('Todo el grupo');studentAttitudes.delete('Todo el grupo');selectedStudentNames.add(name)}renderSelectedStudents();e.target.value=''});
   document.getElementById('supSeleccionados').addEventListener('click',e=>{const b=e.target.closest('[data-remove-student]');if(!b)return;selectedStudentNames.delete(b.dataset.removeStudent);studentAttitudes.delete(b.dataset.removeStudent);renderSelectedStudents()});
   document.getElementById('supSeleccionados').addEventListener('change',e=>{if(e.target.matches('[data-student-attitude]'))studentAttitudes.set(e.target.dataset.studentAttitude,e.target.value)});
   document.getElementById('supGuardar').addEventListener('click',saveSupport);document.getElementById('supLimpiar').addEventListener('click',clearForm);
