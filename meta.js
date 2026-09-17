@@ -150,7 +150,7 @@ window.H={"d":["Lunes","Martes","Miércoles","Jueves","Viernes"],"h":["09:00-09:
     const faltanActitudes=alumnado.filter(name=>!studentAttitudes.has(name));
     const actitud=alumnado.map(name=>name+': '+(studentAttitudes.get(name)||'Sin indicar')).join(' | ');
     const data={action:'support-set',curso:'26-27',grupo:val('supGrupo'),sesion:sesiones.join(', '),docente:val('supDocente'),area:val('supArea'),fecha:val('supFecha'),lugar:val('supLugar'),tipo:val('supTipo'),alumnado:alumnado.join(', '),actitud:actitud,contenido:val('supContenido'),observaciones:val('supObs')};
-    if(!data.grupo||!data.docente||!data.area||!data.fecha||!data.sesion||!data.lugar||!data.tipo||!data.alumnado||!data.contenido){msg('Completa los campos obligatorios.','err');return}
+    if(!data.grupo||!data.docente||!data.area||!data.fecha||!data.sesion||!data.lugar||!data.tipo||!data.alumnado){msg('Completa los campos obligatorios.','err');return}
     if(faltanActitudes.length){msg('Indica la actitud de cada alumno seleccionado.','err');return}
     const btn=document.getElementById('supGuardar');btn.disabled=true;msg('Guardando registro…','warn');
     try{const r=await fetch(SUPPORT_API,{method:'POST',redirect:'follow',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(data)});const j=await r.json();if(!j.success)throw new Error(j.error||'No se ha podido guardar');msg('Registro guardado correctamente en CURSO 26-27.','ok');setTimeout(clearForm,1600)}
