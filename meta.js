@@ -154,7 +154,7 @@ window.H={"d":["Lunes","Martes","Miércoles","Jueves","Viernes"],"h":["09:00-09:
     if(faltanActitudes.length){msg('Indica la actitud de cada alumno seleccionado.','err');return}
     const btn=document.getElementById('supGuardar');btn.disabled=true;msg('Guardando registro…','warn');
     try{const r=await fetch(SUPPORT_API,{method:'POST',redirect:'follow',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(data)});const j=await r.json();if(!j.success)throw new Error(j.error||'No se ha podido guardar');msg('Registro guardado correctamente en CURSO 26-27.','ok');setTimeout(clearForm,1600)}
-    catch(e){msg('No se ha podido guardar el registro.','err')}
+    catch(e){msg('No se ha podido guardar el registro'+(e&&e.message?': '+e.message:'')+'.','err')}
     finally{btn.disabled=false}
   }
   document.getElementById('supGrupo').addEventListener('change',e=>loadStudents(e.target.value));
