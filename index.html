@@ -47,7 +47,7 @@ footer{padding:18px;text-align:center;color:#64748b;font-size:.88rem;background:
 <div class="notice">Los viernes se alternan: Turno A en las semanas 1.ª y 3.ª del mes; Turno B en las semanas 2.ª y 4.ª.</div>
 </section>
 <section id="calendar" style="display:none">
-<div class="calendar-head"><div><h2 class="title">📅 Calendario académico 2026/27</h2><p class="hint">Plan general de reuniones y actuaciones del CEIP Bartolomé Flores. La planificación podrá ajustarse mediante convocatoria.</p></div><div class="calendar-tools"><select id="calendarMonth" aria-label="Filtrar por mes"></select><select id="calendarType" aria-label="Filtrar por tipo de reunión"><option value="">Todos los órganos</option><option>Equipos docentes</option><option>Ciclos</option><option>Equipo de Orientación</option><option>ETCP</option><option>Claustro</option><option>Consejo Escolar</option><option>Evaluación</option></select></div></div>
+<div class="calendar-head"><div><h2 class="title">📅 Calendario académico 2026/27</h2><p class="hint">Plan general de reuniones y actuaciones del CEIP Bartolomé Flores. La planificación podrá ajustarse mediante convocatoria.</p></div><div class="calendar-tools"><select id="calendarMonth" aria-label="Filtrar por mes"></select><select id="calendarType" aria-label="Filtrar por tipo de reunión"><option value="">Todos los órganos</option><option>Reuniones con familias</option><option>Equipos docentes</option><option>Ciclos</option><option>Equipo de Orientación</option><option>ETCP</option><option>Claustro</option><option>Consejo Escolar</option><option>Evaluación</option></select></div></div>
 <div class="calendar-summary"><div class="calendar-stat"><b id="calendarCount">0</b>actuaciones previstas</div><div class="calendar-stat"><b>Telemática</b>modalidad ordinaria</div><div class="calendar-stat"><b>Presencial</b>sesiones oficiales de evaluación</div></div>
 <div id="calendarList" class="calendar-list"></div>
 </section>
@@ -63,11 +63,16 @@ const CALENDAR_EVENTS=[
 {month:'Septiembre 2026',date:'Jueves 3 septiembre',time:'10:00',name:'Equipo de Orientación',type:'Equipo de Orientación',mode:'Presencial'},
 {month:'Septiembre 2026',date:'Jueves 3 septiembre',time:'12:00',name:'Ciclo de Educación Infantil',type:'Ciclos',mode:'Presencial'},
 {month:'Septiembre 2026',date:'Miércoles 9 septiembre',time:'Por determinar',name:'Claustro de inicio de curso',type:'Claustro',mode:'Presencial'},
-{month:'Septiembre 2026',date:'Lunes 14 septiembre',time:'Tarde',name:'Equipos docentes · organización inicial',type:'Equipos docentes',mode:'Telemática'},
-{month:'Septiembre 2026',date:'Lunes 21 septiembre',time:'Tarde',name:'Ciclos + Equipo de Orientación',type:'Ciclos',mode:'Telemática'},
-{month:'Septiembre 2026',date:'Lunes 28 septiembre',time:'Tarde',name:'ETCP · Memoria de Autoevaluación y Plan de Mejora',type:'ETCP',mode:'Telemática'},
+{month:'Septiembre 2026',date:'Lunes 14 septiembre',time:'16:00',name:'Claustro y EOE',type:'Claustro',mode:'Presencial'},
+{month:'Septiembre 2026',date:'Lunes 21 septiembre',time:'16:00',name:'Reunión con familias · 1.º ciclo de Primaria',type:'Reuniones con familias',mode:'Presencial'},
+{month:'Septiembre 2026',date:'Lunes 21 septiembre',time:'17:00',name:'Reunión con familias · 2.º ciclo de Primaria e Infantil de 4 años',type:'Reuniones con familias',mode:'Presencial'},
+{month:'Septiembre 2026',date:'Lunes 21 septiembre',time:'18:00',name:'Reunión con familias · 3.º ciclo de Primaria',type:'Reuniones con familias',mode:'Presencial'},
+{month:'Septiembre 2026',date:'Lunes 28 septiembre',time:'16:00',name:'Sesión de evaluación · ETCP',type:'Evaluación',mode:'Presencial'},
+{month:'Septiembre 2026',date:'Lunes 28 septiembre',time:'17:00',name:'Sesión de evaluación · 2.º ciclo de Primaria',type:'Evaluación',mode:'Presencial'},
+{month:'Septiembre 2026',date:'Lunes 28 septiembre',time:'18:00',name:'Sesión de evaluación · 3.º ciclo de Primaria',type:'Evaluación',mode:'Presencial'},
 {month:'Septiembre 2026',date:'Antes del 30 septiembre',time:'Por determinar',name:'Consejo Escolar · aprobación de la Memoria de Autoevaluación',type:'Consejo Escolar',mode:'Según convocatoria'},
-{month:'Octubre 2026',date:'Lunes 5 octubre',time:'Tarde',name:'Equipos docentes',type:'Equipos docentes',mode:'Telemática'},
+{month:'Octubre 2026',date:'Lunes 5 octubre',time:'16:00',name:'Sesión de evaluación · Educación Infantil',type:'Evaluación',mode:'Presencial'},
+{month:'Octubre 2026',date:'Lunes 5 octubre',time:'17:30',name:'Sesión de evaluación · 1.º ciclo de Primaria',type:'Evaluación',mode:'Presencial'},
 {month:'Octubre 2026',date:'Lunes 19 octubre',time:'Tarde',name:'Ciclos + Equipo de Orientación',type:'Ciclos',mode:'Telemática'},
 {month:'Octubre 2026',date:'Lunes 26 octubre',time:'Tarde',name:'ETCP',type:'ETCP',mode:'Telemática'},
 {month:'Noviembre 2026',date:'Lunes 9 noviembre',time:'Tarde',name:'Equipos docentes',type:'Equipos docentes',mode:'Telemática'},
