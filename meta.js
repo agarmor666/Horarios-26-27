@@ -31,6 +31,13 @@ window.H={"d":["Lunes","Martes","Miércoles","Jueves","Viernes"],"h":["09:00-09:
   apoyo.style.cssText=commonLink;
   nav.appendChild(apoyo);
 
+  const planCentro=document.createElement('a');
+  planCentro.href='https://agarmor666.github.io/plan-de-centro/';
+  planCentro.className='nav-plan';
+  planCentro.textContent='🏫 Plan de Centro';
+  planCentro.style.cssText=commonLink;
+  nav.appendChild(planCentro);
+
   const style=document.createElement('style');
   style.textContent=`
     #portal-home .home-hero{position:relative;overflow:hidden;border-radius:20px;min-height:320px;margin-bottom:20px;background:#0f172a;box-shadow:0 12px 30px #0002}
