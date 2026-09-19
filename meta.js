@@ -12,18 +12,21 @@ window.H={"d":["Lunes","Martes","Miércoles","Jueves","Viernes"],"h":["09:00-09:
   const commonLink='display:inline-flex;align-items:center;text-decoration:none;background:#fff;color:#475569;padding:11px 17px;border-radius:12px;font-weight:800;box-shadow:0 2px 6px #0001;cursor:pointer';
   const home=document.createElement('a');
   home.href='#inicio';
+  home.className='nav-home';
   home.textContent='🏠 Inicio';
   home.style.cssText=commonLink;
   nav.insertBefore(home,nav.firstChild);
 
   const asuntos=document.createElement('a');
   asuntos.href='https://agarmor666.github.io/asuntos-propios/';
+  asuntos.className='nav-asuntos';
   asuntos.textContent='📝 Asuntos propios';
   asuntos.style.cssText=commonLink;
   nav.appendChild(asuntos);
 
   const apoyo=document.createElement('a');
   apoyo.href='#apoyo-refuerzo';
+  apoyo.className='nav-apoyo';
   apoyo.textContent='🧩 Apoyo y refuerzo';
   apoyo.style.cssText=commonLink;
   nav.appendChild(apoyo);
@@ -73,7 +76,7 @@ window.H={"d":["Lunes","Martes","Miércoles","Jueves","Viernes"],"h":["09:00-09:
   sec.innerHTML=`<h2 class="title">🧩 Registro de apoyo y refuerzo · Curso 2026/27</h2><p class="hint">Registro interno del CEIP Bartolomé Flores.</p><div class="support-grid"><div class="support-card"><h3>1. Datos de la sesión</h3><div class="support-required-note"><span class="support-required">*</span> Campos obligatorios</div><div class="support-field"><label>Maestra/o de apoyo <span class="support-required" aria-hidden="true">*</span></label><select id="supDocente"><option value="">Seleccionar docente…</option>${docentes.map(d=>`<option>${d}</option>`).join('')}</select></div><div class="support-field"><label for="supArea">Área / ámbito <span class="support-required" aria-hidden="true">*</span></label><select id="supArea"><option value="">Seleccionar área / ámbito…</option><option>Lengua Castellana y Literatura</option><option>Matemáticas</option><option>Conocimiento del Medio</option><option>Inglés</option><option>Francés</option><option>Educación Física</option><option>Educación Artística</option><option>Religión / Atención Educativa</option><option>Comunicación y Representación de la Realidad</option><option>Crecimiento en Armonía</option><option>Descubrimiento y Exploración del Entorno</option><option>Otro ámbito</option></select></div><div class="support-field"><label>Fecha <span class="support-required" aria-hidden="true">*</span></label><input type="date" id="supFecha" min="2026-09-10" max="2027-06-22"></div><div class="support-field"><label>Sesión / tramo horario <span class="support-required" aria-hidden="true">*</span></label><div class="support-tramos">${tramos.map(t=>`<label class="support-check"><input type="checkbox" name="supTramo" value="${t}"> ${t}</label>`).join('')}</div></div></div><div class="support-card"><h3>2. Organización del apoyo</h3><div class="support-required-note"><span class="support-required">*</span> Campos obligatorios</div><div class="support-field"><label>Lugar de la sesión <span class="support-required" aria-hidden="true">*</span></label><select id="supLugar"><option value="">Seleccionar…</option><option>Dentro del aula</option><option>Fuera del aula</option></select></div><div class="support-field"><label>Tipo de sesión <span class="support-required" aria-hidden="true">*</span></label><select id="supTipo"><option value="">Seleccionar…</option><option>Individual</option><option>Pequeño grupo</option><option>Gran grupo</option></select></div><div class="support-field"><label>Grupo <span class="support-required" aria-hidden="true">*</span></label><select id="supGrupo"><option value="">Seleccionar grupo…</option>${H.g.map(g=>`<option>${g}</option>`).join('')}</select></div><div class="support-field"><label for="supAlumnado">Alumna/o/s que recibe el apoyo <span class="support-required" aria-hidden="true">*</span></label><select id="supAlumnado" disabled><option value="">Selecciona primero un grupo…</option></select><div class="support-student-help">Selecciona un alumno cada vez. Se irá añadiendo a la fila inferior.</div><div id="supSeleccionados" class="support-student-row"><span class="support-student-empty">Todavía no has añadido alumnado.</span></div></div></div><div class="support-card" style="grid-column:1/-1"><h3>3. Intervención realizada</h3><div class="support-field"><label>Actividad / contenidos reforzados</label><textarea id="supContenido"></textarea></div><div class="support-field"><label>Observaciones</label><textarea id="supObs"></textarea></div><div class="support-actions"><button class="support-btn" id="supGuardar">💾 Guardar registro</button><button class="support-btn alt" id="supLimpiar" type="button">↺ Limpiar</button></div><div id="supMsg" class="support-msg"></div></div></div>`;
   main.appendChild(sec);
 
-  function allHide(){['viewer','stats','recess','portal-home','apoyo-refuerzo'].forEach(id=>{const e=document.getElementById(id);if(e)e.style.display='none'})}
+  function allHide(){['viewer','stats','recess','calendar','portal-home','apoyo-refuerzo'].forEach(id=>{const e=document.getElementById(id);if(e)e.style.display='none'})}
   function resetNav(){document.querySelectorAll('.nav button').forEach(x=>x.classList.remove('active'));[home,apoyo].forEach(a=>{a.style.color='#475569';a.style.background='#fff'})}
   function showHome(){allHide();resetNav();homeSec.style.display='block';home.style.color='#fff';home.style.background='linear-gradient(135deg,#2563eb,#7c3aed)';history.replaceState(null,'','#inicio')}
   function showSupport(){allHide();resetNav();sec.style.display='block';apoyo.style.color='#fff';apoyo.style.background='linear-gradient(135deg,#2563eb,#7c3aed)';history.replaceState(null,'','#apoyo-refuerzo');warmStudentCache()}
