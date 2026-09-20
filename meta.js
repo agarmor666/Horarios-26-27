@@ -18,7 +18,9 @@ window.H={"d":["Lunes","Martes","Miércoles","Jueves","Viernes"],"h":["09:00-09:
   nav.insertBefore(home,nav.firstChild);
 
   const asuntos=document.createElement('a');
-  asuntos.href='https://agarmor666.github.io/asuntos-propios/';
+  asuntos.href='#asuntos-propios';
+  asuntos.dataset.embedUrl='https://agarmor666.github.io/asuntos-propios/';
+  asuntos.dataset.embedTitle='📝 Asuntos propios';
   asuntos.className='nav-asuntos';
   asuntos.textContent='📝 Asuntos propios';
   asuntos.style.cssText=commonLink;
@@ -83,14 +85,32 @@ window.H={"d":["Lunes","Martes","Miércoles","Jueves","Viernes"],"h":["09:00-09:
   sec.innerHTML=`<h2 class="title">🧩 Registro de apoyo y refuerzo · Curso 2026/27</h2><p class="hint">Registro interno del CEIP Bartolomé Flores.</p><div class="support-grid"><div class="support-card"><h3>1. Datos de la sesión</h3><div class="support-required-note"><span class="support-required">*</span> Campos obligatorios</div><div class="support-field"><label>Maestra/o de apoyo <span class="support-required" aria-hidden="true">*</span></label><select id="supDocente"><option value="">Seleccionar docente…</option>${docentes.map(d=>`<option>${d}</option>`).join('')}</select></div><div class="support-field"><label for="supArea">Área / ámbito <span class="support-required" aria-hidden="true">*</span></label><select id="supArea"><option value="">Seleccionar área / ámbito…</option><option>Lengua Castellana y Literatura</option><option>Matemáticas</option><option>Conocimiento del Medio</option><option>Inglés</option><option>Francés</option><option>Educación Física</option><option>Educación Artística</option><option>Religión / Atención Educativa</option><option>Comunicación y Representación de la Realidad</option><option>Crecimiento en Armonía</option><option>Descubrimiento y Exploración del Entorno</option><option>Otro ámbito</option></select></div><div class="support-field"><label>Fecha <span class="support-required" aria-hidden="true">*</span></label><input type="date" id="supFecha" min="2026-09-10" max="2027-06-22"></div><div class="support-field"><label>Sesión / tramo horario <span class="support-required" aria-hidden="true">*</span></label><div class="support-tramos">${tramos.map(t=>`<label class="support-check"><input type="checkbox" name="supTramo" value="${t}"> ${t}</label>`).join('')}</div></div></div><div class="support-card"><h3>2. Organización del apoyo</h3><div class="support-required-note"><span class="support-required">*</span> Campos obligatorios</div><div class="support-field"><label>Lugar de la sesión <span class="support-required" aria-hidden="true">*</span></label><select id="supLugar"><option value="">Seleccionar…</option><option>Dentro del aula</option><option>Fuera del aula</option></select></div><div class="support-field"><label>Tipo de sesión <span class="support-required" aria-hidden="true">*</span></label><select id="supTipo"><option value="">Seleccionar…</option><option>Individual</option><option>Pequeño grupo</option><option>Gran grupo</option></select></div><div class="support-field"><label>Grupo <span class="support-required" aria-hidden="true">*</span></label><select id="supGrupo"><option value="">Seleccionar grupo…</option>${H.g.map(g=>`<option>${g}</option>`).join('')}</select></div><div class="support-field"><label for="supAlumnado">Alumna/o/s que recibe el apoyo <span class="support-required" aria-hidden="true">*</span></label><select id="supAlumnado" disabled><option value="">Selecciona primero un grupo…</option></select><div class="support-student-help">Selecciona un alumno cada vez. Se irá añadiendo a la fila inferior.</div><div id="supSeleccionados" class="support-student-row"><span class="support-student-empty">Todavía no has añadido alumnado.</span></div></div></div><div class="support-card" style="grid-column:1/-1"><h3>3. Intervención realizada</h3><div class="support-field"><label>Actividad / contenidos reforzados</label><textarea id="supContenido"></textarea></div><div class="support-field"><label>Observaciones</label><textarea id="supObs"></textarea></div><div class="support-actions"><button class="support-btn" id="supGuardar">💾 Guardar registro</button><button class="support-btn alt" id="supLimpiar" type="button">↺ Limpiar</button></div><div id="supMsg" class="support-msg"></div></div></div>`;
   main.appendChild(sec);
 
-  function allHide(){['viewer','stats','recess','calendar','portal-home','apoyo-refuerzo'].forEach(id=>{const e=document.getElementById(id);if(e)e.style.display='none'})}
-  function resetNav(){document.querySelectorAll('.nav button').forEach(x=>x.classList.remove('active'));[home,apoyo].forEach(a=>{a.style.color='#475569';a.style.background='#fff'})}
+  const embeddedSec=document.createElement('section');
+  embeddedSec.id='external-portal';
+  embeddedSec.style.display='none';
+  embeddedSec.innerHTML='<h2 class="title" id="externalPortalTitle"></h2><p class="hint">Contenido integrado en el portal del CEIP Bartolomé Flores.</p><div class="external-frame-wrap"><iframe id="externalPortalFrame" title="Contenido integrado" loading="eager" allow="clipboard-read; clipboard-write"></iframe></div>';
+  main.appendChild(embeddedSec);
+  const embeddedFrame=embeddedSec.querySelector('#externalPortalFrame');
+  const embeddedTitle=embeddedSec.querySelector('#externalPortalTitle');
+
+  const embeddedStyle=document.createElement('style');
+  embeddedStyle.textContent=`
+    .external-frame-wrap{overflow:hidden;border:1px solid #dbe3ec;border-radius:16px;background:#fff;box-shadow:0 5px 18px #0001}
+    #externalPortalFrame{display:block;width:100%;height:max(760px,calc(100vh - 235px));border:0;background:#fff}
+    @media(max-width:760px){#externalPortalFrame{height:max(720px,calc(100vh - 190px))}}
+  `;
+  document.head.appendChild(embeddedStyle);
+
+  function allHide(){['viewer','stats','recess','calendar','portal-home','apoyo-refuerzo','external-portal'].forEach(id=>{const e=document.getElementById(id);if(e)e.style.display='none'})}
+  function resetNav(){document.querySelectorAll('.nav button,.nav a').forEach(x=>x.classList.remove('active'));[home,apoyo].forEach(a=>{a.style.color='#475569';a.style.background='#fff'})}
   function showHome(){allHide();resetNav();homeSec.style.display='block';home.style.color='#fff';home.style.background='linear-gradient(135deg,#2563eb,#7c3aed)';history.replaceState(null,'','#inicio')}
   function showSupport(){allHide();resetNav();sec.style.display='block';apoyo.style.color='#fff';apoyo.style.background='linear-gradient(135deg,#2563eb,#7c3aed)';history.replaceState(null,'','#apoyo-refuerzo');warmStudentCache()}
+  function showEmbedded(link){allHide();resetNav();embeddedTitle.textContent=link.dataset.embedTitle||link.textContent.trim();if(embeddedFrame.src!==link.dataset.embedUrl)embeddedFrame.src=link.dataset.embedUrl;embeddedSec.style.display='block';link.classList.add('active');history.replaceState(null,'',link.getAttribute('href'))}
   home.addEventListener('click',e=>{e.preventDefault();showHome()});apoyo.addEventListener('click',e=>{e.preventDefault();showSupport()});
+  document.querySelectorAll('[data-embed-url]').forEach(link=>link.addEventListener('click',e=>{e.preventDefault();showEmbedded(link)}));
 
   function blankDropdown(kind){setTimeout(()=>{const sel=document.getElementById('entity'),title=document.getElementById('title'),tbl=document.getElementById('tbl');if(!sel)return;const label=kind==='groups'?'Seleccionar grupo…':'Seleccionar profesor/a…';const o=document.createElement('option');o.value='-1';o.textContent=label;sel.insertBefore(o,sel.firstChild);sel.value='-1';if(title)title.textContent='';if(tbl)tbl.innerHTML='';},0)}
-  document.querySelectorAll('.nav button').forEach(b=>b.addEventListener('click',()=>{homeSec.style.display='none';sec.style.display='none';home.style.color='#475569';home.style.background='#fff';apoyo.style.color='#475569';apoyo.style.background='#fff';if(b.dataset.k==='groups'||b.dataset.k==='teachers')blankDropdown(b.dataset.k)}));
+  document.querySelectorAll('.nav button').forEach(b=>b.addEventListener('click',()=>{homeSec.style.display='none';sec.style.display='none';embeddedSec.style.display='none';document.querySelectorAll('[data-embed-url]').forEach(x=>x.classList.remove('active'));home.style.color='#475569';home.style.background='#fff';apoyo.style.color='#475569';apoyo.style.background='#fff';if(b.dataset.k==='groups'||b.dataset.k==='teachers')blankDropdown(b.dataset.k)}));
 
   function openEntity(kind,idx){const btn=nav.querySelector(`button[data-k="${kind}"]`);if(!btn)return;btn.click();setTimeout(()=>{const sel=document.getElementById('entity');if(!sel)return;sel.value=String(idx);if(window.render)window.render(idx);},20)}
   document.getElementById('homeGroup').addEventListener('change',e=>{if(e.target.value!=='')openEntity('groups',+e.target.value)});
@@ -172,5 +192,5 @@ window.H={"d":["Lunes","Martes","Miércoles","Jueves","Viernes"],"h":["09:00-09:
   document.getElementById('supSeleccionados').addEventListener('click',e=>{const b=e.target.closest('[data-remove-student]');if(!b)return;selectedStudentNames.delete(b.dataset.removeStudent);studentAttitudes.delete(b.dataset.removeStudent);renderSelectedStudents()});
   document.getElementById('supSeleccionados').addEventListener('change',e=>{if(e.target.matches('[data-student-attitude]'))studentAttitudes.set(e.target.dataset.studentAttitude,e.target.value)});
   document.getElementById('supGuardar').addEventListener('click',saveSupport);document.getElementById('supLimpiar').addEventListener('click',clearForm);
-  setTimeout(()=>{if(location.hash==='#apoyo-refuerzo')showSupport();else showHome()},0);
+  setTimeout(()=>{const embeddedLink=document.querySelector('[data-embed-url][href="'+location.hash+'"]');if(location.hash==='#apoyo-refuerzo')showSupport();else if(embeddedLink)showEmbedded(embeddedLink);else showHome()},0);
 })();
