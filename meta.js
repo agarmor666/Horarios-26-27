@@ -34,7 +34,9 @@ window.H={"d":["Lunes","Martes","Miércoles","Jueves","Viernes"],"h":["09:00-09:
   nav.appendChild(apoyo);
 
   const planCentro=document.createElement('a');
-  planCentro.href='https://agarmor666.github.io/plan-de-centro/';
+  planCentro.href='#plan-de-centro';
+  planCentro.dataset.embedUrl='https://agarmor666.github.io/plan-de-centro/';
+  planCentro.dataset.embedTitle='🏫 Plan de Centro';
   planCentro.className='nav-plan';
   planCentro.textContent='🏫 Plan de Centro';
   planCentro.style.cssText=commonLink;
