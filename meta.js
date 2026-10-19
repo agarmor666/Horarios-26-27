@@ -33,6 +33,15 @@ window.H={"d":["Lunes","Martes","Miércoles","Jueves","Viernes"],"h":["09:00-09:
   apoyo.style.cssText=commonLink;
   nav.appendChild(apoyo);
 
+  const compromisos=document.createElement('a');
+  compromisos.href='#compromisos-educativos';
+  compromisos.dataset.embedUrl='compromisos.html';
+  compromisos.dataset.embedTitle='📘 Compromisos educativos';
+  compromisos.className='nav-compromisos';
+  compromisos.textContent='📘 Compromisos educativos';
+  compromisos.style.cssText=commonLink;
+  nav.appendChild(compromisos);
+
   const planCentro=document.createElement('a');
   planCentro.href='#plan-de-centro';
   planCentro.dataset.embedUrl='https://agarmor666.github.io/plan-de-centro/';
@@ -53,6 +62,7 @@ window.H={"d":["Lunes","Martes","Miércoles","Jueves","Viernes"],"h":["09:00-09:
     #portal-home .home-card{border:1px solid #dbe3ec;border-radius:16px;padding:18px;background:linear-gradient(135deg,#fff,#f8fafc);box-shadow:0 5px 18px #0001}
     #portal-home .home-card h3{margin:0 0 8px}.home-card p{margin:0 0 12px;color:#64748b}
     #portal-home select{width:100%;padding:12px;border:1px solid #cbd5e1;border-radius:11px;background:#fff;font:inherit;font-weight:700}
+    .nav .nav-compromisos{background:linear-gradient(135deg,#0f766e,#14b8a6)!important}
     #apoyo-refuerzo .support-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
     #apoyo-refuerzo .support-card{background:#fff;border:1px solid #dbe3ec;border-radius:16px;padding:18px;box-shadow:0 5px 18px #0001}
     #apoyo-refuerzo .support-card h3{margin:0 0 14px;color:#334155}.support-required{color:#dc2626;font-weight:900;margin-left:3px}.support-required-note{margin:-4px 0 14px;color:#64748b;font-size:.82rem}.support-required-note .support-required{margin-left:0}

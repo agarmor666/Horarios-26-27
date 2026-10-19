@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#0f766e">
+  <title>Compromisos educativos · CEIP Bartolomé Flores</title>
+  <style>
+    :root{--ink:#172033;--muted:#64748b;--line:#dbe3ec;--green:#0f766e;--green2:#14b8a6;--soft:#f0fdfa;--warn:#9a3412;--danger:#b91c1c}
+    *{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:#f5f7fa;color:var(--ink);font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;line-height:1.5}
+    button,input,select,textarea{font:inherit}.shell{max-width:1080px;margin:auto;padding:18px}.top{display:grid;grid-template-columns:88px 1fr 88px;align-items:center;gap:18px;background:linear-gradient(135deg,#fff,#ecfeff);border:1px solid var(--line);border-top:6px solid var(--green);border-radius:22px;padding:18px 24px;box-shadow:0 12px 32px #0f172a12}.top img{width:84px;height:76px;object-fit:contain}.top img:last-child{justify-self:end}.top-copy{text-align:center}.top h1{font-size:clamp(1.45rem,4vw,2.25rem);line-height:1.05;margin:0}.top p{margin:6px 0 0;color:var(--muted);font-weight:700}.home{display:inline-flex;align-items:center;gap:7px;margin:14px 0 0;padding:10px 14px;border-radius:11px;background:#0f172a;color:#fff;text-decoration:none;font-weight:850}
+    .intro{margin:18px 0;padding:17px 20px;border-radius:16px;background:#fff;border:1px solid var(--line)}.intro strong{color:var(--green)}.required{color:#dc2626;font-weight:900}.type-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:18px 0}.type-card{position:relative;display:block;border:2px solid var(--line);border-radius:18px;background:#fff;padding:18px;cursor:pointer;transition:.15s}.type-card:hover{transform:translateY(-1px);box-shadow:0 8px 20px #0f172a12}.type-card:has(input:checked){border-color:var(--green);background:var(--soft);box-shadow:0 0 0 3px #99f6e455}.type-card input{position:absolute;opacity:0}.type-card b{display:block;font-size:1.05rem}.type-card span{display:block;margin-top:5px;color:var(--muted);font-size:.9rem}
+    form{display:grid;gap:16px}.panel{background:#fff;border:1px solid var(--line);border-radius:18px;padding:20px;box-shadow:0 5px 18px #0f172a0b}.panel h2{margin:0 0 15px;font-size:1.15rem;color:#334155}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.field.full{grid-column:1/-1}.field label,.label{display:block;margin-bottom:6px;font-size:.9rem;font-weight:850;color:#334155}.field input,.field select,.field textarea{width:100%;border:1px solid #cbd5e1;border-radius:11px;background:#fff;padding:11px 12px;color:var(--ink)}.field input:focus,.field select:focus,.field textarea:focus{outline:3px solid #99f6e4;border-color:var(--green)}textarea{min-height:92px;resize:vertical}.checks{display:grid;gap:9px}.check{display:flex;gap:10px;align-items:flex-start;border:1px solid #e2e8f0;border-radius:12px;background:#f8fafc;padding:11px 12px;cursor:pointer}.check:has(input:checked){background:#ecfdf5;border-color:#6ee7b7}.check input{flex:0 0 auto;width:18px;height:18px;margin-top:2px}.center-box{margin-top:14px;border-left:5px solid var(--green);background:var(--soft);padding:13px 15px;border-radius:10px}.center-box h3{margin:0 0 7px;font-size:.95rem}.center-box ul{margin:0;padding-left:20px;color:#334155}
+    .signature-wrap{border:1px dashed #94a3b8;border-radius:14px;background:#fff;overflow:hidden}.signature-wrap canvas{display:block;width:100%;height:170px;touch-action:none;cursor:crosshair}.signature-tools{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:8px 10px;background:#f8fafc;border-top:1px solid #e2e8f0}.signature-tools span{font-size:.82rem;color:var(--muted)}.small-btn{border:0;border-radius:9px;padding:8px 11px;background:#475569;color:#fff;font-weight:800;cursor:pointer}.accept{display:flex;gap:10px;align-items:flex-start;margin-top:14px;padding:12px;border-radius:11px;background:#f8fafc}.accept input{width:19px;height:19px;flex:0 0 auto;margin-top:2px}.privacy{font-size:.82rem;color:var(--muted)}.actions{display:flex;gap:10px;flex-wrap:wrap}.primary{border:0;border-radius:12px;padding:13px 20px;background:linear-gradient(135deg,var(--green),var(--green2));color:#fff;font-weight:900;cursor:pointer;box-shadow:0 7px 16px #0f766e33}.primary:disabled{opacity:.55;cursor:wait}.secondary{border:0;border-radius:12px;padding:13px 18px;background:#e2e8f0;color:#334155;font-weight:850;cursor:pointer}.message{display:none;padding:14px 16px;border-radius:12px;font-weight:750}.message.show{display:block}.message.warn{background:#fff7ed;color:var(--warn);border:1px solid #fdba74}.message.error{background:#fef2f2;color:var(--danger);border:1px solid #fca5a5}.message.success{background:#ecfdf5;color:#166534;border:1px solid #6ee7b7}.success-code{display:block;margin-top:8px;font-size:1.15rem;color:#065f46}.hp{position:absolute!important;left:-9999px!important;width:1px!important;height:1px!important;opacity:0!important}footer{text-align:center;color:var(--muted);font-size:.82rem;padding:20px}.hidden{display:none!important}
+    @media(max-width:720px){.shell{padding:10px}.top{grid-template-columns:58px 1fr 58px;padding:14px 12px}.top img{width:58px;height:58px}.top p{font-size:.78rem}.type-grid,.grid{grid-template-columns:1fr}.field.full{grid-column:auto}.panel{padding:16px}.signature-wrap canvas{height:145px}}
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <header class="top">
+      <img src="logo-mojacar.png" alt="Mojácar">
+      <div class="top-copy"><h1>Compromisos educativos</h1><p>CEIP Bartolomé Flores · Mojácar · Curso 2026/27</p></div>
+      <img src="escudo-colegio.png" alt="Escudo del CEIP Bartolomé Flores">
+    </header>
+    <a class="home" href="./#inicio" target="_top">🏠 Volver al portal principal</a>
+    <section class="intro"><strong>Formulario para las familias.</strong> Selecciona el tipo de compromiso, completa los datos y firma la solicitud. El centro la revisará antes de darla por validada. Los campos marcados con <span class="required">*</span> son obligatorios.</section>
+
+    <form id="commitmentForm" novalidate>
+      <div class="type-grid" role="radiogroup" aria-label="Tipo de compromiso">
+        <label class="type-card"><input type="radio" name="tipo" value="educativo" checked><b>📘 Compromiso educativo</b><span>Para mejorar el progreso escolar, los hábitos de estudio, el esfuerzo y la autonomía.</span></label>
+        <label class="type-card"><input type="radio" name="tipo" value="convivencia"><b>🤝 Compromiso de convivencia</b><span>Para mejorar el comportamiento, el respeto, la integración y el cumplimiento de las normas.</span></label>
+      </div>
+
+      <section class="panel">
+        <h2>1. Personas que suscriben el compromiso</h2>
+        <div class="grid">
+          <div class="field"><label for="representante">Representante legal <span class="required">*</span></label><input id="representante" name="representante" autocomplete="name" required maxlength="120"></div>
+          <div class="field"><label for="email">Correo electrónico familiar <span class="required">*</span></label><input id="email" name="email" type="email" autocomplete="email" required maxlength="160"></div>
+          <div class="field"><label for="parentesco">Relación con el alumno/a <span class="required">*</span></label><select id="parentesco" name="parentesco" required><option value="">Seleccionar…</option><option>Madre</option><option>Padre</option><option>Tutor/a legal</option><option>Otro representante legal</option></select></div>
+          <div class="field"><label for="alumno">Alumno/a <span class="required">*</span></label><input id="alumno" name="alumno" required maxlength="120"></div>
+          <div class="field"><label for="grupo">Grupo <span class="required">*</span></label><select id="grupo" name="grupo" required><option value="">Seleccionar grupo…</option><option>I 3 A</option><option>I 3 B</option><option>I 4 A</option><option>I 4 B</option><option>I 5 A</option><option>I 5 B</option><option>1.º A</option><option>1.º B</option><option>2.º A</option><option>2.º B</option><option>3.º A</option><option>3.º B</option><option>4.º A</option><option>4.º B</option><option>5.º A</option><option>5.º B</option><option>6.º A</option><option>6.º B</option><option>6.º C</option></select></div>
+          <div class="field"><label for="tutor">Tutor/a <span class="required">*</span></label><input id="tutor" name="tutor" required maxlength="120" placeholder="Nombre y apellidos"></div>
+          <div class="field full"><label for="duracion">Duración prevista del compromiso <span class="required">*</span></label><select id="duracion" name="duracion" required><option value="">Seleccionar duración…</option><option>Hasta la próxima revisión mensual</option><option>Un trimestre</option><option>Hasta finalizar el curso 2026/27</option><option>Otra duración, indicada en observaciones</option></select></div>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h2>2. Objetivos que se pretenden <span class="required">*</span></h2>
+        <div id="objectives" class="checks"></div>
+        <div class="field" style="margin-top:12px"><label for="otroObjetivo">Otro objetivo</label><input id="otroObjetivo" name="otroObjetivo" maxlength="300"></div>
+      </section>
+
+      <section class="panel">
+        <h2>3. Compromisos de la familia <span class="required">*</span></h2>
+        <div id="familyCommitments" class="checks"></div>
+        <div class="field" style="margin-top:12px"><label for="otroCompromiso">Otro compromiso</label><input id="otroCompromiso" name="otroCompromiso" maxlength="300"></div>
+        <div class="center-box"><h3>Compromisos que asumirá el centro tras su validación</h3><ul id="centerCommitments"></ul></div>
+      </section>
+
+      <section class="panel">
+        <h2>4. Observaciones y firma familiar</h2>
+        <div class="field"><label for="observaciones">Observaciones</label><textarea id="observaciones" name="observaciones" maxlength="1500" placeholder="Información que deba conocer el tutor o tutora."></textarea></div>
+        <div class="field"><label for="firmante">Nombre completo de la persona firmante <span class="required">*</span></label><input id="firmante" name="firmante" required maxlength="120"></div>
+        <span class="label">Firma manuscrita <span class="required">*</span></span>
+        <div class="signature-wrap"><canvas id="signature" aria-label="Zona para firmar"></canvas><div class="signature-tools"><span>Firma con el ratón o con el dedo.</span><button class="small-btn" id="clearSignature" type="button">Borrar firma</button></div></div>
+        <label class="accept"><input id="aceptacion" type="checkbox" required><span>Declaro que soy representante legal del alumno/a, que los datos son correctos y que acepto los compromisos seleccionados, pendientes de validación por el centro. <span class="required">*</span></span></label>
+        <p class="privacy">Los datos se utilizarán exclusivamente para tramitar, documentar y realizar el seguimiento del compromiso educativo o de convivencia. No se solicita DNI ni información ajena a este procedimiento.</p>
+        <input class="hp" id="website" name="website" tabindex="-1" autocomplete="off" aria-hidden="true">
+      </section>
+
+      <div class="actions"><button class="primary" id="submitBtn" type="submit">Enviar compromiso</button><button class="secondary" id="resetBtn" type="button">Limpiar formulario</button></div>
+      <div id="message" class="message" role="status" aria-live="polite"></div>
+    </form>
+    <footer>CEIP Bartolomé Flores · Código 04003160 · Plaza Rey Alabez, 11 · 04638 Mojácar (Almería)</footer>
+  </div>
+  <script src="compromisos-config.js"></script>
+  <script>
+    const DATA={
+      educativo:{
+        objectives:[
+          'Conocer, compartir y facilitar el logro de los objetivos educativos adecuados al alumno/a.',
+          'Comunicarse de manera habitual y positiva sobre el progreso y el desarrollo personal del alumno/a.',
+          'Mejorar los resultados escolares del alumno/a.',
+          'Mejorar los hábitos de estudio y esfuerzo del alumno/a.',
+          'Mejorar la autonomía y responsabilidad del alumno/a en el cumplimiento de las tareas escolares.'
+        ],
+        family:[
+          'Favorecer y controlar la asistencia diaria y puntual del alumno/a al centro y con los materiales necesarios para las clases.',
+          'Aceptar y cumplir las indicaciones del profesorado para el progreso educativo del alumno/a.',
+          'Facilitar un ambiente, horario y condiciones de estudio adecuadas para el alumno/a y procurar el cuidado de los materiales educativos.',
+          'Colaborar en el control y cumplimiento de las tareas escolares del alumno/a.',
+          'Mantener una comunicación fluida con el tutor o tutora del alumno/a.'
+        ],
+        center:[
+          'Controlar diariamente la asistencia e informar de las ausencias.',
+          'Proporcionar los recursos e indicaciones necesarios para el progreso escolar.',
+          'Mantener las entrevistas periódicas con los representantes legales.',
+          'Facilitar hábitos de estudio y el apoyo pedagógico necesario.'
+        ]
+      },
+      convivencia:{
+        objectives:[
+          'Conocer, compartir y facilitar el logro de los objetivos educativos adecuados al alumno/a.',
+          'Comunicarse de manera habitual y positiva sobre el progreso y el desarrollo personal del alumno/a.',
+          'Mejorar el comportamiento del alumno/a y su aceptación de las normas de convivencia del centro.',
+          'Mejorar la actitud hacia las personas de la comunidad educativa y relacionarse de manera respetuosa y colaborativa.',
+          'Mejorar la integración escolar del alumno/a en el centro.'
+        ],
+        family:[
+          'Favorecer y controlar la asistencia diaria y puntual del alumno/a al centro y con los materiales necesarios para las clases.',
+          'Aceptar y cumplir las indicaciones del profesorado para la mejora de la convivencia.',
+          'Colaborar con el centro para la modificación de la conducta del alumno/a en relación con su convivencia.',
+          'Colaborar para mejorar la percepción y valoración del centro y del profesorado.',
+          'Informarse periódicamente sobre la actitud y conducta del alumno/a e intervenir cuando sea necesario.',
+          'Mantener una actitud positiva y dialogante con la dirección, el tutor/a y el profesorado.',
+          'Colaborar en el cumplimiento de las correcciones o medidas disciplinarias que se adopten.'
+        ],
+        center:[
+          'Controlar diariamente la asistencia e informar de las ausencias.',
+          'Realizar entrevistas periódicas entre los representantes legales y el tutor/a.',
+          'Realizar el seguimiento e informar sobre los cambios de actitud.',
+          'Aplicar actuaciones preventivas individualizadas y facilitar el apoyo pedagógico necesario.'
+        ]
+      }
+    };
+    const form=document.getElementById('commitmentForm'),canvas=document.getElementById('signature'),ctx=canvas.getContext('2d'),message=document.getElementById('message'),submitBtn=document.getElementById('submitBtn');
+    let drawing=false,signed=false,last={x:0,y:0};
+    function esc(s){return String(s).replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]))}
+    function renderOptions(){const type=form.elements.tipo.value,d=DATA[type];document.getElementById('objectives').innerHTML=d.objectives.map((x,i)=>`<label class="check"><input type="checkbox" name="objetivos" value="${esc(x)}" ${i<2?'checked':''}><span>${esc(x)}</span></label>`).join('');document.getElementById('familyCommitments').innerHTML=d.family.map(x=>`<label class="check"><input type="checkbox" name="familia" value="${esc(x)}" checked><span>${esc(x)}</span></label>`).join('');document.getElementById('centerCommitments').innerHTML=d.center.map(x=>`<li>${esc(x)}</li>`).join('')}
+    function resizeCanvas(){const ratio=Math.max(1,window.devicePixelRatio||1),rect=canvas.getBoundingClientRect();canvas.width=Math.round(rect.width*ratio);canvas.height=Math.round(rect.height*ratio);ctx.setTransform(ratio,0,0,ratio,0,0);ctx.lineWidth=2.2;ctx.lineCap='round';ctx.lineJoin='round';ctx.strokeStyle='#172033';signed=false}
+    function point(e){const r=canvas.getBoundingClientRect(),p=e.touches?e.touches[0]:e;return{x:p.clientX-r.left,y:p.clientY-r.top}}
+    function start(e){e.preventDefault();drawing=true;last=point(e)}
+    function move(e){if(!drawing)return;e.preventDefault();const p=point(e);ctx.beginPath();ctx.moveTo(last.x,last.y);ctx.lineTo(p.x,p.y);ctx.stroke();last=p;signed=true}
+    function end(){drawing=false}
+    function clearSignature(){ctx.clearRect(0,0,canvas.width,canvas.height);signed=false}
+    function checked(name){return[...form.querySelectorAll(`input[name="${name}"]:checked`)].map(x=>x.value)}
+    function show(text,type){message.className='message show '+type;message.innerHTML=text;message.scrollIntoView({behavior:'smooth',block:'center'})}
+    function payload(){return{action:'submitCommitment',tipo:form.elements.tipo.value,representante:form.representante.value.trim(),email:form.email.value.trim(),parentesco:form.parentesco.value,alumno:form.alumno.value.trim(),grupo:form.grupo.value,tutor:form.tutor.value.trim(),duracion:form.duracion.value,objetivos:checked('objetivos'),otroObjetivo:form.otroObjetivo.value.trim(),compromisosFamilia:checked('familia'),otroCompromiso:form.otroCompromiso.value.trim(),observaciones:form.observaciones.value.trim(),firmante:form.firmante.value.trim(),aceptacion:form.querySelector('#aceptacion').checked,firma:canvas.toDataURL('image/png'),website:form.website.value,urlOrigen:location.href,enviadoEn:new Date().toISOString()}}
+    form.addEventListener('change',e=>{if(e.target.name==='tipo')renderOptions()});
+    form.addEventListener('submit',async e=>{e.preventDefault();if(!form.reportValidity())return;if(!checked('objetivos').length)return show('Selecciona al menos un objetivo.','error');if(!checked('familia').length)return show('Selecciona al menos un compromiso de la familia.','error');if(!signed)return show('Falta la firma manuscrita.','error');const api=(window.COMPROMISOS_CONFIG||{}).apiUrl||'';if(!/^https:\/\/script\.google\.com\/macros\/s\//.test(api))return show('El formulario está preparado, pero falta activar la conexión segura con el registro del centro.','warn');submitBtn.disabled=true;submitBtn.textContent='Enviando…';show('Enviando la solicitud y generando el justificante…','warn');try{const r=await fetch(api,{method:'POST',redirect:'follow',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(payload())});const j=await r.json();if(!j.ok)throw new Error(j.message||'No se pudo registrar');show(`Solicitud enviada correctamente. Queda pendiente de validación por el centro.<strong class="success-code">Código: ${esc(j.code)}</strong>Recibirás una copia en el correo indicado.`,'success');form.reset();renderOptions();clearSignature()}catch(err){show('No se ha podido enviar la solicitud: '+esc(err.message||'error desconocido')+'. No vuelvas a enviarla hasta comprobar la conexión.','error')}finally{submitBtn.disabled=false;submitBtn.textContent='Enviar compromiso'}});
+    document.getElementById('clearSignature').addEventListener('click',clearSignature);document.getElementById('resetBtn').addEventListener('click',()=>{form.reset();renderOptions();clearSignature();message.className='message'});['mousedown','touchstart'].forEach(x=>canvas.addEventListener(x,start,{passive:false}));['mousemove','touchmove'].forEach(x=>canvas.addEventListener(x,move,{passive:false}));['mouseup','mouseleave','touchend','touchcancel'].forEach(x=>canvas.addEventListener(x,end));
+    window.addEventListener('resize',()=>{if(!signed)resizeCanvas()});renderOptions();requestAnimationFrame(resizeCanvas);
+  </script>
+</body>
+</html>
