@@ -10,7 +10,8 @@ const HEADERS = [
   'Correo familiar','Parentesco','Alumno/a','Grupo','Tutor/a','Duración','Objetivos',
   'Otro objetivo','Compromisos de la familia','Otros compromisos','Observaciones',
   'Nombre de la persona firmante','Aceptación','Documento PDF','Fecha de seguimiento',
-  'Observaciones de seguimiento','Estado final','Valoración final'
+  'Observaciones de seguimiento','Estado final','Valoración final',
+  'Compromisos del centro','Otros compromisos del centro','Versión del modelo'
 ];
 
 function doGet() {
@@ -53,6 +54,7 @@ function validate_(d) {
   if (!['educativo','convivencia'].includes(d.tipo)) throw new Error('Tipo de compromiso no válido');
   if (!Array.isArray(d.objetivos) || !d.objetivos.length) throw new Error('Debe seleccionarse al menos un objetivo');
   if (!Array.isArray(d.compromisosFamilia) || !d.compromisosFamilia.length) throw new Error('Debe seleccionarse al menos un compromiso familiar');
+  if (!Array.isArray(d.compromisosCentro) || !d.compromisosCentro.length) throw new Error('Debe seleccionarse al menos un compromiso del centro');
   if (d.aceptacion !== true) throw new Error('Falta la aceptación expresa');
   if (!/^data:image\/png;base64,/.test(String(d.firma || ''))) throw new Error('Falta la firma manuscrita');
   if (String(d.firma).length > 750000) throw new Error('La firma supera el tamaño permitido');
@@ -67,7 +69,8 @@ function appendRow_(d,code,date,pdfUrl) {
     code,date,labelType_(d.tipo),'Pendiente de validación',safe_(d.representante),safe_(d.email),
     safe_(d.parentesco),safe_(d.alumno),safe_(d.grupo),safe_(d.tutor),safe_(d.duracion),
     safe_(d.objetivos.join(' | ')),safe_(d.otroObjetivo),safe_(d.compromisosFamilia.join(' | ')),
-    safe_(d.otroCompromiso),safe_(d.observaciones),safe_(d.firmante),'Sí',pdfUrl,'','','',''
+    safe_(d.otroCompromiso),safe_(d.observaciones),safe_(d.firmante),'Sí',pdfUrl,'','','','',
+    safe_(d.compromisosCentro.join(' | ')),safe_(d.otroCompromisoCentro),safe_(d.modeloVersion)
   ];
   sh.appendRow(row);
   sh.getRange(sh.getLastRow(),2).setNumberFormat('dd/mm/yyyy hh:mm');
@@ -96,6 +99,7 @@ function createPdf_(d,code,date) {
   addField_(body,'Duración prevista',d.duracion);
   addList_(body,'Objetivos seleccionados',d.objetivos,d.otroObjetivo);
   addList_(body,'Compromisos de la familia',d.compromisosFamilia,d.otroCompromiso);
+  addList_(body,'Compromisos del centro',d.compromisosCentro,d.otroCompromisoCentro);
   addField_(body,'Observaciones',d.observaciones || 'Sin observaciones');
   body.appendParagraph('Firma del representante legal').setHeading(DocumentApp.ParagraphHeading.HEADING2);
   body.appendParagraph(d.firmante);
