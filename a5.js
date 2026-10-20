@@ -4,11 +4,8 @@ H.a.push(...[[0,4,1,46,[18],[]],[0,6,1,39,[18],[]],[0,7,1,42,[18],[]],[0,8,1,38,
 document.addEventListener('DOMContentLoaded',()=>{
   if(typeof CALENDAR_EVENTS==='undefined') return;
   const extra=[
-    {month:'Septiembre 2026',date:'Martes 22 septiembre',time:'09:00–13:00',name:'Ponteguildo · Cruz Roja',type:'Actividades complementarias',mode:'Confirmada',status:'CONFIRMADA',professional:'Cruz Roja',group:'6º A · 6º B · 6º C',details:'6º A 09:00–10:00 · 6º C 10:00–11:00 · 6º B 12:00–13:00. Tramo 11:00–12:00 libre.'},
     {month:'Septiembre 2026',date:'Miércoles 23 septiembre',time:'09:30–14:00',name:'Jornada de introducción al Baloncesto',type:'Actividades complementarias',mode:'Confirmada',status:'CONFIRMADA',professional:'Actividad externa',group:'1º a 6º de Primaria',details:'1º 09:30–10:10 · 2º 10:10–10:50 · 3º 10:50–11:30 · recreo 11:30–12:00 · 4º 12:00–12:40 · 5º 12:40–13:20 · 6º 13:20–14:00.'},
     {month:'Octubre 2026',date:'Jueves 8 octubre',time:'Por concretar',name:'Recogida de consentimientos',type:'Actividades complementarias',mode:'Programada',status:'PROGRAMADA',professional:'Enfermera de referencia',group:'Por concretar',details:'Actuación del primer trimestre.'},
-    {month:'Octubre 2026',date:'Viernes 9 octubre',time:'Por concretar',name:'Vacunación',type:'Actividades complementarias',mode:'Programada',status:'PROGRAMADA',professional:'Enfermera de referencia',group:'Por concretar',details:'Actuación del primer trimestre.'},
-    {month:'Octubre 2026',date:'Miércoles 21 octubre',time:'Por concretar',name:'Charla sobre adicciones digitales',type:'Actividades complementarias',mode:'Programada',status:'PROGRAMADA',professional:'Enfermera de referencia',group:'Por concretar',details:'Actuación del primer trimestre.'},
     {month:'Noviembre 2026',date:'Jueves 5 noviembre',time:'Por concretar',name:'Charla sobre la fiebre',type:'Actividades complementarias',mode:'Programada',status:'PROGRAMADA',professional:'Enfermera de referencia',group:'Por concretar',details:'Actuación del primer trimestre.'},
     {month:'Noviembre 2026',date:'Lunes 9 noviembre',time:'Por concretar',name:'Salud bucodental · jornada 1',type:'Actividades complementarias',mode:'Programada',status:'PROGRAMADA',professional:'Enfermera de referencia',group:'Por concretar',details:'Primera jornada.'},
     {month:'Noviembre 2026',date:'Martes 10 noviembre',time:'Por concretar',name:'Salud bucodental · jornada 2',type:'Actividades complementarias',mode:'Programada',status:'PROGRAMADA',professional:'Enfermera de referencia',group:'Por concretar',details:'Segunda jornada.'},
@@ -38,9 +35,25 @@ document.addEventListener('DOMContentLoaded',()=>{
   groupSel.innerHTML='<option value="">Todos los grupos</option>'+unique('group').map(v=>'<option>'+esc(v)+'</option>').join('');
 
   const semClass=e=>e.status==='CONFLICTO'?'status-red':(e.status==='CONFIRMADA'?'status-green':'status-yellow');
+  const monthNumber={enero:0,febrero:1,marzo:2,abril:3,mayo:4,junio:5,julio:6,agosto:7,septiembre:8,octubre:9,noviembre:10,diciembre:11};
+  function eventDateKey(e){
+    const mm=String(e.month||'').match(/([A-Za-zÁÉÍÓÚáéíóúñÑ]+)\s+(\d{4})/);
+    const dm=String(e.date||'').match(/(\d{1,2})\s+([A-Za-zÁÉÍÓÚáéíóúñÑ]+)/);
+    if(!mm||!dm)return Number.MAX_SAFE_INTEGER;
+    const normMonth=s=>s.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
+    const y=Number(mm[2]),m=monthNumber[normMonth(dm[2])],d=Number(dm[1]);
+    return (m===undefined)?Number.MAX_SAFE_INTEGER:new Date(y,m,d).getTime();
+  }
+  function eventTimeKey(e){
+    const tm=String(e.time||'').match(/(\d{1,2}):(\d{2})/);
+    return tm?(Number(tm[1])*60+Number(tm[2])):9999;
+  }
   window.renderCalendar=function(){
     const m=monthSel.value,t=typeSel.value,p=profSel.value,g=groupSel.value;
-    const events=CALENDAR_EVENTS.filter(e=>(!m||e.month===m)&&(!t||e.type===t||e.name.includes(t))&&(!p||e.professional===p)&&(!g||e.group===g));
+    const events=CALENDAR_EVENTS
+      .filter(e=>(!m||e.month===m)&&(!t||e.type===t||e.name.includes(t))&&(!p||e.professional===p)&&(!g||e.group===g))
+      .slice()
+      .sort((a,b)=>eventDateKey(a)-eventDateKey(b)||eventTimeKey(a)-eventTimeKey(b)||String(a.name||'').localeCompare(String(b.name||''),'es'));
     document.getElementById('calendarCount').textContent=events.length;
     const list=document.getElementById('calendarList');
     if(!events.length){list.innerHTML='<div class="calendar-empty">No hay actuaciones con esos filtros.</div>';return}
