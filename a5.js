@@ -26,6 +26,11 @@ document.addEventListener('DOMContentLoaded',()=>{
   const BASE_CALENDAR_EVENTS=CALENDAR_EVENTS.map(e=>({...e,_sourceKey:staticKey(e),_sourceType:'static'}));
   let runtimeEvents=BASE_CALENDAR_EVENTS.map(e=>({...e}));
   let editingKey='';
+  const CAL_GROUPS=(window.H&&Array.isArray(H.g))?H.g.slice():['1º A','1º B','2º A','2º B','3º A','3º B','4º A','4º B','5º A','5º B','6º A','6º B','6º C','I 3 A','I 3 B','I 4 A','I 4 B','I 5 A','I 5 B'];
+  const CAL_RESPONSABLES=['Alconchel Vázquez, Carlos','Del Caño Ceballos, María','Enjuto Mena, Carolina','Fernández Marcos Donate, Raquel','Flores Ortega, Juana del Pilar','García Arnau, Mireia','García Piñero, Isabel María','Garrido Morales, Antonio Jesús','González Carrillo, Francisco','González Sanz, Nuria','Haro Mansilla, Aladina','Jimena Quesada, Luis María','Jiménez Medina, Ana Bella','Jiménez Torres, María Jose','Mañas Villar, Lucía','Martínez Guerrero, Isabel María','Montoya Morales, María Luisa','Moreno Alonso, Antonia','Palomares Padilla, Pilar','Pastor Reche, Carmen Dolores','Peña Ruiz, María Cruz','Ramos Muñoz, Patricia','Rodríguez Agüero, María Isabel','Rodríguez Domínguez, Ana Belén','Rodríguez Montes, Jesús','Roldán Camenforte, Leónides','Tafur Porras, Ángela María','Teruel Ortiz, Carlos','Torres Molina, Juan Carlos','Vedia Salinas, Carmen Cristín','Velázquez Peramos, María de la Cabeza','Yanguez López-Cano, Rafael'];
+  const CAL_HOURS=Array.from({length:24},(_,i)=>String(i).padStart(2,'0'));
+  const CAL_MINUTES=['00','15','30','45'];
+  const timeSelects=(prefix)=>'<div class="calendar-time-selects"><select id="'+prefix+'Hora"><option value="">Hora</option>'+CAL_HOURS.map(h=>'<option>'+h+'</option>').join('')+'</select><span>:</span><select id="'+prefix+'Min"><option value="00">00</option>'+CAL_MINUTES.slice(1).map(m=>'<option>'+m+'</option>').join('')+'</select></div>';
   const calendarGroups=(window.H&&Array.isArray(H.g))?H.g.slice():[];
   const calendarTeachers=['Alconchel Vázquez, Carlos','Del Caño Ceballos, María','Enjuto Mena, Carolina','Fernández Marcos Donate, Raquel','Flores Ortega, Juana del Pilar','García Arnau, Mireia','García Piñero, Isabel María','Garrido Morales, Antonio Jesús','González Carrillo, Francisco','González Sanz, Nuria','Haro Mansilla, Aladina','Jimena Quesada, Luis María','Jiménez Medina, Ana Bella','Jiménez Torres, María Jose','Mañas Villar, Lucía','Martínez Guerrero, Isabel María','Montoya Morales, María Luisa','Moreno Alonso, Antonia','Palomares Padilla, Pilar','Pastor Reche, Carmen Dolores','Peña Ruiz, María Cruz','Ramos Muñoz, Patricia','Rodríguez Agüero, María Isabel','Rodríguez Domínguez, Ana Belén','Rodríguez Montes, Jesús','Roldán Camenforte, Leónides','Tafur Porras, Ángela María','Teruel Ortiz, Carlos','Torres Molina, Juan Carlos','Vedia Salinas, Carmen Cristín','Velázquez Peramos, María de la Cabeza','Yanguez López-Cano, Rafael'];
   const calendarTimes=[];
@@ -90,7 +95,7 @@ document.addEventListener('DOMContentLoaded',()=>{
     <div id="calendarList" class="calendar-list"></div>`;
 
   const style=document.createElement('style');
-  style.textContent=`.calendar-event.status-green{border-left-color:#16a34a}.calendar-event.status-yellow{border-left-color:#eab308}.calendar-event.status-red{border-left-color:#dc2626}.calendar-details{margin-top:5px;color:#64748b;font-size:.8rem}.calendar-prof{display:inline-block;margin-top:5px;padding:3px 7px;border-radius:999px;background:#ecfeff;color:#155e75;font-size:.72rem;font-weight:800}.calendar-group{display:inline-block;margin:5px 0 0 5px;padding:3px 7px;border-radius:999px;background:#eef2ff;color:#3730a3;font-size:.72rem;font-weight:800}.calendar-add-panel{margin:0 0 18px;padding:18px;border:1px solid #cbd5e1;border-radius:16px;background:#f8fafc}.calendar-add-form{margin:0}.calendar-form-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.calendar-form-grid label{display:flex;flex-direction:column;gap:6px;font-weight:800;color:#334155;font-size:.86rem}.calendar-form-grid input,.calendar-form-grid select,.calendar-form-grid textarea{width:100%;box-sizing:border-box;padding:10px 11px;border:1px solid #cbd5e1;border-radius:10px;background:#fff;font:inherit;font-weight:500;color:#0f172a}.calendar-form-wide{grid-column:1/-1}.calendar-form-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:14px}.calendar-secondary{background:#e2e8f0!important;color:#334155!important}.calendar-form-msg{font-weight:800;font-size:.85rem}.calendar-form-msg.ok{color:#166534}.calendar-form-msg.err{color:#b91c1c}.calendar-event-actions{display:flex;gap:6px;justify-content:flex-end;flex-wrap:wrap;margin-top:7px}.calendar-mini-btn{border:0;border-radius:8px;padding:5px 8px;font:inherit;font-size:.72rem;font-weight:900;cursor:pointer}.calendar-edit-btn{background:#e0e7ff;color:#3730a3}.calendar-delete-btn{background:#fee2e2;color:#991b1b}@media(max-width:900px){.calendar-tools{display:grid!important;grid-template-columns:1fr 1fr}.calendar-tools select{width:100%!important;min-width:0!important}.calendar-form-grid{grid-template-columns:1fr 1fr}}@media(max-width:600px){.calendar-tools{grid-template-columns:1fr}.calendar-form-grid{grid-template-columns:1fr}.calendar-form-wide{grid-column:auto}}`;
+  style.textContent=`.calendar-event.status-green{border-left-color:#16a34a}.calendar-event.status-yellow{border-left-color:#eab308}.calendar-event.status-red{border-left-color:#dc2626}.calendar-details{margin-top:5px;color:#64748b;font-size:.8rem}.calendar-prof{display:inline-block;margin-top:5px;padding:3px 7px;border-radius:999px;background:#ecfeff;color:#155e75;font-size:.72rem;font-weight:800}.calendar-group{display:inline-block;margin:5px 0 0 5px;padding:3px 7px;border-radius:999px;background:#eef2ff;color:#3730a3;font-size:.72rem;font-weight:800}.calendar-add-panel{margin:0 0 18px;padding:18px;border:1px solid #cbd5e1;border-radius:16px;background:#f8fafc}.calendar-add-form{margin:0}.calendar-form-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.calendar-form-grid label{display:flex;flex-direction:column;gap:6px;font-weight:800;color:#334155;font-size:.86rem}.calendar-form-grid input,.calendar-form-grid select,.calendar-form-grid textarea{width:100%;box-sizing:border-box;padding:10px 11px;border:1px solid #cbd5e1;border-radius:10px;background:#fff;font:inherit;font-weight:500;color:#0f172a}.calendar-form-wide{grid-column:1/-1}.calendar-time-selects{display:grid;grid-template-columns:1fr auto 1fr;gap:6px;align-items:center}.calendar-time-selects span{text-align:center;font-weight:900}.calendar-form-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:14px}.calendar-secondary{background:#e2e8f0!important;color:#334155!important}.calendar-form-msg{font-weight:800;font-size:.85rem}.calendar-form-msg.ok{color:#166534}.calendar-form-msg.err{color:#b91c1c}.calendar-event-actions{display:flex;gap:6px;justify-content:flex-end;flex-wrap:wrap;margin-top:7px}.calendar-mini-btn{border:0;border-radius:8px;padding:5px 8px;font:inherit;font-size:.72rem;font-weight:900;cursor:pointer}.calendar-edit-btn{background:#e0e7ff;color:#3730a3}.calendar-delete-btn{background:#fee2e2;color:#991b1b}@media(max-width:900px){.calendar-tools{display:grid!important;grid-template-columns:1fr 1fr}.calendar-tools select{width:100%!important;min-width:0!important}.calendar-form-grid{grid-template-columns:1fr 1fr}}@media(max-width:600px){.calendar-tools{grid-template-columns:1fr}.calendar-form-grid{grid-template-columns:1fr}.calendar-form-wide{grid-column:auto}}`;
   document.head.appendChild(style);
 
   const monthSel=document.getElementById('calendarMonth'),typeSel=document.getElementById('calendarType'),profSel=document.getElementById('calendarProfessional'),groupSel=document.getElementById('calendarGroup');
@@ -125,6 +130,18 @@ document.addEventListener('DOMContentLoaded',()=>{
   });
   cancelBtn.addEventListener('click',()=>{editingKey='';addPanel.hidden=true;formMsg.textContent='';addForm.reset()});
 
+  function readQuarterTime(prefix){
+    const h=document.getElementById(prefix+'Hora').value;
+    const m=document.getElementById(prefix+'Min').value;
+    return h?String(h).padStart(2,'0')+':'+(m||'00'):'';
+  }
+  function setQuarterTime(prefix,value){
+    const tm=String(value||'').match(/(\d{1,2}):(\d{2})/);
+    document.getElementById(prefix+'Hora').value=tm?String(tm[1]).padStart(2,'0'):'';
+    const min=tm?tm[2]:'00';
+    document.getElementById(prefix+'Min').value=CAL_MINUTES.includes(min)?min:'00';
+  }
+
   addForm.addEventListener('submit',async ev=>{
     ev.preventDefault();
     formMsg.className='calendar-form-msg';
@@ -135,8 +152,8 @@ document.addEventListener('DOMContentLoaded',()=>{
       action:editingKey?'calendar-update':'calendar-set',
       sourceKey:editingKey,
       fecha,
-      inicio:document.getElementById('calInicio').value,
-      fin:document.getElementById('calFin').value,
+      inicio:readQuarterTime('calInicio'),
+      fin:readQuarterTime('calFin'),
       tipo,
       categoria:tipo,
       profesional:'',
@@ -160,10 +177,16 @@ document.addEventListener('DOMContentLoaded',()=>{
       const data=await res.json();
       if(!data.success) throw new Error(data.error||'No se pudo guardar');
       formMsg.className='calendar-form-msg ok';
-      formMsg.textContent=editingKey?'Actividad modificada correctamente.':'Actividad guardada correctamente.';
+      if(data.pending){
+        formMsg.textContent=data.message||'Solicitud enviada a Dirección para su aprobación.';
+      }else{
+        formMsg.textContent=editingKey?'Actividad modificada correctamente.':'Actividad guardada correctamente.';
+        await loadCalendarFromApi();
+      }
       editingKey='';
       addForm.reset();
-      await loadCalendarFromApi();
+      setQuarterTime('calInicio','');
+      setQuarterTime('calFin','');
     }catch(err){
       formMsg.className='calendar-form-msg err';
       formMsg.textContent='No se pudo guardar: '+(err&&err.message?err.message:err);
@@ -262,7 +285,11 @@ document.addEventListener('DOMContentLoaded',()=>{
       const res=await fetch(CALENDAR_WRITE_API,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'calendar-delete',sourceKey:key})});
       const data=await res.json();
       if(!data.success)throw new Error(data.error||'No se pudo eliminar');
-      await loadCalendarFromApi();
+      if(data.pending){
+        alert(data.message||'Solicitud de eliminación enviada a Dirección para su aprobación.');
+      }else{
+        await loadCalendarFromApi();
+      }
     }catch(err){alert('No se pudo eliminar: '+(err&&err.message?err.message:err))}
   }
 
