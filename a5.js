@@ -65,8 +65,8 @@ document.addEventListener('DOMContentLoaded',()=>{
             </select>
           </label>
           <label class="calendar-form-wide">Actividad / asunto *<input id="calActividad" type="text" required placeholder="Ej.: Salida al teatro, reunión de equipo docente…"></label>
-          <label>Grupo(s) / destinatarios<select id="calGrupos">${calendarOptions(calendarGroups,'Seleccionar grupo…')}<option>Claustro</option><option>Equipo docente</option><option>Ciclo</option><option>Consejo Escolar</option><option>ETCP</option><option>Familias</option><option value="Otro / sin grupo concreto">Otro / sin grupo concreto</option></select></label>
-          <label>Responsable<select id="calResponsable">${calendarOptions(calendarTeachers,'Seleccionar responsable…')}</select></label>
+          <label>Grupo(s) / destinatarios<select id="calGrupos"><option value="">Seleccionar grupo…</option>${CAL_GRUPOS.map(g=>'<option value="'+esc(g)+'">'+esc(g)+'</option>').join('')}<option>Claustro</option><option>Equipo docente</option><option>Ciclo</option><option>Consejo Escolar</option><option>ETCP</option><option>Familias</option><option value="Otro / sin grupo concreto">Otro / sin grupo concreto</option></select></label>
+          <label>Responsable<select id="calResponsable"><option value="">Seleccionar responsable…</option>${CAL_RESPONSABLES.map(r=>'<option value="'+esc(r)+'">'+esc(r)+'</option>').join('')}</select></label>
           <label>Lugar<input id="calLugar" type="text" placeholder="Centro, Vera, teatro…"></label>
           <label>Modalidad
             <select id="calModalidad">
