@@ -65,7 +65,7 @@ document.addEventListener('DOMContentLoaded',()=>{
             </select>
           </label>
           <label class="calendar-form-wide">Actividad / asunto *<input id="calActividad" type="text" required placeholder="Ej.: Salida al teatro, reunión de equipo docente…"></label>
-          <label>Grupo(s) / destinatarios<select id="calGrupos"><option value="">Seleccionar grupo…</option>${CAL_GRUPOS.map(g=>'<option value="'+esc(g)+'">'+esc(g)+'</option>').join('')}<option>Claustro</option><option>Equipo docente</option><option>Ciclo</option><option>Consejo Escolar</option><option>ETCP</option><option>Familias</option><option value="Otro / sin grupo concreto">Otro / sin grupo concreto</option></select></label>
+          <label>Grupo(s) / destinatarios<select id="calGrupos"><option value="">Seleccionar grupo…</option>${CAL_GROUPS.map(g=>'<option value="'+esc(g)+'">'+esc(g)+'</option>').join('')}<option>Claustro</option><option>Equipo docente</option><option>Ciclo</option><option>Consejo Escolar</option><option>ETCP</option><option>Familias</option><option value="Otro / sin grupo concreto">Otro / sin grupo concreto</option></select></label>
           <label>Responsable<select id="calResponsable"><option value="">Seleccionar responsable…</option>${CAL_RESPONSABLES.map(r=>'<option value="'+esc(r)+'">'+esc(r)+'</option>').join('')}</select></label>
           <label>Lugar<input id="calLugar" type="text" placeholder="Centro, Vera, teatro…"></label>
           <label>Modalidad
@@ -248,15 +248,8 @@ document.addEventListener('DOMContentLoaded',()=>{
     const e=runtimeEvents.find(x=>x._sourceKey===key);if(!e)return;
     editingKey=key;
     document.getElementById('calFecha').value=isoFromEvent(e);
-    const tm=String(e.time||'').match(/(\d{1,2}):(\d{2})/);
-    const inicioEl=document.getElementById('calInicio');
-    const inicioValue=tm?String(tm[1]).padStart(2,'0')+':'+tm[2]:'';
-    if(inicioValue && ![...inicioEl.options].some(o=>o.value===inicioValue)){const op=document.createElement('option');op.value=inicioValue;op.textContent=inicioValue;inicioEl.appendChild(op)}
-    inicioEl.value=inicioValue;
-    const finEl=document.getElementById('calFin');
-    const finValue=e._fin||'';
-    if(finValue && ![...finEl.options].some(o=>o.value===finValue)){const op=document.createElement('option');op.value=finValue;op.textContent=finValue;finEl.appendChild(op)}
-    finEl.value=finValue;
+    setQuarterTime('calInicio',e.time||'');
+    setQuarterTime('calFin',e._fin||'');
     const tipoSelEl=document.getElementById('calTipo');
     const desired=e.type==='Evaluación'?'Sesión de evaluación':e.type;
     if(![...tipoSelEl.options].some(o=>o.value===desired)){const op=document.createElement('option');op.value=desired;op.textContent=desired;tipoSelEl.appendChild(op)}
