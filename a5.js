@@ -45,8 +45,8 @@ document.addEventListener('DOMContentLoaded',()=>{
       <form id="calendarAddForm" class="calendar-add-form">
         <div class="calendar-form-grid">
           <label>Fecha *<input id="calFecha" type="date" required></label>
-          <label>Hora inicio<select id="calInicio">${calendarOptions(calendarTimes,'Seleccionar hora…')}</select></label>
-          <label>Hora fin<select id="calFin">${calendarOptions(calendarTimes,'Seleccionar hora…')}</select></label>
+          <label>Hora inicio${timeSelects('calInicio')}</label>
+          <label>Hora fin${timeSelects('calFin')}</label>
           <label>Tipo de actividad *
             <select id="calTipo" required>
               <option value="">Seleccionar…</option>
