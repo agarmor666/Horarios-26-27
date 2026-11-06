@@ -103,6 +103,9 @@ function syncProgramacionDocx_() {
     if (!parsed) return;
 
     const actividad = cleanActivityText_(text, parsed.matchedText);
+    if (/Cuevas de Sorbas/i.test(actividad) && /22\s+de\s+febrero\s+de\s+2026/i.test(text)) {
+      parsed.date = new Date(2027, 1, 22);
+    }
     if (!actividad || /TRIMESTRE/i.test(actividad)) return;
 
     const grupos = etapa === 'Educación Infantil' ? 'Infantil'
