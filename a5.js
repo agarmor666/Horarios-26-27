@@ -26,13 +26,63 @@ document.addEventListener('DOMContentLoaded',()=>{
   const section=document.getElementById('calendar');
   if(!section)return;
   section.innerHTML=`
-    <div class="calendar-head"><div><h2 class="title">📅 Calendario académico 2026/27</h2><p class="hint">Reuniones, actividades complementarias y actuaciones de profesionales externos del CEIP Bartolomé Flores.</p></div><a class="action" style="text-decoration:none;display:inline-flex;align-items:center" target="_blank" rel="noopener" href="https://docs.google.com/spreadsheets/d/1wJ4e-B3zxc0xB8nBNMJKNX4dsqBJMEZkYNckDxXzpR8/edit#gid=364567131">➕ Registrar actividad</a></div>
+    <div class="calendar-head"><div><h2 class="title">📅 Calendario académico 2026/27</h2><p class="hint">Reuniones, actividades complementarias y actuaciones de profesionales externos del CEIP Bartolomé Flores.</p></div><button id="calendarAddBtn" class="action" type="button">➕ Registrar actividad</button></div>
+    <div id="calendarAddPanel" class="calendar-add-panel" hidden>
+      <form id="calendarAddForm" class="calendar-add-form">
+        <div class="calendar-form-grid">
+          <label>Fecha *<input id="calFecha" type="date" required></label>
+          <label>Hora inicio<input id="calInicio" type="time"></label>
+          <label>Hora fin<input id="calFin" type="time"></label>
+          <label>Tipo de actividad *
+            <select id="calTipo" required>
+              <option value="">Seleccionar…</option>
+              <option>Equipo docente</option>
+              <option>Ciclos</option>
+              <option>ETCP</option>
+              <option>Claustro</option>
+              <option>Consejo Escolar</option>
+              <option>Tutoría</option>
+              <option>Sesión de evaluación</option>
+              <option>Actividad complementaria</option>
+              <option>Actividad extraescolar</option>
+              <option>Reunión con familias</option>
+              <option>Equipo de Orientación</option>
+              <option>Otra</option>
+            </select>
+          </label>
+          <label class="calendar-form-wide">Actividad / asunto *<input id="calActividad" type="text" required placeholder="Ej.: Salida al teatro, reunión de equipo docente…"></label>
+          <label>Etapa / nivel<input id="calNivel" type="text" placeholder="Infantil, Primer ciclo, 6.º…"></label>
+          <label>Grupo(s) / destinatarios *<input id="calGrupos" type="text" required placeholder="1.º A, Primer ciclo, Claustro…"></label>
+          <label>Responsable<input id="calResponsable" type="text" placeholder="Tutor/a, coordinación, equipo directivo…"></label>
+          <label>Lugar<input id="calLugar" type="text" placeholder="Centro, Vera, teatro…"></label>
+          <label>Modalidad
+            <select id="calModalidad">
+              <option value="">Sin especificar</option>
+              <option>Presencial</option>
+              <option>Telemática</option>
+            </select>
+          </label>
+          <label>Estado
+            <select id="calEstado">
+              <option value="PROGRAMADA">Programada</option>
+              <option value="CONFIRMADA">Confirmada</option>
+            </select>
+          </label>
+          <label class="calendar-form-wide">Observaciones<textarea id="calObservaciones" rows="3" placeholder="Información adicional"></textarea></label>
+        </div>
+        <div class="calendar-form-actions">
+          <button type="submit" class="action">Guardar actividad</button>
+          <button type="button" id="calendarCancelBtn" class="action calendar-secondary">Cancelar</button>
+          <span id="calendarFormMsg" class="calendar-form-msg" aria-live="polite"></span>
+        </div>
+      </form>
+    </div>
     <div class="calendar-tools" style="margin-bottom:16px"><select id="calendarMonth"><option value="">Todo el curso</option></select><select id="calendarType"><option value="">Todas las categorías</option></select><select id="calendarProfessional"><option value="">Todos los profesionales</option></select><select id="calendarGroup"><option value="">Todos los grupos</option></select></div>
     <div class="calendar-summary"><div class="calendar-stat"><b id="calendarCount">0</b>actuaciones visibles</div><div class="calendar-stat"><b>🟢</b>Confirmada</div><div class="calendar-stat"><b>🟡</b>Programada / pendiente</div></div>
     <div id="calendarList" class="calendar-list"></div>`;
 
   const style=document.createElement('style');
-  style.textContent=`.calendar-event.status-green{border-left-color:#16a34a}.calendar-event.status-yellow{border-left-color:#eab308}.calendar-event.status-red{border-left-color:#dc2626}.calendar-details{margin-top:5px;color:#64748b;font-size:.8rem}.calendar-prof{display:inline-block;margin-top:5px;padding:3px 7px;border-radius:999px;background:#ecfeff;color:#155e75;font-size:.72rem;font-weight:800}.calendar-group{display:inline-block;margin:5px 0 0 5px;padding:3px 7px;border-radius:999px;background:#eef2ff;color:#3730a3;font-size:.72rem;font-weight:800}@media(max-width:900px){.calendar-tools{display:grid!important;grid-template-columns:1fr 1fr}.calendar-tools select{width:100%!important;min-width:0!important}}@media(max-width:600px){.calendar-tools{grid-template-columns:1fr}}`;
+  style.textContent=`.calendar-event.status-green{border-left-color:#16a34a}.calendar-event.status-yellow{border-left-color:#eab308}.calendar-event.status-red{border-left-color:#dc2626}.calendar-details{margin-top:5px;color:#64748b;font-size:.8rem}.calendar-prof{display:inline-block;margin-top:5px;padding:3px 7px;border-radius:999px;background:#ecfeff;color:#155e75;font-size:.72rem;font-weight:800}.calendar-group{display:inline-block;margin:5px 0 0 5px;padding:3px 7px;border-radius:999px;background:#eef2ff;color:#3730a3;font-size:.72rem;font-weight:800}.calendar-add-panel{margin:0 0 18px;padding:18px;border:1px solid #cbd5e1;border-radius:16px;background:#f8fafc}.calendar-add-form{margin:0}.calendar-form-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.calendar-form-grid label{display:flex;flex-direction:column;gap:6px;font-weight:800;color:#334155;font-size:.86rem}.calendar-form-grid input,.calendar-form-grid select,.calendar-form-grid textarea{width:100%;box-sizing:border-box;padding:10px 11px;border:1px solid #cbd5e1;border-radius:10px;background:#fff;font:inherit;font-weight:500;color:#0f172a}.calendar-form-wide{grid-column:1/-1}.calendar-form-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:14px}.calendar-secondary{background:#e2e8f0!important;color:#334155!important}.calendar-form-msg{font-weight:800;font-size:.85rem}.calendar-form-msg.ok{color:#166534}.calendar-form-msg.err{color:#b91c1c}@media(max-width:900px){.calendar-tools{display:grid!important;grid-template-columns:1fr 1fr}.calendar-tools select{width:100%!important;min-width:0!important}.calendar-form-grid{grid-template-columns:1fr 1fr}}@media(max-width:600px){.calendar-tools{grid-template-columns:1fr}.calendar-form-grid{grid-template-columns:1fr}.calendar-form-wide{grid-column:auto}}`;
   document.head.appendChild(style);
 
   const monthSel=document.getElementById('calendarMonth'),typeSel=document.getElementById('calendarType'),profSel=document.getElementById('calendarProfessional'),groupSel=document.getElementById('calendarGroup');
@@ -41,6 +91,62 @@ document.addEventListener('DOMContentLoaded',()=>{
   typeSel.innerHTML='<option value="">Todas las categorías</option>'+unique('type').map(v=>'<option>'+esc(v)+'</option>').join('');
   profSel.innerHTML='<option value="">Todos los profesionales</option>'+unique('professional').map(v=>'<option>'+esc(v)+'</option>').join('');
   groupSel.innerHTML='<option value="">Todos los grupos</option>'+unique('group').map(v=>'<option>'+esc(v)+'</option>').join('');
+
+
+  const CALENDAR_WRITE_API = window.CALENDAR_WRITE_API || '';
+  const addBtn=document.getElementById('calendarAddBtn');
+  const addPanel=document.getElementById('calendarAddPanel');
+  const addForm=document.getElementById('calendarAddForm');
+  const cancelBtn=document.getElementById('calendarCancelBtn');
+  const formMsg=document.getElementById('calendarFormMsg');
+
+  addBtn.addEventListener('click',()=>{
+    addPanel.hidden=!addPanel.hidden;
+    if(!addPanel.hidden) document.getElementById('calFecha').focus();
+  });
+  cancelBtn.addEventListener('click',()=>{addPanel.hidden=true;formMsg.textContent='';addForm.reset()});
+
+  addForm.addEventListener('submit',async ev=>{
+    ev.preventDefault();
+    formMsg.className='calendar-form-msg';
+    formMsg.textContent='Guardando…';
+    const fecha=document.getElementById('calFecha').value;
+    const tipo=document.getElementById('calTipo').value;
+    const payload={
+      action:'calendar-set',
+      fecha,
+      inicio:document.getElementById('calInicio').value,
+      fin:document.getElementById('calFin').value,
+      tipo,
+      categoria:tipo,
+      profesional:'',
+      actividad:document.getElementById('calActividad').value.trim(),
+      nivel:document.getElementById('calNivel').value.trim(),
+      grupos:document.getElementById('calGrupos').value.trim(),
+      responsable:document.getElementById('calResponsable').value.trim(),
+      lugar:document.getElementById('calLugar').value.trim(),
+      estado:document.getElementById('calEstado').value,
+      aviso:'Pendiente',
+      correo:'',
+      observaciones:[document.getElementById('calModalidad').value,document.getElementById('calObservaciones').value.trim()].filter(Boolean).join(' · ')
+    };
+    if(!CALENDAR_WRITE_API){
+      formMsg.className='calendar-form-msg err';
+      formMsg.textContent='Formulario preparado; falta conectar la API de guardado del calendario.';
+      return;
+    }
+    try{
+      const res=await fetch(CALENDAR_WRITE_API,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(payload)});
+      const data=await res.json();
+      if(!data.success) throw new Error(data.error||'No se pudo guardar');
+      formMsg.className='calendar-form-msg ok';
+      formMsg.textContent='Actividad guardada correctamente.';
+      addForm.reset();
+    }catch(err){
+      formMsg.className='calendar-form-msg err';
+      formMsg.textContent='No se pudo guardar: '+(err&&err.message?err.message:err);
+    }
+  });
 
   const semClass=e=>e.status==='CONFLICTO'?'status-red':(e.status==='CONFIRMADA'?'status-green':'status-yellow');
   const monthNumber={enero:0,febrero:1,marzo:2,abril:3,mayo:4,junio:5,julio:6,agosto:7,septiembre:8,octubre:9,noviembre:10,diciembre:11};
