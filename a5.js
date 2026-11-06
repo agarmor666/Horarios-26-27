@@ -93,7 +93,7 @@ document.addEventListener('DOMContentLoaded',()=>{
   groupSel.innerHTML='<option value="">Todos los grupos</option>'+unique('group').map(v=>'<option>'+esc(v)+'</option>').join('');
 
 
-  const CALENDAR_WRITE_API = window.CALENDAR_WRITE_API || '';
+  const CALENDAR_WRITE_API = window.CALENDAR_WRITE_API || 'https://script.google.com/macros/s/AKfycbwdWoaTV6jKU8JEmO5-YmdAsbZXJLwZnM-nqsjH0sJQTAf09ITHP-6HKvRXHPUlE1QnoA/exec';
   const addBtn=document.getElementById('calendarAddBtn');
   const addPanel=document.getElementById('calendarAddPanel');
   const addForm=document.getElementById('calendarAddForm');
