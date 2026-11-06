@@ -282,7 +282,7 @@ document.addEventListener('DOMContentLoaded',()=>{
     const e=runtimeEvents.find(x=>x._sourceKey===key);if(!e)return;
     if(!confirm('¿Eliminar «'+e.name+'» del calendario?'))return;
     try{
-      const res=await fetch(CALENDAR_WRITE_API,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'calendar-delete',sourceKey:key})});
+      const res=await fetch(CALENDAR_WRITE_API,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'calendar-delete',sourceKey:key,activityName:e.name||'',activityDate:e.date||''})});
       const data=await res.json();
       if(!data.success)throw new Error(data.error||'No se pudo eliminar');
       if(data.pending){
