@@ -56,7 +56,7 @@ document.addEventListener('DOMContentLoaded',()=>{
           </label>
           <label class="calendar-form-wide">Actividad / asunto *<input id="calActividad" type="text" required placeholder="Ej.: Salida al teatro, reunión de equipo docente…"></label>
           <label>Etapa / nivel<input id="calNivel" type="text" placeholder="Infantil, Primer ciclo, 6.º…"></label>
-          <label>Grupo(s) / destinatarios *<input id="calGrupos" type="text" required placeholder="1.º A, Primer ciclo, Claustro…"></label>
+          <label>Grupo(s) / destinatarios<input id="calGrupos" type="text" placeholder="1.º A, Primer ciclo, Claustro…"></label>
           <label>Responsable<input id="calResponsable" type="text" placeholder="Tutor/a, coordinación, equipo directivo…"></label>
           <label>Lugar<input id="calLugar" type="text" placeholder="Centro, Vera, teatro…"></label>
           <label>Modalidad
