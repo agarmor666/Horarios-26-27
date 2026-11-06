@@ -226,15 +226,27 @@ document.addEventListener('DOMContentLoaded',()=>{
     editingKey=key;
     document.getElementById('calFecha').value=isoFromEvent(e);
     const tm=String(e.time||'').match(/(\d{1,2}):(\d{2})/);
-    document.getElementById('calInicio').value=tm?String(tm[1]).padStart(2,'0')+':'+tm[2]:'';
-    document.getElementById('calFin').value=e._fin||'';
+    const inicioEl=document.getElementById('calInicio');
+    const inicioValue=tm?String(tm[1]).padStart(2,'0')+':'+tm[2]:'';
+    if(inicioValue && ![...inicioEl.options].some(o=>o.value===inicioValue)){const op=document.createElement('option');op.value=inicioValue;op.textContent=inicioValue;inicioEl.appendChild(op)}
+    inicioEl.value=inicioValue;
+    const finEl=document.getElementById('calFin');
+    const finValue=e._fin||'';
+    if(finValue && ![...finEl.options].some(o=>o.value===finValue)){const op=document.createElement('option');op.value=finValue;op.textContent=finValue;finEl.appendChild(op)}
+    finEl.value=finValue;
     const tipoSelEl=document.getElementById('calTipo');
     const desired=e.type==='Evaluación'?'Sesión de evaluación':e.type;
     if(![...tipoSelEl.options].some(o=>o.value===desired)){const op=document.createElement('option');op.value=desired;op.textContent=desired;tipoSelEl.appendChild(op)}
     tipoSelEl.value=desired;
     document.getElementById('calActividad').value=e.name||'';
-    document.getElementById('calGrupos').value=e.group||'';
-    document.getElementById('calResponsable').value=e._responsable||'';
+    const groupEl=document.getElementById('calGrupos');
+    const groupValue=e.group||'';
+    if(groupValue && ![...groupEl.options].some(o=>o.value===groupValue)){const op=document.createElement('option');op.value=groupValue;op.textContent=groupValue;groupEl.appendChild(op)}
+    groupEl.value=groupValue;
+    const respEl=document.getElementById('calResponsable');
+    const respValue=e._responsable||'';
+    if(respValue && ![...respEl.options].some(o=>o.value===respValue)){const op=document.createElement('option');op.value=respValue;op.textContent=respValue;respEl.appendChild(op)}
+    respEl.value=respValue;
     document.getElementById('calLugar').value=e._lugar||'';
     document.getElementById('calModalidad').value=/Telemática/i.test(e.mode||'')?'Telemática':(/Presencial/i.test(e.mode||'')?'Presencial':'');
     document.getElementById('calEstado').value=e.status==='CONFIRMADA'?'CONFIRMADA':'PROGRAMADA';
