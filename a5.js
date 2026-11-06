@@ -22,6 +22,10 @@ document.addEventListener('DOMContentLoaded',()=>{
   ];
   const keys=new Set(CALENDAR_EVENTS.map(e=>[e.month,e.date,e.name].join('|')));
   extra.forEach(e=>{const k=[e.month,e.date,e.name].join('|');if(!keys.has(k)){CALENDAR_EVENTS.push(e);keys.add(k)}});
+  const staticKey=e=>'STATIC:'+encodeURIComponent([e.month,e.date,e.time||'',e.name].join('|'));
+  const BASE_CALENDAR_EVENTS=CALENDAR_EVENTS.map(e=>({...e,_sourceKey:staticKey(e),_sourceType:'static'}));
+  let runtimeEvents=BASE_CALENDAR_EVENTS.map(e=>({...e}));
+  let editingKey='';
 
   const section=document.getElementById('calendar');
   if(!section)return;
@@ -82,15 +86,23 @@ document.addEventListener('DOMContentLoaded',()=>{
     <div id="calendarList" class="calendar-list"></div>`;
 
   const style=document.createElement('style');
-  style.textContent=`.calendar-event.status-green{border-left-color:#16a34a}.calendar-event.status-yellow{border-left-color:#eab308}.calendar-event.status-red{border-left-color:#dc2626}.calendar-details{margin-top:5px;color:#64748b;font-size:.8rem}.calendar-prof{display:inline-block;margin-top:5px;padding:3px 7px;border-radius:999px;background:#ecfeff;color:#155e75;font-size:.72rem;font-weight:800}.calendar-group{display:inline-block;margin:5px 0 0 5px;padding:3px 7px;border-radius:999px;background:#eef2ff;color:#3730a3;font-size:.72rem;font-weight:800}.calendar-add-panel{margin:0 0 18px;padding:18px;border:1px solid #cbd5e1;border-radius:16px;background:#f8fafc}.calendar-add-form{margin:0}.calendar-form-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.calendar-form-grid label{display:flex;flex-direction:column;gap:6px;font-weight:800;color:#334155;font-size:.86rem}.calendar-form-grid input,.calendar-form-grid select,.calendar-form-grid textarea{width:100%;box-sizing:border-box;padding:10px 11px;border:1px solid #cbd5e1;border-radius:10px;background:#fff;font:inherit;font-weight:500;color:#0f172a}.calendar-form-wide{grid-column:1/-1}.calendar-form-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:14px}.calendar-secondary{background:#e2e8f0!important;color:#334155!important}.calendar-form-msg{font-weight:800;font-size:.85rem}.calendar-form-msg.ok{color:#166534}.calendar-form-msg.err{color:#b91c1c}@media(max-width:900px){.calendar-tools{display:grid!important;grid-template-columns:1fr 1fr}.calendar-tools select{width:100%!important;min-width:0!important}.calendar-form-grid{grid-template-columns:1fr 1fr}}@media(max-width:600px){.calendar-tools{grid-template-columns:1fr}.calendar-form-grid{grid-template-columns:1fr}.calendar-form-wide{grid-column:auto}}`;
+  style.textContent=`.calendar-event.status-green{border-left-color:#16a34a}.calendar-event.status-yellow{border-left-color:#eab308}.calendar-event.status-red{border-left-color:#dc2626}.calendar-details{margin-top:5px;color:#64748b;font-size:.8rem}.calendar-prof{display:inline-block;margin-top:5px;padding:3px 7px;border-radius:999px;background:#ecfeff;color:#155e75;font-size:.72rem;font-weight:800}.calendar-group{display:inline-block;margin:5px 0 0 5px;padding:3px 7px;border-radius:999px;background:#eef2ff;color:#3730a3;font-size:.72rem;font-weight:800}.calendar-add-panel{margin:0 0 18px;padding:18px;border:1px solid #cbd5e1;border-radius:16px;background:#f8fafc}.calendar-add-form{margin:0}.calendar-form-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.calendar-form-grid label{display:flex;flex-direction:column;gap:6px;font-weight:800;color:#334155;font-size:.86rem}.calendar-form-grid input,.calendar-form-grid select,.calendar-form-grid textarea{width:100%;box-sizing:border-box;padding:10px 11px;border:1px solid #cbd5e1;border-radius:10px;background:#fff;font:inherit;font-weight:500;color:#0f172a}.calendar-form-wide{grid-column:1/-1}.calendar-form-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:14px}.calendar-secondary{background:#e2e8f0!important;color:#334155!important}.calendar-form-msg{font-weight:800;font-size:.85rem}.calendar-form-msg.ok{color:#166534}.calendar-form-msg.err{color:#b91c1c}.calendar-event-actions{display:flex;gap:6px;justify-content:flex-end;flex-wrap:wrap;margin-top:7px}.calendar-mini-btn{border:0;border-radius:8px;padding:5px 8px;font:inherit;font-size:.72rem;font-weight:900;cursor:pointer}.calendar-edit-btn{background:#e0e7ff;color:#3730a3}.calendar-delete-btn{background:#fee2e2;color:#991b1b}@media(max-width:900px){.calendar-tools{display:grid!important;grid-template-columns:1fr 1fr}.calendar-tools select{width:100%!important;min-width:0!important}.calendar-form-grid{grid-template-columns:1fr 1fr}}@media(max-width:600px){.calendar-tools{grid-template-columns:1fr}.calendar-form-grid{grid-template-columns:1fr}.calendar-form-wide{grid-column:auto}}`;
   document.head.appendChild(style);
 
   const monthSel=document.getElementById('calendarMonth'),typeSel=document.getElementById('calendarType'),profSel=document.getElementById('calendarProfessional'),groupSel=document.getElementById('calendarGroup');
-  const unique=(field)=>[...new Set(CALENDAR_EVENTS.map(e=>e[field]).filter(Boolean))];
-  monthSel.innerHTML='<option value="">Todo el curso</option>'+unique('month').map(v=>'<option>'+esc(v)+'</option>').join('');
-  typeSel.innerHTML='<option value="">Todas las categorías</option>'+unique('type').map(v=>'<option>'+esc(v)+'</option>').join('');
-  profSel.innerHTML='<option value="">Todos los profesionales</option>'+unique('professional').map(v=>'<option>'+esc(v)+'</option>').join('');
-  groupSel.innerHTML='<option value="">Todos los grupos</option>'+unique('group').map(v=>'<option>'+esc(v)+'</option>').join('');
+  const unique=(field)=>[...new Set(runtimeEvents.map(e=>e[field]).filter(Boolean))];
+  function refreshCalendarFilters(){
+    const prev={m:monthSel.value,t:typeSel.value,p:profSel.value,g:groupSel.value};
+    monthSel.innerHTML='<option value="">Todo el curso</option>'+unique('month').map(v=>'<option>'+esc(v)+'</option>').join('');
+    typeSel.innerHTML='<option value="">Todas las categorías</option>'+unique('type').map(v=>'<option>'+esc(v)+'</option>').join('');
+    profSel.innerHTML='<option value="">Todos los profesionales</option>'+unique('professional').map(v=>'<option>'+esc(v)+'</option>').join('');
+    groupSel.innerHTML='<option value="">Todos los grupos</option>'+unique('group').map(v=>'<option>'+esc(v)+'</option>').join('');
+    if([...monthSel.options].some(o=>o.value===prev.m))monthSel.value=prev.m;
+    if([...typeSel.options].some(o=>o.value===prev.t))typeSel.value=prev.t;
+    if([...profSel.options].some(o=>o.value===prev.p))profSel.value=prev.p;
+    if([...groupSel.options].some(o=>o.value===prev.g))groupSel.value=prev.g;
+  }
+  refreshCalendarFilters();
 
 
   const CALENDAR_WRITE_API = window.CALENDAR_WRITE_API || 'https://script.google.com/macros/s/AKfycbwdWoaTV6jKU8JEmO5-YmdAsbZXJLwZnM-nqsjH0sJQTAf09ITHP-6HKvRXHPUlE1QnoA/exec';
@@ -101,10 +113,13 @@ document.addEventListener('DOMContentLoaded',()=>{
   const formMsg=document.getElementById('calendarFormMsg');
 
   addBtn.addEventListener('click',()=>{
+    editingKey='';
+    addForm.reset();
+    formMsg.textContent='';
     addPanel.hidden=!addPanel.hidden;
     if(!addPanel.hidden) document.getElementById('calFecha').focus();
   });
-  cancelBtn.addEventListener('click',()=>{addPanel.hidden=true;formMsg.textContent='';addForm.reset()});
+  cancelBtn.addEventListener('click',()=>{editingKey='';addPanel.hidden=true;formMsg.textContent='';addForm.reset()});
 
   addForm.addEventListener('submit',async ev=>{
     ev.preventDefault();
@@ -113,7 +128,8 @@ document.addEventListener('DOMContentLoaded',()=>{
     const fecha=document.getElementById('calFecha').value;
     const tipo=document.getElementById('calTipo').value;
     const payload={
-      action:'calendar-set',
+      action:editingKey?'calendar-update':'calendar-set',
+      sourceKey:editingKey,
       fecha,
       inicio:document.getElementById('calInicio').value,
       fin:document.getElementById('calFin').value,
@@ -140,13 +156,100 @@ document.addEventListener('DOMContentLoaded',()=>{
       const data=await res.json();
       if(!data.success) throw new Error(data.error||'No se pudo guardar');
       formMsg.className='calendar-form-msg ok';
-      formMsg.textContent='Actividad guardada correctamente.';
+      formMsg.textContent=editingKey?'Actividad modificada correctamente.':'Actividad guardada correctamente.';
+      editingKey='';
       addForm.reset();
+      await loadCalendarFromApi();
     }catch(err){
       formMsg.className='calendar-form-msg err';
       formMsg.textContent='No se pudo guardar: '+(err&&err.message?err.message:err);
     }
   });
+
+  const monthNames=['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+  const dayNames=['domingo','lunes','martes','miércoles','jueves','viernes','sábado'];
+  const cap=s=>s?String(s).charAt(0).toUpperCase()+String(s).slice(1):'';
+  function eventFromApi(x){
+    const iso=x.fecha||x.dateIso||'';
+    const m=String(iso).match(/^(\d{4})-(\d{2})-(\d{2})$/);
+    if(!m)return null;
+    const d=new Date(Number(m[1]),Number(m[2])-1,Number(m[3]));
+    const month=cap(monthNames[d.getMonth()])+' '+d.getFullYear();
+    const date=cap(dayNames[d.getDay()])+' '+d.getDate()+' '+monthNames[d.getMonth()];
+    const obs=x.observaciones||'';
+    const mode=/Telemática/i.test(obs)?'Telemática':(/Presencial/i.test(obs)?'Presencial':(x.estado==='CONFIRMADA'?'Confirmada':'Programada'));
+    return {
+      month,date,time:x.inicio||'Por concretar',name:x.actividad||'',type:x.tipo||'Actividad complementaria',
+      mode,status:x.estado||'PROGRAMADA',professional:x.profesional||'',group:x.grupos||'',
+      details:obs.replace(/^(Presencial|Telemática)\s*·?\s*/i,''),
+      _sourceKey:'SHEET:'+(x.id||''),_sourceType:'sheet',
+      _isoDate:iso,_fin:x.fin||'',_nivel:x.nivel||'',_responsable:x.responsable||'',_lugar:x.lugar||''
+    };
+  }
+  function semanticKey(e){return [String(e.date||'').toLowerCase(),String(e.name||'').toLowerCase()].join('|')}
+  async function loadCalendarFromApi(){
+    try{
+      const res=await fetch(CALENDAR_WRITE_API+'?action=calendar-get&_='+Date.now(),{cache:'no-store'});
+      const data=await res.json();
+      if(!data.success)return;
+      const deleted=new Set(data.deleted||[]);
+      const overrides=new Map((data.overrides||[]).map(o=>[o.targetKey,o]));
+      let base=BASE_CALENDAR_EVENTS.filter(e=>!deleted.has(e._sourceKey)).map(e=>{
+        const o=overrides.get(e._sourceKey);
+        if(!o)return {...e};
+        const oe=eventFromApi(o);
+        return oe?{...oe,_sourceKey:e._sourceKey,_sourceType:'static'}:{...e};
+      });
+      const sheetEvents=(data.events||[]).map(eventFromApi).filter(Boolean);
+      const sheetSem=new Set(sheetEvents.map(semanticKey));
+      base=base.filter(e=>!sheetSem.has(semanticKey(e)));
+      runtimeEvents=[...base,...sheetEvents];
+      refreshCalendarFilters();
+      window.renderCalendar();
+    }catch(err){console.warn('No se pudo cargar el calendario editable',err)}
+  }
+  function isoFromEvent(e){
+    if(e._isoDate)return e._isoDate;
+    const mm=String(e.month||'').match(/([A-Za-zÁÉÍÓÚáéíóúñÑ]+)\s+(\d{4})/);
+    const dm=String(e.date||'').match(/(\d{1,2})\s+([A-Za-zÁÉÍÓÚáéíóúñÑ]+)/);
+    if(!mm||!dm)return '';
+    const norm=s=>s.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
+    const idx=monthNames.findIndex(x=>norm(x)===norm(dm[2]));
+    return idx<0?'':mm[2]+'-'+String(idx+1).padStart(2,'0')+'-'+String(dm[1]).padStart(2,'0');
+  }
+  function startEdit(key){
+    const e=runtimeEvents.find(x=>x._sourceKey===key);if(!e)return;
+    editingKey=key;
+    document.getElementById('calFecha').value=isoFromEvent(e);
+    const tm=String(e.time||'').match(/(\d{1,2}):(\d{2})/);
+    document.getElementById('calInicio').value=tm?String(tm[1]).padStart(2,'0')+':'+tm[2]:'';
+    document.getElementById('calFin').value=e._fin||'';
+    const tipoSelEl=document.getElementById('calTipo');
+    const desired=e.type==='Evaluación'?'Sesión de evaluación':e.type;
+    if(![...tipoSelEl.options].some(o=>o.value===desired)){const op=document.createElement('option');op.value=desired;op.textContent=desired;tipoSelEl.appendChild(op)}
+    tipoSelEl.value=desired;
+    document.getElementById('calActividad').value=e.name||'';
+    document.getElementById('calNivel').value=e._nivel||'';
+    document.getElementById('calGrupos').value=e.group||'';
+    document.getElementById('calResponsable').value=e._responsable||'';
+    document.getElementById('calLugar').value=e._lugar||'';
+    document.getElementById('calModalidad').value=/Telemática/i.test(e.mode||'')?'Telemática':(/Presencial/i.test(e.mode||'')?'Presencial':'');
+    document.getElementById('calEstado').value=e.status==='CONFIRMADA'?'CONFIRMADA':'PROGRAMADA';
+    document.getElementById('calObservaciones').value=e.details||'';
+    formMsg.textContent='Editando una actividad existente.';
+    addPanel.hidden=false;
+    addPanel.scrollIntoView({behavior:'smooth',block:'start'});
+  }
+  async function deleteEvent(key){
+    const e=runtimeEvents.find(x=>x._sourceKey===key);if(!e)return;
+    if(!confirm('¿Eliminar «'+e.name+'» del calendario?'))return;
+    try{
+      const res=await fetch(CALENDAR_WRITE_API,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'calendar-delete',sourceKey:key})});
+      const data=await res.json();
+      if(!data.success)throw new Error(data.error||'No se pudo eliminar');
+      await loadCalendarFromApi();
+    }catch(err){alert('No se pudo eliminar: '+(err&&err.message?err.message:err))}
+  }
 
   const semClass=e=>e.status==='CONFLICTO'?'status-red':(e.status==='CONFIRMADA'?'status-green':'status-yellow');
   const monthNumber={enero:0,febrero:1,marzo:2,abril:3,mayo:4,junio:5,julio:6,agosto:7,septiembre:8,octubre:9,noviembre:10,diciembre:11};
@@ -164,7 +267,7 @@ document.addEventListener('DOMContentLoaded',()=>{
   }
   window.renderCalendar=function(){
     const m=monthSel.value,t=typeSel.value,p=profSel.value,g=groupSel.value;
-    const events=CALENDAR_EVENTS
+    const events=runtimeEvents
       .filter(e=>(!m||e.month===m)&&(!t||e.type===t||e.name.includes(t))&&(!p||e.professional===p)&&(!g||e.group===g))
       .slice()
       .sort((a,b)=>eventDateKey(a)-eventDateKey(b)||eventTimeKey(a)-eventTimeKey(b)||String(a.name||'').localeCompare(String(b.name||''),'es'));
@@ -176,5 +279,10 @@ document.addEventListener('DOMContentLoaded',()=>{
     list.innerHTML=months.map(month=>'<h3 class="calendar-month">'+esc(month.name)+'</h3>'+month.days.map(day=>'<article class="calendar-day"><div class="calendar-date">'+esc(day.date)+'</div>'+day.events.map(e=>'<div class="calendar-event '+semClass(e)+'"><div class="calendar-time">'+esc(e.time||'')+'</div><div><div class="calendar-name">'+esc(e.name)+'</div><div class="meta">'+esc(e.type||'')+'</div>'+(e.professional?'<span class="calendar-prof">'+esc(e.professional)+'</span>':'')+(e.group?'<span class="calendar-group">'+esc(e.group)+'</span>':'')+(e.details?'<div class="calendar-details">'+esc(e.details)+'</div>':'')+'</div><div class="calendar-mode">'+esc(e.mode||e.status||'Programada')+'</div></div>').join('')+'</article>').join('')).join('');
   };
   [monthSel,typeSel,profSel,groupSel].forEach(s=>s.addEventListener('change',window.renderCalendar));
+  document.getElementById('calendarList').addEventListener('click',ev=>{
+    const eb=ev.target.closest('[data-edit]');if(eb){startEdit(eb.dataset.edit);return}
+    const db=ev.target.closest('[data-delete]');if(db){deleteEvent(db.dataset.delete)}
+  });
   window.renderCalendar();
+  loadCalendarFromApi();
 });
