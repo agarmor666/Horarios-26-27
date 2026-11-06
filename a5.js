@@ -40,8 +40,8 @@ document.addEventListener('DOMContentLoaded',()=>{
       <form id="calendarAddForm" class="calendar-add-form">
         <div class="calendar-form-grid">
           <label>Fecha *<input id="calFecha" type="date" required></label>
-          <label>Hora inicio<input id="calInicio" type="time"></label>
-          <label>Hora fin<input id="calFin" type="time"></label>
+          <label>Hora inicio<select id="calInicio">${calendarOptions(calendarTimes,'Seleccionar hora…')}</select></label>
+          <label>Hora fin<select id="calFin">${calendarOptions(calendarTimes,'Seleccionar hora…')}</select></label>
           <label>Tipo de actividad *
             <select id="calTipo" required>
               <option value="">Seleccionar…</option>
@@ -60,9 +60,8 @@ document.addEventListener('DOMContentLoaded',()=>{
             </select>
           </label>
           <label class="calendar-form-wide">Actividad / asunto *<input id="calActividad" type="text" required placeholder="Ej.: Salida al teatro, reunión de equipo docente…"></label>
-          <label>Etapa / nivel<input id="calNivel" type="text" placeholder="Infantil, Primer ciclo, 6.º…"></label>
-          <label>Grupo(s) / destinatarios<input id="calGrupos" type="text" placeholder="1.º A, Primer ciclo, Claustro…"></label>
-          <label>Responsable<input id="calResponsable" type="text" placeholder="Tutor/a, coordinación, equipo directivo…"></label>
+          <label>Grupo(s) / destinatarios<select id="calGrupos">${calendarOptions(calendarGroups,'Seleccionar grupo…')}<option>Claustro</option><option>Equipo docente</option><option>Ciclo</option><option>Consejo Escolar</option><option>ETCP</option><option>Familias</option><option value="Otro / sin grupo concreto">Otro / sin grupo concreto</option></select></label>
+          <label>Responsable<select id="calResponsable">${calendarOptions(calendarTeachers,'Seleccionar responsable…')}</select></label>
           <label>Lugar<input id="calLugar" type="text" placeholder="Centro, Vera, teatro…"></label>
           <label>Modalidad
             <select id="calModalidad">
@@ -142,9 +141,9 @@ document.addEventListener('DOMContentLoaded',()=>{
       categoria:tipo,
       profesional:'',
       actividad:document.getElementById('calActividad').value.trim(),
-      nivel:document.getElementById('calNivel').value.trim(),
-      grupos:document.getElementById('calGrupos').value.trim(),
-      responsable:document.getElementById('calResponsable').value.trim(),
+      nivel:'',
+      grupos:document.getElementById('calGrupos').value,
+      responsable:document.getElementById('calResponsable').value,
       lugar:document.getElementById('calLugar').value.trim(),
       estado:document.getElementById('calEstado').value,
       aviso:'Pendiente',
@@ -234,7 +233,6 @@ document.addEventListener('DOMContentLoaded',()=>{
     if(![...tipoSelEl.options].some(o=>o.value===desired)){const op=document.createElement('option');op.value=desired;op.textContent=desired;tipoSelEl.appendChild(op)}
     tipoSelEl.value=desired;
     document.getElementById('calActividad').value=e.name||'';
-    document.getElementById('calNivel').value=e._nivel||'';
     document.getElementById('calGrupos').value=e.group||'';
     document.getElementById('calResponsable').value=e._responsable||'';
     document.getElementById('calLugar').value=e._lugar||'';
