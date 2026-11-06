@@ -26,6 +26,11 @@ document.addEventListener('DOMContentLoaded',()=>{
   const BASE_CALENDAR_EVENTS=CALENDAR_EVENTS.map(e=>({...e,_sourceKey:staticKey(e),_sourceType:'static'}));
   let runtimeEvents=BASE_CALENDAR_EVENTS.map(e=>({...e}));
   let editingKey='';
+  const calendarGroups=(window.H&&Array.isArray(H.g))?H.g.slice():[];
+  const calendarTeachers=['Alconchel Vázquez, Carlos','Del Caño Ceballos, María','Enjuto Mena, Carolina','Fernández Marcos Donate, Raquel','Flores Ortega, Juana del Pilar','García Arnau, Mireia','García Piñero, Isabel María','Garrido Morales, Antonio Jesús','González Carrillo, Francisco','González Sanz, Nuria','Haro Mansilla, Aladina','Jimena Quesada, Luis María','Jiménez Medina, Ana Bella','Jiménez Torres, María Jose','Mañas Villar, Lucía','Martínez Guerrero, Isabel María','Montoya Morales, María Luisa','Moreno Alonso, Antonia','Palomares Padilla, Pilar','Pastor Reche, Carmen Dolores','Peña Ruiz, María Cruz','Ramos Muñoz, Patricia','Rodríguez Agüero, María Isabel','Rodríguez Domínguez, Ana Belén','Rodríguez Montes, Jesús','Roldán Camenforte, Leónides','Tafur Porras, Ángela María','Teruel Ortiz, Carlos','Torres Molina, Juan Carlos','Vedia Salinas, Carmen Cristín','Velázquez Peramos, María de la Cabeza','Yanguez López-Cano, Rafael'];
+  const calendarTimes=[];
+  for(let h=8;h<=20;h++){for(const m of [0,15,30,45]){if(h===20&&m>0)continue;calendarTimes.push(String(h).padStart(2,'0')+':'+String(m).padStart(2,'0'))}}
+  const calendarOptions=(items,placeholder)=>'<option value="">'+placeholder+'</option>'+items.map(v=>'<option value="'+esc(v)+'">'+esc(v)+'</option>').join('');
 
   const section=document.getElementById('calendar');
   if(!section)return;
