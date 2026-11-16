@@ -3,6 +3,7 @@ const CONFIG = {
   CONVIVENCIA_SHEET_NAME: 'Compromisos de convivencia',
   FAMILY_SHEET_NAME: 'Familias',
   PDF_FOLDER_ID: '1gKBP4cNWl2TyjGemt9J1mfGYXeQoz3G4',
+  TEMPLATE_DOC_ID: '1qBQ2jJjuDxHRrfyca0ASQuaZyjPTzb1vpeqLPaQlG-s',
   SCHOOL_NAME: 'CEIP Bartolomé Flores',
   SCHOOL_CODE: '04003160',
   INSTITUTIONAL_EMAILS: [
@@ -182,34 +183,68 @@ function ensureHeaders_(sh) {
 }
 
 function createPdf_(d,code,date) {
-  const doc = DocumentApp.create(code+' - '+d.alumno);
-  const body = doc.getBody();
-  body.appendParagraph(CONFIG.SCHOOL_NAME+' · MOJÁCAR').setHeading(DocumentApp.ParagraphHeading.TITLE);
-  body.appendParagraph(labelType_(d.tipo).toUpperCase()).setHeading(DocumentApp.ParagraphHeading.HEADING1);
-  body.appendParagraph('Código: '+code+' · Registrado: '+formatDate_(date));
-  body.appendHorizontalRule();
-  addField_(body,'Alumno/a',d.alumno);
-  addField_(body,'Grupo',d.grupo);
-  addField_(body,'Maestro/a que suscribe',d.tutor+' · '+d.emailProfesor);
-  if (d.nombreMadre) addField_(body,'Madre',d.nombreMadre+(d.emailMadre?' · '+d.emailMadre:''));
-  if (d.nombrePadre) addField_(body,'Padre',d.nombrePadre+(d.emailPadre?' · '+d.emailPadre:''));
-  addField_(body,'Duración prevista',d.duracion);
-  addList_(body,'Objetivos seleccionados',d.objetivos,d.otroObjetivo);
-  addList_(body,'Compromisos de la familia',d.compromisosFamilia,d.otroCompromiso);
-  addList_(body,'Compromisos del centro',d.compromisosCentro,d.otroCompromisoCentro);
-  addField_(body,'Observaciones',d.observaciones || 'Sin observaciones');
-  appendSignature_(body,'Firma de la familia',d.firmanteFamilia,d.firmaFamilia,'firma-familia.png');
-  appendSignature_(body,'Firma del profesorado',d.firmanteProfesor,d.firmaProfesor,'firma-profesorado.png');
-  body.appendParagraph('Las personas firmantes declaran que los datos son correctos y aceptan los compromisos seleccionados. El compromiso queda registrado en el centro.');
-  body.appendParagraph('CEIP Bartolomé Flores · Código 04003160 · Plaza Rey Alabez, 11 · 04638 Mojácar (Almería)');
-  doc.saveAndClose();
+  // Usar una copia: el membrete original nunca se modifica.
+  const template=DriveApp.getFileById(CONFIG.TEMPLATE_DOC_ID);
+  const workingCopy=template.makeCopy(code+' - '+d.alumno);
+  let completed=false;
+  try {
+    const doc=DocumentApp.openById(workingCopy.getId());
+    const body=doc.getBody();
+    const replacements={
+      '{{TITULO}}':labelType_(d.tipo).toUpperCase(),
+      '{{CODIGO}}':code,
+      '{{FECHA}}':formatDate_(date),
+      '{{ALUMNO}}':d.alumno||'',
+      '{{GRUPO}}':d.grupo||'',
+      '{{TUTOR}}':d.tutor||'',
+      '{{CORREO_PROFESOR}}':d.emailProfesor||'',
+      '{{MADRE}}':d.nombreMadre||'No indicada',
+      '{{CORREO_MADRE}}':d.emailMadre||'No indicado',
+      '{{PADRE}}':d.nombrePadre||'No indicado',
+      '{{CORREO_PADRE}}':d.emailPadre||'No indicado',
+      '{{DURACION}}':d.duracion||'',
+      '{{OBJETIVOS}}':textList_(d.objetivos,d.otroObjetivo),
+      '{{COMPROMISOS_FAMILIA}}':textList_(d.compromisosFamilia,d.otroCompromiso),
+      '{{COMPROMISOS_CENTRO}}':textList_(d.compromisosCentro,d.otroCompromisoCentro),
+      '{{OBSERVACIONES}}':d.observaciones||'Sin observaciones',
+      '{{FIRMANTE_FAMILIA}}':d.firmanteFamilia||'',
+      '{{FIRMANTE_PROFESOR}}':d.firmanteProfesor||''
+    };
+    Object.keys(replacements).forEach(tag=>body.replaceText(escapeTemplateTag_(tag),String(replacements[tag])));
+    replaceSignatureInTemplate_(body,'{{FIRMA_FAMILIA}}',d.firmaFamilia,'firma-familia.png');
+    replaceSignatureInTemplate_(body,'{{FIRMA_PROFESOR}}',d.firmaProfesor,'firma-profesorado.png');
+    doc.saveAndClose();
+    const pdf=DriveApp.getFileById(workingCopy.getId()).getAs(MimeType.PDF).setName(code+' - '+d.alumno+'.pdf');
+    const folder=DriveApp.getFolderById(CONFIG.PDF_FOLDER_ID);
+    const file=folder.createFile(pdf);
+    completed=true;
+    return {file:file,blob:pdf};
+  } finally {
+    if(completed)workingCopy.setTrashed(true);
+  }
+}
 
-  const source = DriveApp.getFileById(doc.getId());
-  const blob = source.getAs(MimeType.PDF).setName(code+' - '+d.alumno+'.pdf');
-  const folder = DriveApp.getFolderById(CONFIG.PDF_FOLDER_ID);
-  const file = folder.createFile(blob);
-  source.setTrashed(true);
-  return {file:file,blob:blob};
+function textList_(items,other) {
+  const lines=(Array.isArray(items)?items:[]).map(item=>'• '+String(item));
+  if(String(other||'').trim())lines.push('• Otro: '+String(other).trim());
+  return lines.join('\n')||'No indicado';
+}
+function escapeTemplateTag_(value) {
+  return String(value).replace(/\{/g,'\\{').replace(/\}/g,'\\}');
+}
+function replaceSignatureInTemplate_(body,tag,dataUrl,fileName) {
+  const found=body.findText(escapeTemplateTag_(tag));
+  if(!found)throw new Error('Falta el marcador '+tag+' en la plantilla de compromisos');
+  const text=found.getElement().asText();
+  const paragraph=text.getParent().asParagraph();
+  text.deleteText(found.getStartOffset(),found.getEndOffsetInclusive());
+  const bytes=Utilities.base64Decode(String(dataUrl||'').split(',')[1]||'');
+  const image=paragraph.appendInlineImage(Utilities.newBlob(bytes,'image/png',fileName));
+  const width=image.getWidth(),height=image.getHeight();
+  if(width>190) {
+    image.setWidth(190);
+    image.setHeight(Math.max(1,Math.round(height*190/width)));
+  }
 }
 
 function appendSignature_(body,title,name,dataUrl,fileName) {
