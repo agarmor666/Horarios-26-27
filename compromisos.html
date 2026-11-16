@@ -39,9 +39,9 @@
           <div class="field"><label for="alumno">Alumno/a <span class="required">*</span></label><select id="alumno" name="alumno" required disabled><option value="">Elige primero el curso…</option></select><span id="studentHelp" class="field-help">El alumnado aparecerá después de seleccionar el curso.</span></div>
           <div class="field"><label for="tutor">Maestro/a que suscribe <span class="required">*</span></label><select id="tutor" name="tutor" required disabled><option value="">Elige primero el curso…</option></select></div>
           <div class="field"><label for="emailProfesor">Correo del maestro/a <span class="required">*</span></label><input id="emailProfesor" name="emailProfesor" type="email" autocomplete="email" required maxlength="160"></div>
-          <div class="field"><label for="nombreMadre">Nombre y apellidos de la madre</label><select id="nombreMadre" name="nombreMadre" disabled><option value="">Elige primero el alumno/a…</option></select></div>
+          <div class="field"><label for="nombreMadre">Nombre y apellidos de la madre</label><input id="nombreMadre" name="nombreMadre" type="text" list="opcionesMadre" autocomplete="off" maxlength="160" placeholder="Elige primero el alumno/a…" disabled><datalist id="opcionesMadre"></datalist></div>
           <div class="field"><label for="emailMadre">Correo de la madre</label><input id="emailMadre" name="emailMadre" type="email" autocomplete="email" maxlength="160"></div>
-          <div class="field"><label for="nombrePadre">Nombre y apellidos del padre</label><select id="nombrePadre" name="nombrePadre" disabled><option value="">Elige primero el alumno/a…</option></select></div>
+          <div class="field"><label for="nombrePadre">Nombre y apellidos del padre</label><input id="nombrePadre" name="nombrePadre" type="text" list="opcionesPadre" autocomplete="off" maxlength="160" placeholder="Elige primero el alumno/a…" disabled><datalist id="opcionesPadre"></datalist></div>
           <div class="field"><label for="emailPadre">Correo del padre</label><input id="emailPadre" name="emailPadre" type="email" autocomplete="email" maxlength="160"></div>
           <div class="field full"><div id="familyRegistered" class="center-box" role="status" aria-live="polite" hidden></div><span id="familyHelp" class="field-help">Elige el curso y el alumno/a para cargar sus familiares registrados. Identifica expresamente quién es la madre y quién el padre antes de completar los correos, ya que el registro solo acredita que son tutores legales.</span></div>
           <div class="field full"><label for="duracion">Duración prevista del compromiso <span class="required">*</span></label><select id="duracion" name="duracion" required><option value="">Seleccionar duración…</option><option>Hasta la próxima revisión mensual</option><option>Un trimestre</option><option>Hasta finalizar el curso 2026/27</option><option>Otra duración, indicada en observaciones</option></select></div>
@@ -153,7 +153,7 @@
     function checked(name){return[...form.querySelectorAll(`input[name="${name}"]:checked`)].map(x=>x.value)}
     function show(text,type){message.className='message show '+type;message.innerHTML=text;message.scrollIntoView({behavior:'smooth',block:'center'})}
     function options(select,placeholder,values){select.innerHTML=`<option value="">${esc(placeholder)}</option>`+values.map(x=>`<option value="${esc(x)}">${esc(x)}</option>`).join('');select.disabled=!values.length}
-    function resetFamilyOptions(messageText){options(form.nombreMadre,messageText||'Elige primero el alumno/a…',[]);options(form.nombrePadre,messageText||'Elige primero el alumno/a…',[]);form.emailMadre.value='';form.emailPadre.value='';const box=document.getElementById('familyRegistered');box.hidden=true;box.textContent='';updateFamilySigners()}
+    function resetFamilyOptions(messageText){['nombreMadre','nombrePadre'].forEach(id=>{const field=form.elements[id];field.value='';field.disabled=true;field.placeholder=messageText||'Elige primero el alumno/a…';document.getElementById(id==='nombreMadre'?'opcionesMadre':'opcionesPadre').replaceChildren()});form.emailMadre.value='';form.emailPadre.value='';const box=document.getElementById('familyRegistered');box.hidden=true;box.textContent='';updateFamilySigners()}
     let groupLoadId=0,familyLoadId=0;
     async function loadGroupPeople(){const requestId=++groupLoadId,group=form.grupo.value;familyLoadId++;resetFamilyOptions('Elige primero el alumno/a…');document.getElementById('familyHelp').textContent='Elige el curso y el alumno/a para cargar sus familiares registrados.';options(form.tutor,group?'Seleccionar maestro/a…':'Elige primero el curso…',group?(portalData.teachersByGroup[group]||[]):[]);form.firmanteProfesor.value='';options(form.alumno,group?'Cargando alumnado…':'Elige primero el curso…',[]);document.getElementById('studentHelp').textContent=group?'Cargando la lista del grupo…':'El alumnado aparecerá después de seleccionar el curso.';if(!group)return;try{const r=await fetch(`${portalData.studentsApi}?action=students-get&group=${encodeURIComponent(group)}`);const j=await r.json();if(requestId!==groupLoadId)return;const raw=Array.isArray(j.students)?j.students:[];const names=raw.map(x=>typeof x==='string'?x:(x.name||x.nombre||x.student||'')).filter(Boolean).sort((a,b)=>a.localeCompare(b,'es'));options(form.alumno,names.length?'Seleccionar alumno/a…':'No hay alumnado registrado',names);document.getElementById('studentHelp').textContent=names.length?'Lista actualizada desde el registro del centro.':'No se encontró alumnado para este grupo.'}catch(_){if(requestId!==groupLoadId)return;options(form.alumno,'No se pudo cargar el alumnado',[]);document.getElementById('studentHelp').textContent='No se pudo cargar la lista. Inténtalo de nuevo seleccionando el curso.'}}
     async function loadFamilyPeople(){
@@ -162,7 +162,7 @@
       resetFamilyOptions(student?'Cargando familiares…':'Elige primero el alumno/a…');
       help.textContent=student?'Consultando el registro de familiares…':'Elige el curso y el alumno/a para cargar sus familiares registrados.';
       if(!student)return;
-      if(!/^https:\/\/script\.google\.com\/macros\/s\//.test(api)){help.textContent='No está activa la conexión con el registro de familias.';return}
+      if(!/^https:\/\/script\.google\.com\/macros\/s\//.test(api)){form.nombreMadre.disabled=false;form.nombrePadre.disabled=false;help.textContent='La conexión con el registro de familias no está activa. Puedes escribir los nombres, pero no se podrá guardar hasta que se restablezca el servicio.';return}
       try{
         const r=await fetch(api,{method:'POST',redirect:'follow',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'getGuardians',alumno:student,grupo:form.grupo.value})});
         if(!r.ok)throw new Error('El servidor ha devuelto el estado '+r.status);
@@ -170,8 +170,7 @@
         if(requestId!==familyLoadId)return;
         if(!j.ok)throw new Error(j.message||'La consulta de familiares no ha podido completarse');
         const guardians=[...new Map((Array.isArray(j.guardians)?j.guardians:[]).filter(x=>typeof x==='string'&&x.trim()).map(x=>[x.normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim().toLowerCase(),x.trim()])).values()].sort((a,b)=>a.localeCompare(b,'es'));
-        options(form.nombreMadre,guardians.length?'Seleccionar madre (confirmar parentesco)…':'Sin familiares registrados',guardians);
-        options(form.nombrePadre,guardians.length?'Seleccionar padre (confirmar parentesco)…':'Sin familiares registrados',guardians);
+        ['nombreMadre','nombrePadre'].forEach(id=>{const field=form.elements[id],list=document.getElementById(id==='nombreMadre'?'opcionesMadre':'opcionesPadre');list.replaceChildren(...guardians.map(name=>{const option=document.createElement('option');option.value=name;return option}));field.disabled=false;field.placeholder=id==='nombreMadre'?'Escribir o elegir madre…':'Escribir o elegir padre…'});
         if(guardians.length){
           box.hidden=false;
           box.innerHTML='<h3>Familiares registrados de este alumno/a</h3><ul>'+guardians.map(name=>'<li>'+esc(name)+'</li>').join('')+'</ul>';
@@ -181,8 +180,9 @@
         }
       }catch(err){
         if(requestId!==familyLoadId)return;
-        resetFamilyOptions('No se pudieron cargar');
-        help.textContent='No se han podido recuperar los familiares: '+(err&&err.message||'error de conexión')+'. Vuelve a seleccionar el alumno/a. Si persiste, revisa la publicación de Apps Script.';
+        resetFamilyOptions('Escribe los nombres manualmente…');
+        form.nombreMadre.disabled=false;form.nombrePadre.disabled=false;
+        help.textContent='No se pudieron cargar los nombres automáticamente. Puedes escribir los nombres y apellidos de la madre o del padre tal como constan en el registro del centro. Se comprobarán al enviar el compromiso; si no coinciden, el registro no se realizará. Si el problema continúa, hay que revisar la conexión de Apps Script.';
       }
     }
     function updateFamilySigners(){const current=form.firmanteFamilia.value,people=[];if(form.nombreMadre.value.trim())people.push('Madre — '+form.nombreMadre.value.trim());if(form.nombrePadre.value.trim())people.push('Padre — '+form.nombrePadre.value.trim());options(form.firmanteFamilia,people.length?'Seleccionar persona firmante…':'Completa primero los datos familiares…',people);if(people.includes(current))form.firmanteFamilia.value=current}
