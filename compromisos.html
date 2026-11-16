@@ -189,7 +189,7 @@
         if(requestId!==familyLoadId)return;
         resetFamilyOptions('Escribe los nombres manualmente…');
         form.nombreMadre.disabled=false;form.nombrePadre.disabled=false;
-        help.textContent='No se pudieron cargar los nombres automáticamente. Puedes escribir los nombres y apellidos de la madre o del padre tal como constan en el registro del centro. Se comprobarán al enviar el compromiso; si no coinciden, el registro no se realizará. Si el problema continúa, hay que revisar la conexión de Apps Script.';
+        help.textContent='No se pudieron cargar los familiares. Puedes escribir los nombres manualmente, pero el registro se validará con la base de datos. Detalle técnico: '+String(err&&err.message||'Error desconocido')+'. Si aparece «Failed to fetch» o «NetworkError», revisa los permisos y la conexión entre el navegador y Apps Script.';
       }
     }
     function updateFamilySigners(){const current=form.firmanteFamilia.value,people=[];if(form.nombreMadre.value.trim())people.push('Madre — '+form.nombreMadre.value.trim());if(form.nombrePadre.value.trim())people.push('Padre — '+form.nombrePadre.value.trim());options(form.firmanteFamilia,people.length?'Seleccionar persona firmante…':'Completa primero los datos familiares…',people);if(people.includes(current))form.firmanteFamilia.value=current}
