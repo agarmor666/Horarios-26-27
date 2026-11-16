@@ -1,5 +1,5 @@
 const CONFIG = {
-  SHEET_NAME: 'Solicitudes',
+  SHEET_NAME: 'Compromisos Educativos',
   CONVIVENCIA_SHEET_NAME: 'Compromisos de convivencia',
   FAMILY_SHEET_NAME: 'Familias',
   PDF_FOLDER_ID: '1gKBP4cNWl2TyjGemt9J1mfGYXeQoz3G4',
