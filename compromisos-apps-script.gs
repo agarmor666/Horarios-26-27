@@ -75,8 +75,9 @@ function normaliseLegacyFields_(d) {
 function validate_(d) {
   const required = ['tipo','alumno','grupo','tutor','emailProfesor','duracion','firmanteFamilia','firmanteProfesor'];
   required.forEach(k => { if (!String(d[k] || '').trim()) throw new Error('Falta un campo obligatorio: '+k); });
-  validatePersonPair_('madre',d.nombreMadre,d.emailMadre);
-  validatePersonPair_('padre',d.nombrePadre,d.emailPadre);
+  if (d.emailMadre && !String(d.nombreMadre || '').trim()) throw new Error('Se ha indicado correo de la madre sin identificarla');
+  if (d.emailPadre && !String(d.nombrePadre || '').trim()) throw new Error('Se ha indicado correo del padre sin identificarlo');
+  if (!String(d.emailMadre || '').trim() && !String(d.emailPadre || '').trim()) throw new Error('Debe indicarse al menos un correo electrónico familiar');
   if (!String(d.nombreMadre || '').trim() && !String(d.nombrePadre || '').trim()) throw new Error('Debe indicarse al menos la madre o el padre');
   if (d.nombreMadre && d.nombrePadre && canonicalName_(d.nombreMadre) === canonicalName_(d.nombrePadre)) throw new Error('La madre y el padre no pueden ser la misma persona');
   [d.emailMadre,d.emailPadre,d.emailProfesor].filter(Boolean).forEach(validateEmail_);
@@ -190,8 +191,8 @@ function createPdf_(d,code,date) {
   addField_(body,'Alumno/a',d.alumno);
   addField_(body,'Grupo',d.grupo);
   addField_(body,'Maestro/a que suscribe',d.tutor+' · '+d.emailProfesor);
-  if (d.nombreMadre) addField_(body,'Madre',d.nombreMadre+' · '+d.emailMadre);
-  if (d.nombrePadre) addField_(body,'Padre',d.nombrePadre+' · '+d.emailPadre);
+  if (d.nombreMadre) addField_(body,'Madre',d.nombreMadre+(d.emailMadre?' · '+d.emailMadre:''));
+  if (d.nombrePadre) addField_(body,'Padre',d.nombrePadre+(d.emailPadre?' · '+d.emailPadre:''));
   addField_(body,'Duración prevista',d.duracion);
   addList_(body,'Objetivos seleccionados',d.objetivos,d.otroObjetivo);
   addList_(body,'Compromisos de la familia',d.compromisosFamilia,d.otroCompromiso);
