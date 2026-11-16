@@ -169,12 +169,19 @@
         const j=await r.json();
         if(requestId!==familyLoadId)return;
         if(!j.ok)throw new Error(j.message||'La consulta de familiares no ha podido completarse');
+        const detailed=Array.isArray(j.guardiansDetailed)?j.guardiansDetailed:[];
         const guardians=[...new Map((Array.isArray(j.guardians)?j.guardians:[]).filter(x=>typeof x==='string'&&x.trim()).map(x=>[x.normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim().toLowerCase(),x.trim()])).values()].sort((a,b)=>a.localeCompare(b,'es'));
+        const verified=detailed.filter(x=>x&&typeof x.name==='string'&&guardians.includes(x.name));
+        const knownMothers=verified.filter(x=>x.role==='Madre');
+        const knownFathers=verified.filter(x=>x.role==='Padre');
         ['nombreMadre','nombrePadre'].forEach(id=>{const field=form.elements[id],list=document.getElementById(id==='nombreMadre'?'opcionesMadre':'opcionesPadre');list.replaceChildren(...guardians.map(name=>{const option=document.createElement('option');option.value=name;return option}));field.disabled=false;field.placeholder=id==='nombreMadre'?'Escribir o elegir madre…':'Escribir o elegir padre…'});
+        if(knownMothers.length===1&&knownFathers.length<=1)form.nombreMadre.value=knownMothers[0].name;
+        if(knownFathers.length===1&&knownMothers.length<=1)form.nombrePadre.value=knownFathers[0].name;
+        updateFamilySigners();
         if(guardians.length){
           box.hidden=false;
           box.innerHTML='<h3>Familiares registrados de este alumno/a</h3><ul>'+guardians.map(name=>'<li>'+esc(name)+'</li>').join('')+'</ul>';
-          help.textContent='Estos nombres se han cargado automáticamente. El registro no indica parentesco: elige quién es la madre y/o el padre en los desplegables y añade el correo de cada persona seleccionada.';
+          help.textContent=knownMothers.length||knownFathers.length?'Los parentescos confirmados se han completado automáticamente. Comprueba los datos y añade los correos electrónicos correspondientes.':'Se han cargado los tutores legales. Como Séneca no identifica su parentesco, confirma quién es la madre o el padre antes de continuar.';
         }else{
           help.textContent='Este alumno/a no tiene familiares registrados en la base de datos. Comunícalo a Secretaría antes de preparar el compromiso.';
         }
