@@ -7,6 +7,7 @@ const CONFIG = {
   SCHOOL_CODE: '04003160',
   INSTITUTIONAL_EMAILS: [
     'jefaturadeestudios@bartolomeflores.com',
+    'antoniogarrido@bartolomeflores.com',
     '04003160@bartolomeflores.com'
   ]
 };
