@@ -34,7 +34,7 @@ function doPost(e) {
     if (data.action === 'getGuardians') {
       const student = String(data.alumno || '').trim();
       if (!student) throw new Error('Falta seleccionar el alumno/a');
-      return json_({ok:true,guardians:guardiansForStudent_(student)});
+      return json_({ok:true,guardians:guardiansForStudent_(student),guardiansDetailed:guardiansDetailedForStudent_(student)});
     }
     if (data.action !== 'submitCommitment') throw new Error('Acción no válida');
     if (String(data.website || '').trim()) return json_({ok:true,code:'RECIBIDO'});
@@ -99,12 +99,29 @@ function validateRegisteredGuardians_(d) {
 }
 
 function guardiansForStudent_(studentName) {
+  return guardiansDetailedForStudent_(studentName).map(person => person.name);
+}
+
+// El parentesco es opcional y solo se devuelve cuando ha sido confirmado.
+// Nunca se deduce del orden de las filas, nombre propio o apellidos.
+function guardiansDetailedForStudent_(studentName) {
   const sh = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(CONFIG.FAMILY_SHEET_NAME);
   if (!sh || sh.getLastRow() < 2) throw new Error('El registro de familias no está disponible');
-  const rows = sh.getRange(2,1,sh.getLastRow()-1,2).getDisplayValues();
+  const columns = Math.min(3,sh.getLastColumn());
+  const rows = sh.getRange(2,1,sh.getLastRow()-1,columns).getDisplayValues();
   const student = canonicalName_(studentName);
   const seen = {};
-  return rows.filter(r=>canonicalName_(r[0])===student).map(r=>String(r[1] || '').trim()).filter(name=>name && !seen[canonicalName_(name)] && (seen[canonicalName_(name)]=true));
+  return rows.filter(r => canonicalName_(r[0]) === student).map(r => {
+    const name = String(r[1] || '').trim();
+    const enteredRole = String(r[2] || '').trim().toLowerCase();
+    const role = enteredRole === 'madre' ? 'Madre' : enteredRole === 'padre' ? 'Padre' : '';
+    return {name:name,role:role};
+  }).filter(person => {
+    const key = canonicalName_(person.name);
+    if (!key || seen[key]) return false;
+    seen[key] = true;
+    return true;
+  });
 }
 
 function canonicalName_(value) {
