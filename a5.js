@@ -151,7 +151,7 @@ document.addEventListener('DOMContentLoaded',()=>{
   const unique=(field)=>[...new Set(runtimeEvents.map(e=>e[field]).filter(Boolean))];
   function refreshCalendarFilters(){
     const prev={m:monthSel.value,t:typeSel.value,p:profSel.value,g:groupSel.value};
-    monthSel.innerHTML='<option value="">Todo el curso</option>'+unique('month').map(v=>'<option>'+esc(v)+'</option>').join('')+CAL_TRIMESTRES.map(t=>'<option value="'+t.value+'">'+t.label+'</option>').join('');
+    monthSel.innerHTML='<option value="">Todo el curso</option>'+unique('month').filter(v=>!/^((Primer|Segundo|Tercer) trimestre) 2026\/27$/.test(v)).map(v=>'<option>'+esc(v)+'</option>').join('')+CAL_TRIMESTRES.map(t=>'<option value="'+t.value+'">'+t.label+'</option>').join('');
     typeSel.innerHTML='<option value="">Todas las categorías</option>'+unique('type').map(v=>'<option>'+esc(v)+'</option>').join('');
     profSel.innerHTML='<option value="">Todos los profesionales</option>'+unique('professional').map(v=>'<option>'+esc(v)+'</option>').join('');
     groupSel.innerHTML='<option value="">Todos los grupos</option>'+calendarGroupFilterOptions.map(section=>'<optgroup label="'+esc(section.label)+'">'+section.values.map(v=>'<option value="'+esc(v)+'">'+esc(v)+'</option>').join('')+'</optgroup>').join('');
