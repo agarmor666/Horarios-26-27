@@ -183,7 +183,7 @@ document.addEventListener('DOMContentLoaded',()=>{
   function resetResponsibles(){responsibleCheckboxes().forEach(c=>c.checked=false);responsiblePicker.open=false;renderResponsibleSummary()}
   function setResponsibles(value){
     resetResponsibles();
-    String(value||'').split(/\\s*\\|\\s*/).map(v=>v.trim()).filter(Boolean).forEach(name=>{
+    String(value||'').split(/\s*\|\s*/).map(v=>v.trim()).filter(Boolean).forEach(name=>{
       let option=responsibleCheckboxes().find(c=>c.value===name);
       if(!option){
         const label=document.createElement('label');
