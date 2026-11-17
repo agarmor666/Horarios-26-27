@@ -70,7 +70,9 @@ document.addEventListener('DOMContentLoaded',()=>{
     <div id="calendarAddPanel" class="calendar-add-panel" hidden>
       <form id="calendarAddForm" class="calendar-add-form">
         <div class="calendar-form-grid">
-          <label>Fecha *<input id="calFecha" type="date" required></label>
+          <label>Cómo fechar la actividad *<select id="calFechaModo"><option value="fecha">Fecha concreta</option><option value="trimestre">Trimestre previsto (sin fecha concreta)</option></select></label>
+          <label id="calFechaWrap">Fecha *<input id="calFecha" type="date" required></label>
+          <label id="calTrimestreWrap" hidden>Trimestre previsto *<select id="calTrimestre"><option value="">Seleccionar trimestre…</option><option>Primer trimestre</option><option>Segundo trimestre</option><option>Tercer trimestre</option></select></label>
           <label>Hora inicio${timeSelects('calInicio')}</label>
           <label>Hora fin${timeSelects('calFin')}</label>
           <label>Tipo de actividad *
@@ -131,7 +133,7 @@ document.addEventListener('DOMContentLoaded',()=>{
     </dialog>`;
 
   const style=document.createElement('style');
-  style.textContent=`#calSolicitanteWrap[hidden]{display:none!important}.calendar-delete-dialog{max-width:460px;width:calc(100% - 40px);border:1px solid #cbd5e1;border-radius:16px;padding:24px;box-shadow:0 22px 70px #0f172a40;color:#0f172a}.calendar-delete-dialog::backdrop{background:#0f172a88}.calendar-delete-dialog label{display:flex;flex-direction:column;gap:7px;font-weight:800}.calendar-delete-dialog select{width:100%;padding:11px;border:1px solid #cbd5e1;border-radius:10px;background:white}.calendar-event.status-green{border-left-color:#16a34a}.calendar-event.status-yellow{border-left-color:#eab308}.calendar-event.status-red{border-left-color:#dc2626}.calendar-details{margin-top:5px;color:#64748b;font-size:.8rem}.calendar-prof{display:inline-block;margin-top:5px;padding:3px 7px;border-radius:999px;background:#ecfeff;color:#155e75;font-size:.72rem;font-weight:800}.calendar-group{display:inline-block;margin:5px 0 0 5px;padding:3px 7px;border-radius:999px;background:#eef2ff;color:#3730a3;font-size:.72rem;font-weight:800}.calendar-add-panel{margin:0 0 18px;padding:18px;border:1px solid #cbd5e1;border-radius:16px;background:#f8fafc}.calendar-add-form{margin:0}.calendar-form-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.calendar-form-grid label{display:flex;flex-direction:column;gap:6px;font-weight:800;color:#334155;font-size:.86rem}.calendar-form-grid input,.calendar-form-grid select,.calendar-form-grid textarea{width:100%;box-sizing:border-box;padding:10px 11px;border:1px solid #cbd5e1;border-radius:10px;background:#fff;font:inherit;font-weight:500;color:#0f172a}.calendar-form-wide{grid-column:1/-1}.calendar-time-selects{display:grid;grid-template-columns:1fr auto 1fr;gap:6px;align-items:center}.calendar-time-selects span{text-align:center;font-weight:900}.calendar-form-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:14px}.calendar-secondary{background:#e2e8f0!important;color:#334155!important}.calendar-form-msg{font-weight:800;font-size:.85rem}.calendar-form-msg.ok{color:#166534}.calendar-form-msg.err{color:#b91c1c}.calendar-event-actions{display:flex;gap:6px;justify-content:flex-end;flex-wrap:wrap;margin-top:7px}.calendar-mini-btn{border:0;border-radius:8px;padding:5px 8px;font:inherit;font-size:.72rem;font-weight:900;cursor:pointer}.calendar-edit-btn{background:#e0e7ff;color:#3730a3}.calendar-delete-btn{background:#fee2e2;color:#991b1b}@media(max-width:900px){.calendar-tools{display:grid!important;grid-template-columns:1fr 1fr}.calendar-tools select{width:100%!important;min-width:0!important}.calendar-form-grid{grid-template-columns:1fr 1fr}}@media(max-width:600px){.calendar-tools{grid-template-columns:1fr}.calendar-form-grid{grid-template-columns:1fr}.calendar-form-wide{grid-column:auto}}`;
+  style.textContent=`#calSolicitanteWrap[hidden],#calFechaWrap[hidden],#calTrimestreWrap[hidden]{display:none!important}.calendar-delete-dialog{max-width:460px;width:calc(100% - 40px);border:1px solid #cbd5e1;border-radius:16px;padding:24px;box-shadow:0 22px 70px #0f172a40;color:#0f172a}.calendar-delete-dialog::backdrop{background:#0f172a88}.calendar-delete-dialog label{display:flex;flex-direction:column;gap:7px;font-weight:800}.calendar-delete-dialog select{width:100%;padding:11px;border:1px solid #cbd5e1;border-radius:10px;background:white}.calendar-event.status-green{border-left-color:#16a34a}.calendar-event.status-yellow{border-left-color:#eab308}.calendar-event.status-red{border-left-color:#dc2626}.calendar-details{margin-top:5px;color:#64748b;font-size:.8rem}.calendar-prof{display:inline-block;margin-top:5px;padding:3px 7px;border-radius:999px;background:#ecfeff;color:#155e75;font-size:.72rem;font-weight:800}.calendar-group{display:inline-block;margin:5px 0 0 5px;padding:3px 7px;border-radius:999px;background:#eef2ff;color:#3730a3;font-size:.72rem;font-weight:800}.calendar-add-panel{margin:0 0 18px;padding:18px;border:1px solid #cbd5e1;border-radius:16px;background:#f8fafc}.calendar-add-form{margin:0}.calendar-form-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.calendar-form-grid label{display:flex;flex-direction:column;gap:6px;font-weight:800;color:#334155;font-size:.86rem}.calendar-form-grid input,.calendar-form-grid select,.calendar-form-grid textarea{width:100%;box-sizing:border-box;padding:10px 11px;border:1px solid #cbd5e1;border-radius:10px;background:#fff;font:inherit;font-weight:500;color:#0f172a}.calendar-form-wide{grid-column:1/-1}.calendar-time-selects{display:grid;grid-template-columns:1fr auto 1fr;gap:6px;align-items:center}.calendar-time-selects span{text-align:center;font-weight:900}.calendar-form-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:14px}.calendar-secondary{background:#e2e8f0!important;color:#334155!important}.calendar-form-msg{font-weight:800;font-size:.85rem}.calendar-form-msg.ok{color:#166534}.calendar-form-msg.err{color:#b91c1c}.calendar-event-actions{display:flex;gap:6px;justify-content:flex-end;flex-wrap:wrap;margin-top:7px}.calendar-mini-btn{border:0;border-radius:8px;padding:5px 8px;font:inherit;font-size:.72rem;font-weight:900;cursor:pointer}.calendar-edit-btn{background:#e0e7ff;color:#3730a3}.calendar-delete-btn{background:#fee2e2;color:#991b1b}@media(max-width:900px){.calendar-tools{display:grid!important;grid-template-columns:1fr 1fr}.calendar-tools select{width:100%!important;min-width:0!important}.calendar-form-grid{grid-template-columns:1fr 1fr}}@media(max-width:600px){.calendar-tools{grid-template-columns:1fr}.calendar-form-grid{grid-template-columns:1fr}.calendar-form-wide{grid-column:auto}}`;
   document.head.appendChild(style);
 
   const monthSel=document.getElementById('calendarMonth'),typeSel=document.getElementById('calendarType'),profSel=document.getElementById('calendarProfessional'),groupSel=document.getElementById('calendarGroup');
@@ -140,6 +142,7 @@ document.addEventListener('DOMContentLoaded',()=>{
     if(!selection)return true;
     const trimester=CAL_TRIMESTRES.find(t=>t.value===selection);
     if(!trimester)return event.month===selection;
+    if(event._trimestre)return event._trimestre===trimester.label;
     const found=String(event.month||'').toLowerCase().match(/^(enero|febrero|marzo|abril|mayo|junio|julio|agosto|septiembre|octubre|noviembre|diciembre)\s+(\d{4})/);
     if(!found)return false;
     const number=['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'].indexOf(found[1])+1;
@@ -169,16 +172,28 @@ document.addEventListener('DOMContentLoaded',()=>{
   const requesterWrap=document.getElementById('calSolicitanteWrap');
   const requesterSelect=document.getElementById('calSolicitante');
   function toggleRequester(editMode){requesterWrap.hidden=!editMode;requesterSelect.required=!!editMode;if(!editMode)requesterSelect.value=''}
+  const fechaModo=document.getElementById('calFechaModo'),fechaInput=document.getElementById('calFecha'),trimestreInput=document.getElementById('calTrimestre');
+  function syncFechaModo(){
+    const byTrimester=fechaModo.value==='trimestre';
+    document.getElementById('calFechaWrap').hidden=byTrimester;
+    document.getElementById('calTrimestreWrap').hidden=!byTrimester;
+    fechaInput.required=!byTrimester;
+    trimestreInput.required=byTrimester;
+    if(byTrimester)fechaInput.value='';
+    else trimestreInput.value='';
+  }
+  fechaModo.addEventListener('change',syncFechaModo);
 
   addBtn.addEventListener('click',()=>{
     editingKey='';
     addForm.reset();
     toggleRequester(false);
+    syncFechaModo();
     formMsg.textContent='';
     addPanel.hidden=!addPanel.hidden;
-    if(!addPanel.hidden) document.getElementById('calFecha').focus();
+    if(!addPanel.hidden) fechaModo.focus();
   });
-  cancelBtn.addEventListener('click',()=>{editingKey='';addPanel.hidden=true;formMsg.textContent='';addForm.reset();toggleRequester(false)});
+  cancelBtn.addEventListener('click',()=>{editingKey='';addPanel.hidden=true;formMsg.textContent='';addForm.reset();toggleRequester(false);syncFechaModo()});
 
   function readQuarterTime(prefix){
     const h=document.getElementById(prefix+'Hora').value;
@@ -196,7 +211,8 @@ document.addEventListener('DOMContentLoaded',()=>{
     ev.preventDefault();
     formMsg.className='calendar-form-msg';
     formMsg.textContent='Guardando…';
-    const fecha=document.getElementById('calFecha').value;
+    const fecha=fechaModo.value==='trimestre'?trimestreInput.value:fechaInput.value;
+    if(!fecha){formMsg.className='calendar-form-msg err';formMsg.textContent='Indica una fecha o selecciona el trimestre previsto.';return;}
     const tipo=document.getElementById('calTipo').value;
     if(editingKey&&!requesterSelect.value){formMsg.className='calendar-form-msg err';formMsg.textContent='Selecciona quién solicita la modificación.';requesterSelect.focus();return;}
     const payload={
@@ -239,6 +255,7 @@ document.addEventListener('DOMContentLoaded',()=>{
       editingKey='';
       addForm.reset();
       toggleRequester(false);
+      syncFechaModo();
       setQuarterTime('calInicio','');
       setQuarterTime('calFin','');
     }catch(err){
@@ -253,10 +270,11 @@ document.addEventListener('DOMContentLoaded',()=>{
   function eventFromApi(x){
     const iso=x.fecha||x.dateIso||'';
     const m=String(iso).match(/^(\d{4})-(\d{2})-(\d{2})$/);
-    if(!m)return null;
-    const d=new Date(Number(m[1]),Number(m[2])-1,Number(m[3]));
-    const month=cap(monthNames[d.getMonth()])+' '+d.getFullYear();
-    const date=cap(dayNames[d.getDay()])+' '+d.getDate()+' '+monthNames[d.getMonth()];
+    const trimestre=CAL_TRIMESTRES.find(t=>t.label===String(iso).trim());
+    if(!m&&!trimestre)return null;
+    const d=m?new Date(Number(m[1]),Number(m[2])-1,Number(m[3])):null;
+    const month=trimestre?trimestre.label+' 2026/27':cap(monthNames[d.getMonth()])+' '+d.getFullYear();
+    const date=trimestre?'Fecha por concretar':cap(dayNames[d.getDay()])+' '+d.getDate()+' '+monthNames[d.getMonth()];
     const obs=x.observaciones||'';
     const mode=/Telemática/i.test(obs)?'Telemática':(/Presencial/i.test(obs)?'Presencial':(x.estado==='CONFIRMADA'?'Confirmada':'Programada'));
     return {
@@ -264,7 +282,7 @@ document.addEventListener('DOMContentLoaded',()=>{
       mode,status:x.estado||'PROGRAMADA',professional:x.profesional||'',group:x.grupos||'',
       details:obs.replace(/^(Presencial|Telemática)\s*·?\s*/i,''),
       _sourceKey:'SHEET:'+(x.id||''),_sourceType:'sheet',
-      _isoDate:iso,_fin:x.fin||'',_nivel:x.nivel||'',_responsable:x.responsable||'',_lugar:x.lugar||''
+      _trimestre:trimestre?trimestre.label:'',_isoDate:m?iso:'',_fin:x.fin||'',_nivel:x.nivel||'',_responsable:x.responsable||'',_lugar:x.lugar||''
     };
   }
   function semanticKey(e){return [String(e.date||'').toLowerCase(),String(e.name||'').toLowerCase()].join('|')}
@@ -291,6 +309,7 @@ document.addEventListener('DOMContentLoaded',()=>{
   }
   function isoFromEvent(e){
     if(e._isoDate)return e._isoDate;
+    if(e._trimestre)return '';
     const mm=String(e.month||'').match(/([A-Za-zÁÉÍÓÚáéíóúñÑ]+)\s+(\d{4})/);
     const dm=String(e.date||'').match(/(\d{1,2})\s+([A-Za-zÁÉÍÓÚáéíóúñÑ]+)/);
     if(!mm||!dm)return '';
@@ -303,7 +322,11 @@ document.addEventListener('DOMContentLoaded',()=>{
     editingKey=key;
     requesterSelect.value='';
     toggleRequester(true);
-    document.getElementById('calFecha').value=isoFromEvent(e);
+    const prevTrimestre=e._trimestre||'';
+    fechaModo.value=prevTrimestre?'trimestre':'fecha';
+    syncFechaModo();
+    if(prevTrimestre)trimestreInput.value=prevTrimestre;
+    else fechaInput.value=isoFromEvent(e);
     setQuarterTime('calInicio',e.time||'');
     setQuarterTime('calFin',e._fin||'');
     const tipoSelEl=document.getElementById('calTipo');
@@ -366,6 +389,11 @@ document.addEventListener('DOMContentLoaded',()=>{
   const semClass=e=>e.status==='CONFLICTO'?'status-red':(e.status==='CONFIRMADA'?'status-green':'status-yellow');
   const monthNumber={enero:0,febrero:1,marzo:2,abril:3,mayo:4,junio:5,julio:6,agosto:7,septiembre:8,octubre:9,noviembre:10,diciembre:11};
   function eventDateKey(e){
+    if(e._trimestre){
+      const indexes={'Primer trimestre':9,'Segundo trimestre':1,'Tercer trimestre':4};
+      const year=e._trimestre==='Primer trimestre'?2026:2027;
+      return new Date(year,(indexes[e._trimestre]||1)-1,1).getTime();
+    }
     const mm=String(e.month||'').match(/([A-Za-zÁÉÍÓÚáéíóúñÑ]+)\s+(\d{4})/);
     const dm=String(e.date||'').match(/(\d{1,2})\s+([A-Za-zÁÉÍÓÚáéíóúñÑ]+)/);
     if(!mm||!dm)return Number.MAX_SAFE_INTEGER;
