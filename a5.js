@@ -95,7 +95,7 @@ document.addEventListener('DOMContentLoaded',()=>{
           <label class="calendar-form-wide">Actividad / asunto *<input id="calActividad" type="text" required placeholder="Ej.: Salida al teatro, reunión de equipo docente…"></label>
           <label>Grupo(s) / destinatarios<select id="calGrupos"><option value="">Seleccionar grupo…</option>${CAL_GROUPS.map(g=>'<option value="'+esc(g)+'">'+esc(g)+'</option>').join('')}<option>Todos los grupos del centro</option><option>Primer ciclo</option><option>Segundo ciclo</option><option>Tercer ciclo</option><option>Ciclo de Infantil</option><option>Educación Primaria</option><option>Educación Infantil</option><option>Claustro</option><option>Equipo docente</option><option>Ciclo</option><option>Consejo Escolar</option><option>ETCP</option><option>Familias</option><option value="Otro / sin grupo concreto">Otro / sin grupo concreto</option></select></label>
           <div class="cal-responsables-field"><span class="cal-responsables-title">Responsable(s)</span><details id="calResponsablesPicker" class="cal-responsables-picker"><summary id="calResponsablesSummary">Seleccionar uno o varios responsables…</summary><div class="cal-responsables-options"><strong>Responsables colectivos</strong>${CAL_RESPONSABLES_COLECTIVOS.map(r=>'<label><input type="checkbox" name="calResponsableItem" value="'+esc(r)+'"><span>'+esc(r)+'</span></label>').join('')}<strong>Docentes</strong>${CAL_RESPONSABLES.map(r=>'<label><input type="checkbox" name="calResponsableItem" value="'+esc(r)+'"><span>'+esc(r)+'</span></label>').join('')}</div></details><small class="cal-responsables-help">Puedes marcar varias opciones.</small></div>
-          <label id="calSolicitanteWrap" hidden>Persona que solicita la modificación *<select id="calSolicitante"><option value="">Seleccionar docente solicitante…</option>${CAL_RESPONSABLES.map(r=>'<option value="'+esc(r)+'">'+esc(r)+'</option>').join('')}</select></label>
+          <label id="calSolicitanteWrap" hidden>Persona que solicita el registro o la modificación *<select id="calSolicitante"><option value="">Seleccionar docente solicitante…</option>${CAL_RESPONSABLES.map(r=>'<option value="'+esc(r)+'">'+esc(r)+'</option>').join('')}</select></label>
           <label>Lugar<input id="calLugar" type="text" placeholder="Centro, Vera, teatro…"></label>
           <label>Modalidad
             <select id="calModalidad">
@@ -213,7 +213,7 @@ document.addEventListener('DOMContentLoaded',()=>{
     editingKey='';
     addForm.reset();
     resetResponsibles();
-    toggleRequester(false);
+    toggleRequester(true);
     syncFechaModo();
     formMsg.textContent='';
     addPanel.hidden=!addPanel.hidden;
@@ -240,11 +240,11 @@ document.addEventListener('DOMContentLoaded',()=>{
     const fecha=fechaModo.value==='trimestre'?trimestreInput.value:fechaInput.value;
     if(!fecha){formMsg.className='calendar-form-msg err';formMsg.textContent='Indica una fecha o selecciona el trimestre previsto.';return;}
     const tipo=document.getElementById('calTipo').value;
-    if(editingKey&&!requesterSelect.value){formMsg.className='calendar-form-msg err';formMsg.textContent='Selecciona quién solicita la modificación.';requesterSelect.focus();return;}
+    if(!requesterSelect.value){formMsg.className='calendar-form-msg err';formMsg.textContent='Selecciona quién solicita registrar o modificar la actividad.';requesterSelect.focus();return;}
     const payload={
       action:editingKey?'calendar-update':'calendar-set',
-      solicitante:editingKey?requesterSelect.value:'',
-      responsableSolicitud:editingKey?requesterSelect.value:'',
+      solicitante:requesterSelect.value,
+      responsableSolicitud:requesterSelect.value,
       sourceKey:editingKey,
       fecha,
       inicio:readQuarterTime('calInicio'),
