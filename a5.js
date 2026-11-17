@@ -93,9 +93,9 @@ document.addEventListener('DOMContentLoaded',()=>{
             </select>
           </label>
           <label class="calendar-form-wide">Actividad / asunto *<input id="calActividad" type="text" required placeholder="Ej.: Salida al teatro, reunión de equipo docente…"></label>
-          <label>Grupo(s) / destinatarios<select id="calGrupos"><option value="">Seleccionar grupo…</option>${CAL_GROUPS.map(g=>'<option value="'+esc(g)+'">'+esc(g)+'</option>').join('')}<option>Todos los grupos del centro</option><option>Primer ciclo</option><option>Segundo ciclo</option><option>Tercer ciclo</option><option>Ciclo de Infantil</option><option>Educación Primaria</option><option>Educación Infantil</option><option>Claustro</option><option>Equipo docente</option><option>Ciclo</option><option>Consejo Escolar</option><option>ETCP</option><option>Familias</option><option value="Otro / sin grupo concreto">Otro / sin grupo concreto</option></select></label>
-          <div class="cal-responsables-field"><span class="cal-responsables-title">Responsable(s)</span><details id="calResponsablesPicker" class="cal-responsables-picker"><summary id="calResponsablesSummary">Seleccionar uno o varios responsables…</summary><div class="cal-responsables-options"><strong>Responsables colectivos</strong>${CAL_RESPONSABLES_COLECTIVOS.map(r=>'<label><input type="checkbox" name="calResponsableItem" value="'+esc(r)+'"><span>'+esc(r)+'</span></label>').join('')}<strong>Docentes</strong>${CAL_RESPONSABLES.map(r=>'<label><input type="checkbox" name="calResponsableItem" value="'+esc(r)+'"><span>'+esc(r)+'</span></label>').join('')}</div></details><small class="cal-responsables-help">Puedes marcar varias opciones.</small></div>
-          <label id="calSolicitanteWrap" hidden>Persona que solicita el registro o la modificación *<select id="calSolicitante"><option value="">Seleccionar docente solicitante…</option>${CAL_RESPONSABLES.map(r=>'<option value="'+esc(r)+'">'+esc(r)+'</option>').join('')}</select></label>
+          <div class="cal-picker-field"><span class="cal-picker-title">Grupo(s) / destinatarios</span><details id="calGruposPicker" class="cal-choice-picker"><summary id="calGruposSummary">Seleccionar uno o varios grupos…</summary><div class="cal-choice-options"><strong>Grupos del colegio</strong>${CAL_GROUPS.map(g=>'<label><input type="checkbox" name="calGrupoItem" value="'+esc(g)+'"><span>'+esc(g)+'</span></label>').join('')}<strong>Ciclos, etapas y otros destinatarios</strong>${["Todos los grupos del centro","Primer ciclo","Segundo ciclo","Tercer ciclo","Ciclo de Infantil","Educación Primaria","Educación Infantil","Claustro","Equipo docente","Ciclo","Consejo Escolar","ETCP","Familias","Otro / sin grupo concreto"].map(g=>'<label><input type="checkbox" name="calGrupoItem" value="'+esc(g)+'"><span>'+esc(g)+'</span></label>').join('')}</div></details><div id="calGruposSelected" class="cal-selected-tags"></div><small class="cal-picker-help">Puedes seleccionar varios grupos y destinatarios.</small></div>
+          <div class="cal-picker-field"><span class="cal-picker-title">Responsable(s)</span><details id="calResponsablesPicker" class="cal-choice-picker"><summary id="calResponsablesSummary">Seleccionar uno o varios responsables…</summary><div class="cal-choice-options"><strong>Responsables colectivos</strong>${CAL_RESPONSABLES_COLECTIVOS.map(r=>'<label><input type="checkbox" name="calResponsableItem" value="'+esc(r)+'"><span>'+esc(r)+'</span></label>').join('')}<strong>Profesorado del centro</strong>${CAL_RESPONSABLES.map(r=>'<label><input type="checkbox" name="calResponsableItem" value="'+esc(r)+'"><span>'+esc(r)+'</span></label>').join('')}</div></details><div id="calResponsablesSelected" class="cal-selected-tags"></div><div class="cal-picker-other"><input id="calOtroResponsable" type="text" placeholder="Otro responsable (nombre, equipo o entidad)"><button id="calAddOtroResponsable" type="button" class="calendar-mini-btn calendar-edit-btn">Añadir</button></div><small class="cal-picker-help">Marca varios responsables y, si falta alguno, añádelo por su nombre.</small></div>
+          <label id="calSolicitanteWrap" class="calendar-form-wide">Persona que solicita el registro o la modificación *<select id="calSolicitante"><option value="">Seleccionar docente solicitante…</option>${CAL_RESPONSABLES.map(r=>'<option value="'+esc(r)+'">'+esc(r)+'</option>').join('')}</select></label>
           <label>Lugar<input id="calLugar" type="text" placeholder="Centro, Vera, teatro…"></label>
           <label>Modalidad
             <select id="calModalidad">
@@ -133,7 +133,7 @@ document.addEventListener('DOMContentLoaded',()=>{
     </dialog>`;
 
   const style=document.createElement('style');
-  style.textContent=`#calSolicitanteWrap[hidden],#calFechaWrap[hidden],#calTrimestreWrap[hidden]{display:none!important}.cal-responsables-field{display:flex;flex-direction:column;gap:6px;font-size:.86rem}.cal-responsables-title{font-weight:800;color:#334155}.cal-responsables-picker{background:#fff;border:1px solid #cbd5e1;border-radius:10px;min-width:0}.cal-responsables-picker summary{padding:11px;cursor:pointer;color:#0f172a;line-height:1.4}.cal-responsables-picker[open] summary{border-bottom:1px solid #e2e8f0}.cal-responsables-options{max-height:240px;overflow:auto;padding:8px 11px;display:flex;flex-direction:column;gap:5px}.cal-responsables-options strong{font-size:.76rem;color:#64748b;padding-top:8px}.cal-responsables-options label{display:flex;flex-direction:row;align-items:center;gap:8px;font-weight:500;font-size:.83rem;padding:5px 2px;cursor:pointer}.cal-responsables-options label input{width:auto;flex-shrink:0;accent-color:#4f46e5}.cal-responsables-help{font-size:.75rem;color:#64748b}.calendar-delete-dialog{max-width:460px;width:calc(100% - 40px);border:1px solid #cbd5e1;border-radius:16px;padding:24px;box-shadow:0 22px 70px #0f172a40;color:#0f172a}.calendar-delete-dialog::backdrop{background:#0f172a88}.calendar-delete-dialog label{display:flex;flex-direction:column;gap:7px;font-weight:800}.calendar-delete-dialog select{width:100%;padding:11px;border:1px solid #cbd5e1;border-radius:10px;background:white}.calendar-event.status-green{border-left-color:#16a34a}.calendar-event.status-yellow{border-left-color:#eab308}.calendar-event.status-red{border-left-color:#dc2626}.calendar-details{margin-top:5px;color:#64748b;font-size:.8rem}.calendar-prof{display:inline-block;margin-top:5px;padding:3px 7px;border-radius:999px;background:#ecfeff;color:#155e75;font-size:.72rem;font-weight:800}.calendar-group{display:inline-block;margin:5px 0 0 5px;padding:3px 7px;border-radius:999px;background:#eef2ff;color:#3730a3;font-size:.72rem;font-weight:800}.calendar-add-panel{margin:0 0 18px;padding:18px;border:1px solid #cbd5e1;border-radius:16px;background:#f8fafc}.calendar-add-form{margin:0}.calendar-form-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.calendar-form-grid label{display:flex;flex-direction:column;gap:6px;font-weight:800;color:#334155;font-size:.86rem}.calendar-form-grid input,.calendar-form-grid select,.calendar-form-grid textarea{width:100%;box-sizing:border-box;padding:10px 11px;border:1px solid #cbd5e1;border-radius:10px;background:#fff;font:inherit;font-weight:500;color:#0f172a}.calendar-form-wide{grid-column:1/-1}.calendar-time-selects{display:grid;grid-template-columns:1fr auto 1fr;gap:6px;align-items:center}.calendar-time-selects span{text-align:center;font-weight:900}.calendar-form-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:14px}.calendar-secondary{background:#e2e8f0!important;color:#334155!important}.calendar-form-msg{font-weight:800;font-size:.85rem}.calendar-form-msg.ok{color:#166534}.calendar-form-msg.err{color:#b91c1c}.calendar-event-actions{display:flex;gap:6px;justify-content:flex-end;flex-wrap:wrap;margin-top:7px}.calendar-mini-btn{border:0;border-radius:8px;padding:5px 8px;font:inherit;font-size:.72rem;font-weight:900;cursor:pointer}.calendar-edit-btn{background:#e0e7ff;color:#3730a3}.calendar-delete-btn{background:#fee2e2;color:#991b1b}@media(max-width:900px){.calendar-tools{display:grid!important;grid-template-columns:1fr 1fr}.calendar-tools select{width:100%!important;min-width:0!important}.calendar-form-grid{grid-template-columns:1fr 1fr}}@media(max-width:600px){.calendar-tools{grid-template-columns:1fr}.calendar-form-grid{grid-template-columns:1fr}.calendar-form-wide{grid-column:auto}}`;
+  style.textContent=`#calSolicitanteWrap[hidden],#calFechaWrap[hidden],#calTrimestreWrap[hidden]{display:none!important}.cal-picker-field{display:flex;flex-direction:column;gap:6px;font-size:.86rem;min-width:0}.cal-picker-title{font-weight:800;color:#334155}.cal-choice-picker{background:white;border:1px solid #cbd5e1;border-radius:10px;min-width:0}.cal-choice-picker summary{padding:11px;cursor:pointer;color:#0f172a;line-height:1.4;font-weight:500}.cal-choice-picker[open] summary{border-bottom:1px solid #e2e8f0}.cal-choice-options{max-height:260px;overflow-y:auto;padding:8px 11px;display:grid;grid-template-columns:1fr;gap:5px}.cal-choice-options strong{font-size:.76rem;color:#64748b;padding-top:8px}.cal-choice-options label{display:flex!important;flex-direction:row!important;align-items:center;gap:8px;font-weight:500!important;font-size:.83rem;padding:5px 2px;cursor:pointer}.cal-choice-options label input{width:18px!important;height:18px;flex-shrink:0;accent-color:#4f46e5}.cal-picker-help{font-size:.75rem;color:#64748b}.cal-selected-tags{display:flex;flex-wrap:wrap;gap:5px}.cal-selected-tag{border:1px solid #c7d2fe;border-radius:20px;background:#eef2ff;color:#312e81;padding:4px 9px;cursor:pointer;font:inherit;font-size:.73rem}.cal-picker-other{display:flex;gap:6px}.cal-picker-other input{flex:1;min-width:0}.cal-picker-other button{white-space:nowrap}.calendar-delete-dialog{max-width:460px;width:calc(100% - 40px);border:1px solid #cbd5e1;border-radius:16px;padding:24px;box-shadow:0 22px 70px #0f172a40;color:#0f172a}.calendar-delete-dialog::backdrop{background:#0f172a88}.calendar-delete-dialog label{display:flex;flex-direction:column;gap:7px;font-weight:800}.calendar-delete-dialog select{width:100%;padding:11px;border:1px solid #cbd5e1;border-radius:10px;background:white}.calendar-event.status-green{border-left-color:#16a34a}.calendar-event.status-yellow{border-left-color:#eab308}.calendar-event.status-red{border-left-color:#dc2626}.calendar-details{margin-top:5px;color:#64748b;font-size:.8rem}.calendar-prof{display:inline-block;margin-top:5px;padding:3px 7px;border-radius:999px;background:#ecfeff;color:#155e75;font-size:.72rem;font-weight:800}.calendar-group{display:inline-block;margin:5px 0 0 5px;padding:3px 7px;border-radius:999px;background:#eef2ff;color:#3730a3;font-size:.72rem;font-weight:800}.calendar-add-panel{margin:0 0 18px;padding:18px;border:1px solid #cbd5e1;border-radius:16px;background:#f8fafc}.calendar-add-form{margin:0}.calendar-form-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.calendar-form-grid label{display:flex;flex-direction:column;gap:6px;font-weight:800;color:#334155;font-size:.86rem}.calendar-form-grid input,.calendar-form-grid select,.calendar-form-grid textarea{width:100%;box-sizing:border-box;padding:10px 11px;border:1px solid #cbd5e1;border-radius:10px;background:#fff;font:inherit;font-weight:500;color:#0f172a}.calendar-form-wide{grid-column:1/-1}.calendar-time-selects{display:grid;grid-template-columns:1fr auto 1fr;gap:6px;align-items:center}.calendar-time-selects span{text-align:center;font-weight:900}.calendar-form-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:14px}.calendar-secondary{background:#e2e8f0!important;color:#334155!important}.calendar-form-msg{font-weight:800;font-size:.85rem}.calendar-form-msg.ok{color:#166534}.calendar-form-msg.err{color:#b91c1c}.calendar-event-actions{display:flex;gap:6px;justify-content:flex-end;flex-wrap:wrap;margin-top:7px}.calendar-mini-btn{border:0;border-radius:8px;padding:5px 8px;font:inherit;font-size:.72rem;font-weight:900;cursor:pointer}.calendar-edit-btn{background:#e0e7ff;color:#3730a3}.calendar-delete-btn{background:#fee2e2;color:#991b1b}@media(max-width:900px){.calendar-tools{display:grid!important;grid-template-columns:1fr 1fr}.calendar-tools select{width:100%!important;min-width:0!important}.calendar-form-grid{grid-template-columns:1fr 1fr}}@media(max-width:600px){.calendar-tools{grid-template-columns:1fr}.calendar-form-grid{grid-template-columns:1fr}.calendar-form-wide{grid-column:auto}}`;
   document.head.appendChild(style);
 
   const monthSel=document.getElementById('calendarMonth'),typeSel=document.getElementById('calendarType'),profSel=document.getElementById('calendarProfessional'),groupSel=document.getElementById('calendarGroup');
@@ -171,13 +171,50 @@ document.addEventListener('DOMContentLoaded',()=>{
   const formMsg=document.getElementById('calendarFormMsg');
   const requesterWrap=document.getElementById('calSolicitanteWrap');
   const requesterSelect=document.getElementById('calSolicitante');
+  const groupPicker=document.getElementById('calGruposPicker');
+  const groupSummary=document.getElementById('calGruposSummary');
+  const groupSelected=document.getElementById('calGruposSelected');
+  function groupCheckboxes(){return [...groupPicker.querySelectorAll('input[name="calGrupoItem"]')]}
+  function selectedGroups(){return groupCheckboxes().filter(c=>c.checked).map(c=>c.value)}
+  function renderGroupSummary(){
+    const chosen=selectedGroups();
+    groupSummary.textContent=chosen.length?chosen.length+' destinatario(s) seleccionados':'Seleccionar uno o varios grupos…';
+    renderSelectedTags(groupSelected,chosen,name=>{const input=groupCheckboxes().find(c=>c.value===name);if(input)input.checked=false;renderGroupSummary()});
+  }
+  function resetGroups(){groupCheckboxes().forEach(c=>c.checked=false);groupPicker.open=false;renderGroupSummary()}
+  function setGroups(value){
+    resetGroups();
+    String(value||'').split(/\s*\|\s*/).map(x=>x.trim()).filter(Boolean).forEach(name=>{
+      let option=groupCheckboxes().find(c=>c.value===name);
+      if(!option){
+        const label=document.createElement('label');
+        const input=document.createElement('input');input.type='checkbox';input.name='calGrupoItem';input.value=name;
+        const span=document.createElement('span');span.textContent=name;
+        label.append(input,span);groupPicker.querySelector('.cal-choice-options').append(label);
+        option=input;
+      }
+      option.checked=true;
+    });
+    renderGroupSummary();
+  }
+  function renderSelectedTags(container,items,onRemove){
+    container.replaceChildren();
+    items.forEach(item=>{
+      const chip=document.createElement('button');chip.type='button';chip.className='cal-selected-tag';
+      chip.textContent=item+' ×';chip.title='Quitar '+item;
+      chip.addEventListener('click',()=>onRemove(item));container.appendChild(chip);
+    });
+  }
+  groupPicker.addEventListener('change',renderGroupSummary);
   const responsiblePicker=document.getElementById('calResponsablesPicker');
   const responsibleSummary=document.getElementById('calResponsablesSummary');
+  const responsibleSelected=document.getElementById('calResponsablesSelected');
   function responsibleCheckboxes(){return [...responsiblePicker.querySelectorAll('input[name="calResponsableItem"]')]}
   function selectedResponsibles(){return responsibleCheckboxes().filter(c=>c.checked).map(c=>c.value)}
   function renderResponsibleSummary(){
     const chosen=selectedResponsibles();
-    responsibleSummary.textContent=chosen.length===0?'Seleccionar uno o varios responsables…':chosen.length===1?chosen[0]:chosen.length+' responsables seleccionados';
+    responsibleSummary.textContent=chosen.length===0?'Seleccionar uno o varios responsables…':chosen.length+' responsable(s) seleccionados';
+    renderSelectedTags(responsibleSelected,chosen,name=>{const input=responsibleCheckboxes().find(c=>c.value===name);if(input)input.checked=false;renderResponsibleSummary()});
   }
   responsiblePicker.addEventListener('change',renderResponsibleSummary);
   function resetResponsibles(){responsibleCheckboxes().forEach(c=>c.checked=false);responsiblePicker.open=false;renderResponsibleSummary()}
@@ -189,14 +226,23 @@ document.addEventListener('DOMContentLoaded',()=>{
         const label=document.createElement('label');
         const input=document.createElement('input');input.type='checkbox';input.name='calResponsableItem';input.value=name;
         const span=document.createElement('span');span.textContent=name;
-        label.append(input,span);responsiblePicker.querySelector('.cal-responsables-options').append(label);
+        label.append(input,span);responsiblePicker.querySelector('.cal-choice-options').append(label);
         option=input;
       }
       option.checked=true;
     });
     renderResponsibleSummary();
   }
-  function toggleRequester(editMode){requesterWrap.hidden=!editMode;requesterSelect.required=!!editMode;if(!editMode)requesterSelect.value=''}
+  document.getElementById('calAddOtroResponsable').addEventListener('click',()=>{
+    const input=document.getElementById('calOtroResponsable');
+    const name=input.value.trim().replace(/\s*\|\s*/g,' / ');
+    if(!name)return input.focus();
+    const existing=selectedResponsibles();
+    setResponsibles(existing.concat(name).join(' | '));
+    input.value='';
+  });
+  document.getElementById('calOtroResponsable').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();document.getElementById('calAddOtroResponsable').click()}});
+  function toggleRequester(editMode){requesterWrap.hidden=false;requesterSelect.required=true;if(!editMode)requesterSelect.value=''}
   const fechaModo=document.getElementById('calFechaModo'),fechaInput=document.getElementById('calFecha'),trimestreInput=document.getElementById('calTrimestre');
   function syncFechaModo(){
     const byTrimester=fechaModo.value==='trimestre';
@@ -213,13 +259,14 @@ document.addEventListener('DOMContentLoaded',()=>{
     editingKey='';
     addForm.reset();
     resetResponsibles();
+    resetGroups();
     toggleRequester(true);
     syncFechaModo();
     formMsg.textContent='';
     addPanel.hidden=!addPanel.hidden;
     if(!addPanel.hidden) fechaModo.focus();
   });
-  cancelBtn.addEventListener('click',()=>{editingKey='';addPanel.hidden=true;formMsg.textContent='';addForm.reset();resetResponsibles();toggleRequester(false);syncFechaModo()});
+  cancelBtn.addEventListener('click',()=>{editingKey='';addPanel.hidden=true;formMsg.textContent='';addForm.reset();resetResponsibles();resetGroups();toggleRequester(false);syncFechaModo()});
 
   function readQuarterTime(prefix){
     const h=document.getElementById(prefix+'Hora').value;
@@ -254,7 +301,7 @@ document.addEventListener('DOMContentLoaded',()=>{
       profesional:'',
       actividad:document.getElementById('calActividad').value.trim(),
       nivel:'',
-      grupos:document.getElementById('calGrupos').value,
+      grupos:selectedGroups().join(' | '),
       responsable:selectedResponsibles().join(' | '),
       lugar:document.getElementById('calLugar').value.trim(),
       estado:document.getElementById('calEstado').value,
@@ -281,7 +328,8 @@ document.addEventListener('DOMContentLoaded',()=>{
       editingKey='';
       addForm.reset();
       resetResponsibles();
-      toggleRequester(false);
+      resetGroups();
+      toggleRequester(true);
       syncFechaModo();
       setQuarterTime('calInicio','');
       setQuarterTime('calFin','');
@@ -361,10 +409,7 @@ document.addEventListener('DOMContentLoaded',()=>{
     if(![...tipoSelEl.options].some(o=>o.value===desired)){const op=document.createElement('option');op.value=desired;op.textContent=desired;tipoSelEl.appendChild(op)}
     tipoSelEl.value=desired;
     document.getElementById('calActividad').value=e.name||'';
-    const groupEl=document.getElementById('calGrupos');
-    const groupValue=e.group||'';
-    if(groupValue && ![...groupEl.options].some(o=>o.value===groupValue)){const op=document.createElement('option');op.value=groupValue;op.textContent=groupValue;groupEl.appendChild(op)}
-    groupEl.value=groupValue;
+    setGroups(e.group||'');
     setResponsibles(e._responsable||'');
     document.getElementById('calLugar').value=e._lugar||'';
     document.getElementById('calModalidad').value=/Telemática/i.test(e.mode||'')?'Telemática':(/Presencial/i.test(e.mode||'')?'Presencial':'');
