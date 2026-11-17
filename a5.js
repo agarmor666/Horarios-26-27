@@ -27,7 +27,36 @@ document.addEventListener('DOMContentLoaded',()=>{
   const CAL_HOURS=Array.from({length:24},(_,i)=>String(i).padStart(2,'0'));
   const CAL_MINUTES=['00','15','30','45'];
   const timeSelects=(prefix)=>'<div class="calendar-time-selects"><select id="'+prefix+'Hora"><option value="">Hora</option>'+CAL_HOURS.map(h=>'<option>'+h+'</option>').join('')+'</select><span>:</span><select id="'+prefix+'Min"><option value="00">00</option>'+CAL_MINUTES.slice(1).map(m=>'<option>'+m+'</option>').join('')+'</select></div>';
-  const calendarGroups=(window.H&&Array.isArray(H.g))?H.g.slice():[];
+  // Opciones del filtro del calendario (independientes del formulario de registro).
+  const calendarGroups=CAL_GROUPS.slice();
+  const calendarGroupFilterOptions=[
+    {label:'Etapas',values:['Educación Infantil','Educación Primaria']},
+    {label:'Ciclos',values:['Ciclo de Infantil','Primer ciclo','Segundo ciclo','Tercer ciclo']},
+    {label:'Grupos de Infantil',values:['I 3 A','I 3 B','I 4 A','I 4 B','I 5 A','I 5 B']},
+    {label:'Grupos de Primaria',values:['1º A','1º B','2º A','2º B','3º A','3º B','4º A','4º B','5º A','5º B','6º A','6º B','6º C']}
+  ];
+  const groupNorm=x=>String(x||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[.º°]/g,'').replace(/\s+/g,' ').trim();
+  function calendarGroupMatches(e,selected){
+    if(!selected)return true;
+    const original=String(e.group||'');
+    const group=groupNorm(original);
+    if(!group)return false;
+    const tokens=group.replace(/\b(primero|primer)\s+ciclo\b/g,'primer ciclo')
+      .replace(/\b(segundo)\s+ciclo\b/g,'segundo ciclo')
+      .replace(/\b(tercero|tercer)\s+ciclo\b/g,'tercer ciclo');
+    const infantil=/\b(infantil|educacion infantil)\b|\bi\s*[345]\s*[ab]\b/.test(tokens);
+    const primaria=/\bprimaria\b|\b[1-6]\s*[abc]\b|\b(primer|segundo|tercer)\s+ciclo\b/.test(tokens);
+    const cycles={'Primer ciclo':[1,2],'Segundo ciclo':[3,4],'Tercer ciclo':[5,6]};
+    if(selected==='Educación Infantil'||selected==='Ciclo de Infantil')return infantil;
+    if(selected==='Educación Primaria')return primaria;
+    if(cycles[selected])return tokens.includes(groupNorm(selected))||cycles[selected].some(n=>new RegExp('\\b'+n+'\\s*[abc]\\b').test(tokens));
+    const selectedGroup=groupNorm(selected);
+    const m=selectedGroup.match(/^i\s*([345])\s*([ab])$/);
+    if(m)return new RegExp('\\bi\\s*'+m[1]+'\\s*'+m[2]+'\\b').test(tokens)||tokens.includes('infantil '+m[1]+' anos '+m[2]);
+    const p=selectedGroup.match(/^([1-6])\s*([abc])$/);
+    if(p)return new RegExp('\\b'+p[1]+'\\s*'+p[2]+'\\b').test(tokens);
+    return tokens.includes(selectedGroup);
+  }
   const calendarTeachers=['Alconchel Vázquez, Carlos','Del Caño Ceballos, María','Enjuto Mena, Carolina','Fernández Marcos Donate, Raquel','Flores Ortega, Juana del Pilar','García Arnau, Mireia','García Piñero, Isabel María','Garrido Morales, Antonio Jesús','González Carrillo, Francisco','González Sanz, Nuria','Haro Mansilla, Aladina','Jimena Quesada, Luis María','Jiménez Medina, Ana Bella','Jiménez Torres, María Jose','Mañas Villar, Lucía','Martínez Guerrero, Isabel María','Montoya Morales, María Luisa','Moreno Alonso, Antonia','Palomares Padilla, Pilar','Pastor Reche, Carmen Dolores','Peña Ruiz, María Cruz','Ramos Muñoz, Patricia','Rodríguez Agüero, María Isabel','Rodríguez Domínguez, Ana Belén','Rodríguez Montes, Jesús','Roldán Camenforte, Leónides','Tafur Porras, Ángela María','Teruel Ortiz, Carlos','Torres Molina, Juan Carlos','Vedia Salinas, Carmen Cristín','Velázquez Peramos, María de la Cabeza','Yanguez López-Cano, Rafael'];
   const calendarTimes=[];
   for(let h=8;h<=20;h++){for(const m of [0,15,30,45]){if(h===20&&m>0)continue;calendarTimes.push(String(h).padStart(2,'0')+':'+String(m).padStart(2,'0'))}}
@@ -111,7 +140,7 @@ document.addEventListener('DOMContentLoaded',()=>{
     monthSel.innerHTML='<option value="">Todo el curso</option>'+unique('month').map(v=>'<option>'+esc(v)+'</option>').join('');
     typeSel.innerHTML='<option value="">Todas las categorías</option>'+unique('type').map(v=>'<option>'+esc(v)+'</option>').join('');
     profSel.innerHTML='<option value="">Todos los profesionales</option>'+unique('professional').map(v=>'<option>'+esc(v)+'</option>').join('');
-    groupSel.innerHTML='<option value="">Todos los grupos</option>'+unique('group').map(v=>'<option>'+esc(v)+'</option>').join('');
+    groupSel.innerHTML='<option value="">Todos los grupos</option>'+calendarGroupFilterOptions.map(section=>'<optgroup label="'+esc(section.label)+'">'+section.values.map(v=>'<option value="'+esc(v)+'">'+esc(v)+'</option>').join('')+'</optgroup>').join('');
     if([...monthSel.options].some(o=>o.value===prev.m))monthSel.value=prev.m;
     if([...typeSel.options].some(o=>o.value===prev.t))typeSel.value=prev.t;
     if([...profSel.options].some(o=>o.value===prev.p))profSel.value=prev.p;
@@ -340,7 +369,7 @@ document.addEventListener('DOMContentLoaded',()=>{
   window.renderCalendar=function(){
     const m=monthSel.value,t=typeSel.value,p=profSel.value,g=groupSel.value;
     const events=runtimeEvents
-      .filter(e=>(!m||e.month===m)&&(!t||e.type===t||e.name.includes(t))&&(!p||e.professional===p)&&(!g||e.group===g))
+      .filter(e=>(!m||e.month===m)&&(!t||e.type===t||e.name.includes(t))&&(!p||e.professional===p)&&calendarGroupMatches(e,g))
       .slice()
       .sort((a,b)=>eventDateKey(a)-eventDateKey(b)||eventTimeKey(a)-eventTimeKey(b)||String(a.name||'').localeCompare(String(b.name||''),'es'));
     document.getElementById('calendarCount').textContent=events.length;
