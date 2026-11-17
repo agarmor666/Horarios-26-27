@@ -63,6 +63,7 @@ document.addEventListener('DOMContentLoaded',()=>{
           <label class="calendar-form-wide">Actividad / asunto *<input id="calActividad" type="text" required placeholder="Ej.: Salida al teatro, reunión de equipo docente…"></label>
           <label>Grupo(s) / destinatarios<select id="calGrupos"><option value="">Seleccionar grupo…</option>${CAL_GROUPS.map(g=>'<option value="'+esc(g)+'">'+esc(g)+'</option>').join('')}<option>Claustro</option><option>Equipo docente</option><option>Ciclo</option><option>Consejo Escolar</option><option>ETCP</option><option>Familias</option><option value="Otro / sin grupo concreto">Otro / sin grupo concreto</option></select></label>
           <label>Responsable<select id="calResponsable"><option value="">Seleccionar responsable…</option>${CAL_RESPONSABLES.map(r=>'<option value="'+esc(r)+'">'+esc(r)+'</option>').join('')}</select></label>
+          <label id="calSolicitanteWrap" hidden>Persona que solicita la modificación *<select id="calSolicitante"><option value="">Seleccionar docente solicitante…</option>${CAL_RESPONSABLES.map(r=>'<option value="'+esc(r)+'">'+esc(r)+'</option>').join('')}</select></label>
           <label>Lugar<input id="calLugar" type="text" placeholder="Centro, Vera, teatro…"></label>
           <label>Modalidad
             <select id="calModalidad">
@@ -88,10 +89,19 @@ document.addEventListener('DOMContentLoaded',()=>{
     </div>
     <div class="calendar-tools" style="margin-bottom:16px"><select id="calendarMonth"><option value="">Todo el curso</option></select><select id="calendarType"><option value="">Todas las categorías</option></select><select id="calendarProfessional"><option value="">Todos los profesionales</option></select><select id="calendarGroup"><option value="">Todos los grupos</option></select></div>
     <div class="calendar-summary"><div class="calendar-stat"><b id="calendarCount">0</b>actuaciones visibles</div><div class="calendar-stat"><b>🟢</b>Confirmada</div><div class="calendar-stat"><b>🟡</b>Programada / pendiente</div></div>
-    <div id="calendarList" class="calendar-list"></div>`;
+    <div id="calendarList" class="calendar-list"></div>
+    <dialog id="calendarDeleteDialog" class="calendar-delete-dialog" aria-labelledby="calendarDeleteTitle">
+      <form id="calendarDeleteForm" method="dialog">
+        <h3 id="calendarDeleteTitle">Solicitar eliminación de actividad</h3>
+        <p id="calendarDeleteDescription"></p>
+        <label>Persona que solicita la eliminación *<select id="calDeleteSolicitante" required><option value="">Seleccionar docente solicitante…</option>${CAL_RESPONSABLES.map(r=>'<option value="'+esc(r)+'">'+esc(r)+'</option>').join('')}</select></label>
+        <div class="calendar-form-actions"><button type="submit" class="action">Enviar solicitud de eliminación</button><button type="button" class="action calendar-secondary" id="calDeleteCancel">Cancelar</button></div>
+        <p id="calDeleteMessage" role="status" aria-live="polite"></p>
+      </form>
+    </dialog>`;
 
   const style=document.createElement('style');
-  style.textContent=`.calendar-event.status-green{border-left-color:#16a34a}.calendar-event.status-yellow{border-left-color:#eab308}.calendar-event.status-red{border-left-color:#dc2626}.calendar-details{margin-top:5px;color:#64748b;font-size:.8rem}.calendar-prof{display:inline-block;margin-top:5px;padding:3px 7px;border-radius:999px;background:#ecfeff;color:#155e75;font-size:.72rem;font-weight:800}.calendar-group{display:inline-block;margin:5px 0 0 5px;padding:3px 7px;border-radius:999px;background:#eef2ff;color:#3730a3;font-size:.72rem;font-weight:800}.calendar-add-panel{margin:0 0 18px;padding:18px;border:1px solid #cbd5e1;border-radius:16px;background:#f8fafc}.calendar-add-form{margin:0}.calendar-form-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.calendar-form-grid label{display:flex;flex-direction:column;gap:6px;font-weight:800;color:#334155;font-size:.86rem}.calendar-form-grid input,.calendar-form-grid select,.calendar-form-grid textarea{width:100%;box-sizing:border-box;padding:10px 11px;border:1px solid #cbd5e1;border-radius:10px;background:#fff;font:inherit;font-weight:500;color:#0f172a}.calendar-form-wide{grid-column:1/-1}.calendar-time-selects{display:grid;grid-template-columns:1fr auto 1fr;gap:6px;align-items:center}.calendar-time-selects span{text-align:center;font-weight:900}.calendar-form-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:14px}.calendar-secondary{background:#e2e8f0!important;color:#334155!important}.calendar-form-msg{font-weight:800;font-size:.85rem}.calendar-form-msg.ok{color:#166534}.calendar-form-msg.err{color:#b91c1c}.calendar-event-actions{display:flex;gap:6px;justify-content:flex-end;flex-wrap:wrap;margin-top:7px}.calendar-mini-btn{border:0;border-radius:8px;padding:5px 8px;font:inherit;font-size:.72rem;font-weight:900;cursor:pointer}.calendar-edit-btn{background:#e0e7ff;color:#3730a3}.calendar-delete-btn{background:#fee2e2;color:#991b1b}@media(max-width:900px){.calendar-tools{display:grid!important;grid-template-columns:1fr 1fr}.calendar-tools select{width:100%!important;min-width:0!important}.calendar-form-grid{grid-template-columns:1fr 1fr}}@media(max-width:600px){.calendar-tools{grid-template-columns:1fr}.calendar-form-grid{grid-template-columns:1fr}.calendar-form-wide{grid-column:auto}}`;
+  style.textContent=`.calendar-delete-dialog{max-width:460px;width:calc(100% - 40px);border:1px solid #cbd5e1;border-radius:16px;padding:24px;box-shadow:0 22px 70px #0f172a40;color:#0f172a}.calendar-delete-dialog::backdrop{background:#0f172a88}.calendar-delete-dialog label{display:flex;flex-direction:column;gap:7px;font-weight:800}.calendar-delete-dialog select{width:100%;padding:11px;border:1px solid #cbd5e1;border-radius:10px;background:white}.calendar-event.status-green{border-left-color:#16a34a}.calendar-event.status-yellow{border-left-color:#eab308}.calendar-event.status-red{border-left-color:#dc2626}.calendar-details{margin-top:5px;color:#64748b;font-size:.8rem}.calendar-prof{display:inline-block;margin-top:5px;padding:3px 7px;border-radius:999px;background:#ecfeff;color:#155e75;font-size:.72rem;font-weight:800}.calendar-group{display:inline-block;margin:5px 0 0 5px;padding:3px 7px;border-radius:999px;background:#eef2ff;color:#3730a3;font-size:.72rem;font-weight:800}.calendar-add-panel{margin:0 0 18px;padding:18px;border:1px solid #cbd5e1;border-radius:16px;background:#f8fafc}.calendar-add-form{margin:0}.calendar-form-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.calendar-form-grid label{display:flex;flex-direction:column;gap:6px;font-weight:800;color:#334155;font-size:.86rem}.calendar-form-grid input,.calendar-form-grid select,.calendar-form-grid textarea{width:100%;box-sizing:border-box;padding:10px 11px;border:1px solid #cbd5e1;border-radius:10px;background:#fff;font:inherit;font-weight:500;color:#0f172a}.calendar-form-wide{grid-column:1/-1}.calendar-time-selects{display:grid;grid-template-columns:1fr auto 1fr;gap:6px;align-items:center}.calendar-time-selects span{text-align:center;font-weight:900}.calendar-form-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:14px}.calendar-secondary{background:#e2e8f0!important;color:#334155!important}.calendar-form-msg{font-weight:800;font-size:.85rem}.calendar-form-msg.ok{color:#166534}.calendar-form-msg.err{color:#b91c1c}.calendar-event-actions{display:flex;gap:6px;justify-content:flex-end;flex-wrap:wrap;margin-top:7px}.calendar-mini-btn{border:0;border-radius:8px;padding:5px 8px;font:inherit;font-size:.72rem;font-weight:900;cursor:pointer}.calendar-edit-btn{background:#e0e7ff;color:#3730a3}.calendar-delete-btn{background:#fee2e2;color:#991b1b}@media(max-width:900px){.calendar-tools{display:grid!important;grid-template-columns:1fr 1fr}.calendar-tools select{width:100%!important;min-width:0!important}.calendar-form-grid{grid-template-columns:1fr 1fr}}@media(max-width:600px){.calendar-tools{grid-template-columns:1fr}.calendar-form-grid{grid-template-columns:1fr}.calendar-form-wide{grid-column:auto}}`;
   document.head.appendChild(style);
 
   const monthSel=document.getElementById('calendarMonth'),typeSel=document.getElementById('calendarType'),profSel=document.getElementById('calendarProfessional'),groupSel=document.getElementById('calendarGroup');
@@ -116,15 +126,19 @@ document.addEventListener('DOMContentLoaded',()=>{
   const addForm=document.getElementById('calendarAddForm');
   const cancelBtn=document.getElementById('calendarCancelBtn');
   const formMsg=document.getElementById('calendarFormMsg');
+  const requesterWrap=document.getElementById('calSolicitanteWrap');
+  const requesterSelect=document.getElementById('calSolicitante');
+  function toggleRequester(editMode){requesterWrap.hidden=!editMode;requesterSelect.required=!!editMode;if(!editMode)requesterSelect.value=''}
 
   addBtn.addEventListener('click',()=>{
     editingKey='';
     addForm.reset();
+    toggleRequester(false);
     formMsg.textContent='';
     addPanel.hidden=!addPanel.hidden;
     if(!addPanel.hidden) document.getElementById('calFecha').focus();
   });
-  cancelBtn.addEventListener('click',()=>{editingKey='';addPanel.hidden=true;formMsg.textContent='';addForm.reset()});
+  cancelBtn.addEventListener('click',()=>{editingKey='';addPanel.hidden=true;formMsg.textContent='';addForm.reset();toggleRequester(false)});
 
   function readQuarterTime(prefix){
     const h=document.getElementById(prefix+'Hora').value;
@@ -144,8 +158,11 @@ document.addEventListener('DOMContentLoaded',()=>{
     formMsg.textContent='Guardando…';
     const fecha=document.getElementById('calFecha').value;
     const tipo=document.getElementById('calTipo').value;
+    if(editingKey&&!requesterSelect.value){formMsg.className='calendar-form-msg err';formMsg.textContent='Selecciona quién solicita la modificación.';requesterSelect.focus();return;}
     const payload={
       action:editingKey?'calendar-update':'calendar-set',
+      solicitante:editingKey?requesterSelect.value:'',
+      responsableSolicitud:editingKey?requesterSelect.value:'',
       sourceKey:editingKey,
       fecha,
       inicio:readQuarterTime('calInicio'),
@@ -181,6 +198,7 @@ document.addEventListener('DOMContentLoaded',()=>{
       }
       editingKey='';
       addForm.reset();
+      toggleRequester(false);
       setQuarterTime('calInicio','');
       setQuarterTime('calFin','');
     }catch(err){
@@ -243,6 +261,8 @@ document.addEventListener('DOMContentLoaded',()=>{
   function startEdit(key){
     const e=runtimeEvents.find(x=>x._sourceKey===key);if(!e)return;
     editingKey=key;
+    requesterSelect.value='';
+    toggleRequester(true);
     document.getElementById('calFecha').value=isoFromEvent(e);
     setQuarterTime('calInicio',e.time||'');
     setQuarterTime('calFin',e._fin||'');
@@ -267,20 +287,41 @@ document.addEventListener('DOMContentLoaded',()=>{
     addPanel.hidden=false;
     addPanel.scrollIntoView({behavior:'smooth',block:'start'});
   }
-  async function deleteEvent(key){
+  const deleteDialog=document.getElementById('calendarDeleteDialog');
+  const deleteForm=document.getElementById('calendarDeleteForm');
+  const deleteRequester=document.getElementById('calDeleteSolicitante');
+  const deleteMessage=document.getElementById('calDeleteMessage');
+  let deletingKey='';
+  document.getElementById('calDeleteCancel').addEventListener('click',()=>deleteDialog.close());
+  deleteDialog.addEventListener('close',()=>{deletingKey='';deleteRequester.value='';deleteMessage.textContent=''});
+  function deleteEvent(key){
     const e=runtimeEvents.find(x=>x._sourceKey===key);if(!e)return;
-    if(!confirm('¿Eliminar «'+e.name+'» del calendario?'))return;
-    try{
-      const res=await fetch(CALENDAR_WRITE_API,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'calendar-delete',sourceKey:key,activityName:e.name||'',activityDate:e.date||''})});
-      const data=await res.json();
-      if(!data.success)throw new Error(data.error||'No se pudo eliminar');
-      if(data.pending){
-        alert(data.message||'Solicitud de eliminación enviada a Dirección para su aprobación.');
-      }else{
-        await loadCalendarFromApi();
-      }
-    }catch(err){alert('No se pudo eliminar: '+(err&&err.message?err.message:err))}
+    deletingKey=key;
+    deleteRequester.value='';
+    deleteMessage.textContent='';
+    document.getElementById('calendarDeleteDescription').textContent='Actividad: '+e.name+' · '+e.date+'. Esta solicitud se remitirá a Dirección para su aprobación.';
+    deleteDialog.showModal();
+    deleteRequester.focus();
   }
+  deleteForm.addEventListener('submit',async ev=>{
+    ev.preventDefault();
+    if(!deleteForm.reportValidity()||!deletingKey)return;
+    const e=runtimeEvents.find(x=>x._sourceKey===deletingKey);
+    if(!e)return;
+    const requester=deleteRequester.value;
+    const submitBtn=deleteForm.querySelector('button[type="submit"]');
+    submitBtn.disabled=true;
+    deleteMessage.textContent='Enviando solicitud…';
+    try{
+      const res=await fetch(CALENDAR_WRITE_API,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'calendar-delete',sourceKey:deletingKey,activityName:e.name||'',activityDate:e.date||'',solicitante:requester,responsableSolicitud:requester})});
+      const data=await res.json();
+      if(!data.success)throw new Error(data.error||'No se pudo solicitar la eliminación');
+      deleteDialog.close();
+      if(data.pending)alert(data.message||'Solicitud de eliminación enviada a Dirección para su aprobación.');
+      else await loadCalendarFromApi();
+    }catch(err){deleteMessage.textContent='No se pudo enviar: '+(err&&err.message?err.message:err)}
+    finally{submitBtn.disabled=false}
+  });
 
   const semClass=e=>e.status==='CONFLICTO'?'status-red':(e.status==='CONFIRMADA'?'status-green':'status-yellow');
   const monthNumber={enero:0,febrero:1,marzo:2,abril:3,mayo:4,junio:5,julio:6,agosto:7,septiembre:8,octubre:9,noviembre:10,diciembre:11};
