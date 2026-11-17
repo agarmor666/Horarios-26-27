@@ -22,7 +22,13 @@ document.addEventListener('DOMContentLoaded',()=>{
   const BASE_CALENDAR_EVENTS=CALENDAR_EVENTS.map(e=>({...e,_sourceKey:staticKey(e),_sourceType:'static'}));
   let runtimeEvents=BASE_CALENDAR_EVENTS.map(e=>({...e}));
   let editingKey='';
-  const CAL_GROUPS=(window.H&&Array.isArray(H.g))?H.g.slice():['1º A','1º B','2º A','2º B','3º A','3º B','4º A','4º B','5º A','5º B','6º A','6º B','6º C','I 3 A','I 3 B','I 4 A','I 4 B','I 5 A','I 5 B'];
+  const CAL_GROUPS=(window.H&&Array.isArray(H.g)&&H.g.length)?H.g.slice():['1º A','1º B','2º A','2º B','3º A','3º B','4º A','4º B','5º A','5º B','6º A','6º B','6º C','I 3 A','I 3 B','I 4 A','I 4 B','I 5 A','I 5 B'];
+  const CAL_DESTINATARIOS_GENERALES=['Todo el centro','Educación Infantil','Educación Primaria','Ciclo de Infantil','Primer ciclo','Segundo ciclo','Tercer ciclo'];
+  const calGroupOptions=()=>'<option value="">Seleccionar grupo o destinatarios…</option>'+
+    '<optgroup label="Centro, etapas y ciclos">'+CAL_DESTINATARIOS_GENERALES.map(g=>'<option value="'+esc(g)+'">'+esc(g)+'</option>').join('')+'</optgroup>'+
+    '<optgroup label="Educación Infantil">'+CAL_GROUPS.filter(g=>/^I\s*[345]\s*[A-Z]/i.test(g)).map(g=>'<option value="'+esc(g)+'">'+esc(g)+'</option>').join('')+'</optgroup>'+
+    '<optgroup label="Educación Primaria">'+CAL_GROUPS.filter(g=>!/^I\s*[345]\s*[A-Z]/i.test(g)).map(g=>'<option value="'+esc(g)+'">'+esc(g)+'</option>').join('')+'</optgroup>'+
+    '<optgroup label="Otros destinatarios">'+['Claustro','Equipo docente','Ciclo','Consejo Escolar','ETCP','Familias','Otro / sin grupo concreto'].map(g=>'<option value="'+esc(g)+'">'+esc(g)+'</option>').join('')+'</optgroup>';
   const CAL_RESPONSABLES=['Alconchel Vázquez, Carlos','Del Caño Ceballos, María','Enjuto Mena, Carolina','Fernández Marcos Donate, Raquel','Flores Ortega, Juana del Pilar','García Arnau, Mireia','García Piñero, Isabel María','Garrido Morales, Antonio Jesús','González Carrillo, Francisco','González Sanz, Nuria','Haro Mansilla, Aladina','Jimena Quesada, Luis María','Jiménez Medina, Ana Bella','Jiménez Torres, María Jose','Mañas Villar, Lucía','Martínez Guerrero, Isabel María','Montoya Morales, María Luisa','Moreno Alonso, Antonia','Palomares Padilla, Pilar','Pastor Reche, Carmen Dolores','Peña Ruiz, María Cruz','Ramos Muñoz, Patricia','Rodríguez Agüero, María Isabel','Rodríguez Domínguez, Ana Belén','Rodríguez Montes, Jesús','Roldán Camenforte, Leónides','Tafur Porras, Ángela María','Teruel Ortiz, Carlos','Torres Molina, Juan Carlos','Vedia Salinas, Carmen Cristín','Velázquez Peramos, María de la Cabeza','Yanguez López-Cano, Rafael'];
   const CAL_HOURS=Array.from({length:24},(_,i)=>String(i).padStart(2,'0'));
   const CAL_MINUTES=['00','15','30','45'];
@@ -61,7 +67,7 @@ document.addEventListener('DOMContentLoaded',()=>{
             </select>
           </label>
           <label class="calendar-form-wide">Actividad / asunto *<input id="calActividad" type="text" required placeholder="Ej.: Salida al teatro, reunión de equipo docente…"></label>
-          <label>Grupo(s) / destinatarios<select id="calGrupos"><option value="">Seleccionar grupo…</option>${CAL_GROUPS.map(g=>'<option value="'+esc(g)+'">'+esc(g)+'</option>').join('')}<option>Claustro</option><option>Equipo docente</option><option>Ciclo</option><option>Consejo Escolar</option><option>ETCP</option><option>Familias</option><option value="Otro / sin grupo concreto">Otro / sin grupo concreto</option></select></label>
+          <label>Grupo(s) / destinatarios<select id="calGrupos">${calGroupOptions()}</select></label>
           <label>Responsable<select id="calResponsable"><option value="">Seleccionar responsable…</option>${CAL_RESPONSABLES.map(r=>'<option value="'+esc(r)+'">'+esc(r)+'</option>').join('')}</select></label>
           <label id="calSolicitanteWrap" hidden>Persona que solicita la modificación *<select id="calSolicitante"><option value="">Seleccionar docente solicitante…</option>${CAL_RESPONSABLES.map(r=>'<option value="'+esc(r)+'">'+esc(r)+'</option>').join('')}</select></label>
           <label>Lugar<input id="calLugar" type="text" placeholder="Centro, Vera, teatro…"></label>
