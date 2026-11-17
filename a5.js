@@ -24,6 +24,7 @@ document.addEventListener('DOMContentLoaded',()=>{
   let editingKey='';
   const CAL_GROUPS=(window.H&&Array.isArray(H.g))?H.g.slice():['1º A','1º B','2º A','2º B','3º A','3º B','4º A','4º B','5º A','5º B','6º A','6º B','6º C','I 3 A','I 3 B','I 4 A','I 4 B','I 5 A','I 5 B'];
   const CAL_RESPONSABLES=['Alconchel Vázquez, Carlos','Del Caño Ceballos, María','Enjuto Mena, Carolina','Fernández Marcos Donate, Raquel','Flores Ortega, Juana del Pilar','García Arnau, Mireia','García Piñero, Isabel María','Garrido Morales, Antonio Jesús','González Carrillo, Francisco','González Sanz, Nuria','Haro Mansilla, Aladina','Jimena Quesada, Luis María','Jiménez Medina, Ana Bella','Jiménez Torres, María Jose','Mañas Villar, Lucía','Martínez Guerrero, Isabel María','Montoya Morales, María Luisa','Moreno Alonso, Antonia','Palomares Padilla, Pilar','Pastor Reche, Carmen Dolores','Peña Ruiz, María Cruz','Ramos Muñoz, Patricia','Rodríguez Agüero, María Isabel','Rodríguez Domínguez, Ana Belén','Rodríguez Montes, Jesús','Roldán Camenforte, Leónides','Tafur Porras, Ángela María','Teruel Ortiz, Carlos','Torres Molina, Juan Carlos','Vedia Salinas, Carmen Cristín','Velázquez Peramos, María de la Cabeza','Yanguez López-Cano, Rafael'];
+  const CAL_RESPONSABLES_COLECTIVOS=['Profesorado del primer ciclo','Profesorado del segundo ciclo','Profesorado del tercer ciclo'];
   const CAL_HOURS=Array.from({length:24},(_,i)=>String(i).padStart(2,'0'));
   const CAL_MINUTES=['00','15','30','45'];
   const timeSelects=(prefix)=>'<div class="calendar-time-selects"><select id="'+prefix+'Hora"><option value="">Hora</option>'+CAL_HOURS.map(h=>'<option>'+h+'</option>').join('')+'</select><span>:</span><select id="'+prefix+'Min"><option value="00">00</option>'+CAL_MINUTES.slice(1).map(m=>'<option>'+m+'</option>').join('')+'</select></div>';
@@ -91,7 +92,7 @@ document.addEventListener('DOMContentLoaded',()=>{
           </label>
           <label class="calendar-form-wide">Actividad / asunto *<input id="calActividad" type="text" required placeholder="Ej.: Salida al teatro, reunión de equipo docente…"></label>
           <label>Grupo(s) / destinatarios<select id="calGrupos"><option value="">Seleccionar grupo…</option>${CAL_GROUPS.map(g=>'<option value="'+esc(g)+'">'+esc(g)+'</option>').join('')}<option>Todos los grupos del centro</option><option>Primer ciclo</option><option>Segundo ciclo</option><option>Tercer ciclo</option><option>Ciclo de Infantil</option><option>Educación Primaria</option><option>Educación Infantil</option><option>Claustro</option><option>Equipo docente</option><option>Ciclo</option><option>Consejo Escolar</option><option>ETCP</option><option>Familias</option><option value="Otro / sin grupo concreto">Otro / sin grupo concreto</option></select></label>
-          <label>Responsable<select id="calResponsable"><option value="">Seleccionar responsable…</option>${CAL_RESPONSABLES.map(r=>'<option value="'+esc(r)+'">'+esc(r)+'</option>').join('')}</select></label>
+          <label>Responsable<select id="calResponsable"><option value="">Seleccionar responsable…</option>${CAL_RESPONSABLES_COLECTIVOS.concat(CAL_RESPONSABLES).map(r=>'<option value="'+esc(r)+'">'+esc(r)+'</option>').join('')}</select></label>
           <label id="calSolicitanteWrap" hidden>Persona que solicita la modificación *<select id="calSolicitante"><option value="">Seleccionar docente solicitante…</option>${CAL_RESPONSABLES.map(r=>'<option value="'+esc(r)+'">'+esc(r)+'</option>').join('')}</select></label>
           <label>Lugar<input id="calLugar" type="text" placeholder="Centro, Vera, teatro…"></label>
           <label>Modalidad
@@ -134,10 +135,20 @@ document.addEventListener('DOMContentLoaded',()=>{
   document.head.appendChild(style);
 
   const monthSel=document.getElementById('calendarMonth'),typeSel=document.getElementById('calendarType'),profSel=document.getElementById('calendarProfessional'),groupSel=document.getElementById('calendarGroup');
+  const CAL_TRIMESTRES=[{value:'TRIMESTRE_1',label:'Primer trimestre',months:[9,10,11,12]},{value:'TRIMESTRE_2',label:'Segundo trimestre',months:[1,2,3]},{value:'TRIMESTRE_3',label:'Tercer trimestre',months:[4,5,6,7,8]}];
+  function matchesCalendarPeriod(event,selection){
+    if(!selection)return true;
+    const trimester=CAL_TRIMESTRES.find(t=>t.value===selection);
+    if(!trimester)return event.month===selection;
+    const found=String(event.month||'').toLowerCase().match(/^(enero|febrero|marzo|abril|mayo|junio|julio|agosto|septiembre|octubre|noviembre|diciembre)\s+(\d{4})/);
+    if(!found)return false;
+    const number=['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'].indexOf(found[1])+1;
+    return trimester.months.includes(number);
+  }
   const unique=(field)=>[...new Set(runtimeEvents.map(e=>e[field]).filter(Boolean))];
   function refreshCalendarFilters(){
     const prev={m:monthSel.value,t:typeSel.value,p:profSel.value,g:groupSel.value};
-    monthSel.innerHTML='<option value="">Todo el curso</option>'+unique('month').map(v=>'<option>'+esc(v)+'</option>').join('');
+    monthSel.innerHTML='<option value="">Todo el curso</option>'+unique('month').map(v=>'<option>'+esc(v)+'</option>').join('')+CAL_TRIMESTRES.map(t=>'<option value="'+t.value+'">'+t.label+'</option>').join('');
     typeSel.innerHTML='<option value="">Todas las categorías</option>'+unique('type').map(v=>'<option>'+esc(v)+'</option>').join('');
     profSel.innerHTML='<option value="">Todos los profesionales</option>'+unique('professional').map(v=>'<option>'+esc(v)+'</option>').join('');
     groupSel.innerHTML='<option value="">Todos los grupos</option>'+calendarGroupFilterOptions.map(section=>'<optgroup label="'+esc(section.label)+'">'+section.values.map(v=>'<option value="'+esc(v)+'">'+esc(v)+'</option>').join('')+'</optgroup>').join('');
@@ -369,7 +380,7 @@ document.addEventListener('DOMContentLoaded',()=>{
   window.renderCalendar=function(){
     const m=monthSel.value,t=typeSel.value,p=profSel.value,g=groupSel.value;
     const events=runtimeEvents
-      .filter(e=>(!m||e.month===m)&&(!t||e.type===t||e.name.includes(t))&&(!p||e.professional===p)&&calendarGroupMatches(e,g))
+      .filter(e=>matchesCalendarPeriod(e,m)&&(!t||e.type===t||e.name.includes(t))&&(!p||e.professional===p)&&calendarGroupMatches(e,g))
       .slice()
       .sort((a,b)=>eventDateKey(a)-eventDateKey(b)||eventTimeKey(a)-eventTimeKey(b)||String(a.name||'').localeCompare(String(b.name||''),'es'));
     document.getElementById('calendarCount').textContent=events.length;
