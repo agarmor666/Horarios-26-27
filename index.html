@@ -88,10 +88,14 @@ footer{padding:18px;text-align:center;color:#64748b;font-size:.88rem;background:
 </div>
 </div>
 <div class="res-form-card">
-<h3>✍️ Inscripción a la comida</h3>
+<h3>✍️ Inscripción y gestión de asistencia</h3>
+<p class="hint">Para proteger tu inscripción y poder modificarla o darte de baja, indica un correo al que tengas acceso. Recibirás una clave personal para gestionar cambios.</p>
+<div class="res-field" style="margin-bottom:16px"><label for="resOperacion">¿Qué deseas hacer?</label><select id="resOperacion"><option value="alta">Apuntarme a la comida</option><option value="modificar">Modificar mi inscripción</option><option value="baja">Cancelar mi asistencia</option></select></div>
 <form id="resForm" method="POST" target="resTransport">
 <div class="res-field"><label for="resNombre">Nombre y apellidos *</label><select id="resNombre" name="nombre" required><option value="">Selecciona tu nombre…</option></select></div>
 <div class="res-field" id="resOtroWrap" hidden><label for="resOtroNombre">Otro compañero/a: nombre y apellidos *</label><input id="resOtroNombre" maxlength="120" placeholder="Escribe el nombre completo" autocomplete="name" disabled></div>
+<div class="res-field"><label for="resCorreo">Correo electrónico de contacto *</label><input id="resCorreo" name="correo" type="email" required autocomplete="email" maxlength="180" placeholder="Correo donde recibirás la clave de inscripción"></div>
+<div class="res-field" id="resClaveWrap" hidden><label for="resClave">Clave de inscripción *</label><input id="resClave" name="clave" maxlength="90" autocomplete="off" disabled placeholder="Clave recibida por correo"></div>
 <div class="res-field"><label for="resAsistencia">¿Te apuntas a la comida? *</label><select id="resAsistencia" name="asistencia" required><option value="Sí, asistiré">Sí, asistiré</option><option value="Por ahora no podré asistir">Por ahora no podré asistir</option></select></div>
 <div class="res-field"><label for="resPlato">Plato principal elegido *</label><select id="resPlato" required><option value="">Selecciona tu plato…</option><option value="Bacalao, beurre blanc y bilbaína">Bacalao, beurre blanc y bilbaína</option><option value="Pluma de cerdo ibérico marinada en miso">Pluma de cerdo ibérico marinada en miso</option><option value="Necesito una alternativa">Necesito una alternativa (consúltala con el restaurante)</option></select></div>
 <div class="res-field"><label for="resNecesidad">Necesidades alimentarias relacionadas con el menú Superior *</label><select id="resNecesidad" name="necesidad" required><option value="Ninguna">Ninguna</option><option value="Alergia alimentaria">Alergia alimentaria (p. ej., pescado, marisco, huevo, lácteos, frutos secos)</option><option value="Intolerancia alimentaria">Intolerancia alimentaria (p. ej., gluten o lactosa)</option><option value="Menú vegetariano">Solicito alternativa vegetariana</option><option value="Menú vegano">Solicito alternativa vegana</option><option value="Otra adaptación">Otra adaptación del menú</option></select></div>
@@ -101,7 +105,7 @@ footer{padding:18px;text-align:center;color:#64748b;font-size:.88rem;background:
 <div style="display:none" aria-hidden="true"><label for="resWeb">Web</label><input id="resWeb" type="text" name="sitio_web" tabindex="-1" autocomplete="off"></div>
 <div class="res-nota">💶 <strong>Pago: 46 €.</strong> El dinero se puede ir dejando en lo de <strong>Nila</strong>. Dirección actualizará el estado <strong>Pendiente / Pagado</strong> en la hoja privada; no es necesario marcarlo aquí.</div>
 <p id="resMessage" class="hint" role="status" aria-live="polite">El envío se activará al conectar el servicio de registro del colegio.</p>
-<button id="resSubmit" class="action" type="submit" disabled>Registrar inscripción</button>
+<input id="resAccionHidden" type="hidden" name="accion" value="alta"><button id="resSubmit" class="action" type="submit" disabled>Registrar inscripción</button>
 </form>
 <iframe id="resTransport" name="resTransport" title="Envío de inscripción" style="display:none"></iframe>
 </div>
@@ -242,6 +246,24 @@ function sincronizarNombreReserva(){
 }
 resNombreSelect.addEventListener('change',sincronizarNombreReserva);
 sincronizarNombreReserva();
+const resOperacion=document.getElementById('resOperacion');
+const resClaveWrap=document.getElementById('resClaveWrap');
+const resClave=document.getElementById('resClave');
+const resAccionHidden=document.getElementById('resAccionHidden');
+const resCorreo=document.getElementById('resCorreo');
+function cambiarOperacionReserva(){
+ const accion=resOperacion.value, alta=accion==='alta', baja=accion==='baja';
+ resAccionHidden.value=accion;
+ resClaveWrap.hidden=alta;
+ resClave.disabled=alta;resClave.required=!alta;
+ document.getElementById('resAsistencia').value=baja?'Por ahora no podré asistir':'Sí, asistiré';
+ document.getElementById('resAsistencia').disabled=baja;
+ // Nombre y correo se requieren para buscar la reserva; al cancelar no se exigen platos ni alergias.
+ ['resPlato','resNecesidad'].forEach(id=>{document.getElementById(id).required=!baja;document.getElementById(id).disabled=baja;});
+ ['resDetalle','resObservaciones'].forEach(id=>{document.getElementById(id).disabled=baja;});
+ resSubmit.textContent=alta?'Registrar inscripción':baja?'Solicitar baja':'Guardar modificaciones';
+}
+resOperacion.addEventListener('change',cambiarOperacionReserva);
 const resPlato=document.getElementById('resPlato');
 const resObs=document.getElementById('resObservaciones');
 resPlato.addEventListener('change',()=>{resPlato.dataset.platoElegido=resPlato.value;});
@@ -258,18 +280,21 @@ if(/^https:\/\/script\.google\.com\/macros\/s\/[a-zA-Z0-9_-]+\/exec$/.test(RESER
 resForm.addEventListener('submit',ev=>{
   if(resSubmit.disabled||!resForm.action||!RESERVAS_BACKEND_URL){ev.preventDefault();return;}
   if(resNombreSelect.value==='__otro__'&&!resOtroNombre.value.trim()){ev.preventDefault();resOtroNombre.reportValidity();return;}
-  if(!resPlato.value){ev.preventDefault();resPlato.reportValidity();return;}
+  if(resOperacion.value!=="baja"&&!resPlato.value){ev.preventDefault();resPlato.reportValidity();return;}
   // Guardamos el plato seleccionado en Observaciones para que la hoja actual lo recoja.
-  let base=resObs.value.replace(/^Plato principal: [^\n]*\n?/,'');
-  resObs.value='Plato principal: '+resPlato.value+(base?'\n'+base:'');
+  if(resOperacion.value!=='baja'){
+    let base=resObs.value.replace(/^Plato principal: [^\n]*\n?/,'');
+    resObs.value='Plato principal: '+resPlato.value+(base?'\n'+base:'');
+  }
   resSubmit.disabled=true;resMsg.textContent='Enviando inscripción…';
 });
 window.addEventListener('message',ev=>{
   if(ev.origin!=='https://script.google.com'&&!ev.origin.endsWith('.googleusercontent.com'))return;
   if(!ev.data||ev.data.tipo!=='reserva-bartolome-flores')return;
-  if(ev.data.ok){resForm.reset();resMsg.textContent='✅ Inscripción registrada correctamente.';}
+  if(ev.data.ok){resForm.reset();resOperacion.value='alta';sincronizarNombreReserva();cambiarOperacionReserva();resMsg.textContent=ev.data.mensaje||'✅ Solicitud registrada correctamente.';}
   else resMsg.textContent='No se pudo registrar la inscripción. Revisa la conexión o consulta con dirección.';
   resSubmit.disabled=false;
 });
+cambiarOperacionReserva();
 </script>
 </body></html>
