@@ -89,13 +89,11 @@ footer{padding:18px;text-align:center;color:#64748b;font-size:.88rem;background:
 </div>
 <div class="res-form-card">
 <h3>✍️ Inscripción y gestión de asistencia</h3>
-<p class="hint">Para proteger tu inscripción y poder modificarla o darte de baja, indica un correo al que tengas acceso. Recibirás una clave personal para gestionar cambios.</p>
-<div class="res-field" style="margin-bottom:16px"><label for="resOperacion">¿Qué deseas hacer?</label><select id="resOperacion"><option value="alta">Apuntarme a la comida</option><option value="modificar">Modificar mi inscripción</option><option value="baja">Cancelar mi asistencia</option></select></div>
+<p class="hint">Selecciona tu nombre y completa la inscripción. No necesitas correo electrónico.</p>
 <form id="resForm" method="POST" target="resTransport">
 <div class="res-field"><label for="resNombre">Nombre y apellidos *</label><select id="resNombre" name="nombre" required><option value="">Selecciona tu nombre…</option></select></div>
 <div class="res-field" id="resOtroWrap" hidden><label for="resOtroNombre">Otro compañero/a: nombre y apellidos *</label><input id="resOtroNombre" maxlength="120" placeholder="Escribe el nombre completo" autocomplete="name" disabled></div>
-<div class="res-field"><label for="resCorreo">Correo electrónico de contacto *</label><input id="resCorreo" name="correo" type="email" required autocomplete="email" maxlength="180" placeholder="Correo donde recibirás la clave de inscripción"></div>
-<div class="res-field" id="resClaveWrap" hidden><label for="resClave">Clave de inscripción *</label><input id="resClave" name="clave" maxlength="90" autocomplete="off" disabled placeholder="Clave recibida por correo"></div>
+<div class="res-field"><label for="resOperacion">¿Qué deseas hacer?</label><select id="resOperacion"><option value="alta">Apuntarme a la comida</option><option value="modificar">Solicitar una modificación</option><option value="baja">Solicitar baja por causa sobrevenida</option></select></div>
 <div class="res-field"><label for="resAsistencia">¿Te apuntas a la comida? *</label><select id="resAsistencia" name="asistencia" required><option value="Sí, asistiré">Sí, asistiré</option><option value="Por ahora no podré asistir">Por ahora no podré asistir</option></select></div>
 <div class="res-field"><label for="resPlato">Plato principal elegido *</label><select id="resPlato" required><option value="">Selecciona tu plato…</option><option value="Bacalao, beurre blanc y bilbaína">Bacalao, beurre blanc y bilbaína</option><option value="Pluma de cerdo ibérico marinada en miso">Pluma de cerdo ibérico marinada en miso</option><option value="Necesito una alternativa">Necesito una alternativa (consúltala con el restaurante)</option></select></div>
 <div id="resAlternativa" hidden>
@@ -105,9 +103,9 @@ footer{padding:18px;text-align:center;color:#64748b;font-size:.88rem;background:
 </div>
 <div class="res-field" id="resObsWrap" hidden><label for="resObservaciones">Otras observaciones sobre la adaptación (opcional)</label><textarea id="resObservaciones" name="observaciones" maxlength="500" rows="2" disabled></textarea></div>
 <div style="display:none" aria-hidden="true"><label for="resWeb">Web</label><input id="resWeb" type="text" name="sitio_web" tabindex="-1" autocomplete="off"></div>
-<div class="res-nota">💶 <strong>Menú: 46 €.</strong> El dinero se puede ir dejando en <strong>Ludenila</strong>. Si ya lo has entregado, puedes indicarlo aquí; la organización comprobará el pago antes de marcarlo como confirmado.</div>
-<div class="res-field"><label for="resPago">Estado de entrega del dinero</label><select id="resPago" name="pagoDeclarado"><option value="Pendiente">Todavía no he entregado el dinero</option><option value="Entregado, pendiente de comprobar">He entregado 46 € en Ludenila</option></select></div>
-<p class="hint">Si surge una situación sobrevenida, puedes solicitar la baja desde «¿Qué deseas hacer?». Si el pago ya está confirmado, la organización revisará la devolución.</p>
+<div class="res-nota">💶 <strong>Menú: 46 €.</strong> El dinero se puede ir dejando en <strong>Mila</strong>. Si ya lo has entregado, puedes indicarlo aquí; la organización comprobará el pago antes de marcarlo como confirmado.</div>
+<div class="res-field"><label for="resPago">Estado de entrega del dinero</label><select id="resPago" name="pagoDeclarado"><option value="Pendiente">Todavía no he entregado el dinero</option><option value="Entregado, pendiente de comprobar">He entregado 46 € a Mila</option></select></div>
+<p class="hint">Ante una causa sobrevenida puedes solicitar la baja. Dirección verificará la solicitud antes de confirmarla y revisará, si procede, la devolución del pago.</p>
 <p id="resMessage" class="hint" role="status" aria-live="polite">El envío se activará al conectar el servicio de registro del colegio.</p>
 <input id="resAccionHidden" type="hidden" name="accion" value="alta"><button id="resSubmit" class="action" type="submit" disabled>Registrar inscripción</button>
 </form>
@@ -251,10 +249,7 @@ function sincronizarNombreReserva(){
 resNombreSelect.addEventListener('change',sincronizarNombreReserva);
 sincronizarNombreReserva();
 const resOperacion=document.getElementById('resOperacion');
-const resClaveWrap=document.getElementById('resClaveWrap');
-const resClave=document.getElementById('resClave');
 const resAccionHidden=document.getElementById('resAccionHidden');
-const resCorreo=document.getElementById('resCorreo');
 const resPlato=document.getElementById('resPlato');
 const resAlternativa=document.getElementById('resAlternativa');
 const resNecesidad=document.getElementById('resNecesidad');
@@ -265,14 +260,13 @@ const resPago=document.getElementById('resPago');
 function cambiarOperacionReserva(){
  const accion=resOperacion.value,alta=accion==='alta',baja=accion==='baja';
  resAccionHidden.value=accion;
- resClaveWrap.hidden=alta;resClave.disabled=alta;resClave.required=!alta;
  document.getElementById('resAsistencia').value=baja?'Por ahora no podré asistir':'Sí, asistiré';
  // En la baja el valor de asistencia debe seguir enviándose.
- document.getElementById('resAsistencia').readOnly=baja;
+ document.getElementById('resAsistencia').disabled=baja;
  resPlato.disabled=baja;resPlato.required=!baja;
  resPago.disabled=baja;
  actualizarAlternativa();
- resSubmit.textContent=alta?'Registrar inscripción':baja?'Solicitar baja':'Guardar modificaciones';
+ resSubmit.textContent=alta?'Registrar inscripción':baja?'Solicitar baja':'Solicitar modificación';
 }
 function actualizarAlternativa(){
  const activa=resOperacion.value!=='baja'&&resPlato.value==='Necesito una alternativa';
