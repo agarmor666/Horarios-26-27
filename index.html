@@ -40,6 +40,10 @@ footer{padding:18px;text-align:center;color:#64748b;font-size:.88rem;background:
 .res-nota{background:#eff6ff;border-radius:10px;padding:12px;color:#1e40af}
 #resSubmit:disabled{opacity:.55;cursor:not-allowed}
 @media(max-width:750px){.res-layout{grid-template-columns:1fr}}
+
+.res-menu-preview{display:block;max-width:340px;margin:0 auto 12px;border-radius:13px;overflow:hidden;border:1px solid #e5e7eb;box-shadow:0 8px 24px #0002;background:white;cursor:zoom-in}
+.res-menu-preview img{display:block;width:100%;height:auto;object-fit:contain}
+.res-menu-price{font-weight:900;color:#92400e;font-size:1.3rem;margin:8px 0}
 </style>
 </head>
 <body>
@@ -75,10 +79,13 @@ footer{padding:18px;text-align:center;color:#64748b;font-size:.88rem;background:
     <p class="hint">La inscripción es provisional. Más adelante se comunicará el plazo de confirmación definitiva.</p>
   </div>
   <div class="res-menu">
-    <h3>Menú elegido · Superior</h3>
-    <p>46 € por persona</p>
-    <p class="hint">Si se incorpora la fotografía original del menú, aparecerá aquí para consultarla.</p>
-  </div>
+  <h3>Menú elegido · Superior</h3>
+  <a class="res-menu-preview" href="menu-navidad-superior.jpg" target="_blank" rel="noopener noreferrer" aria-label="Ampliar fotografía del menú Superior">
+    <img src="menu-navidad-superior.jpg" alt="Menú Navidad Superior de La Matta · 46 euros" loading="lazy">
+  </a>
+  <p class="res-menu-price">46 € por persona</p>
+  <p class="hint">Pulsa la fotografía para verla en grande y consultar los platos.</p>
+</div>
 </div>
 <div class="res-form-card">
 <h3>✍️ Inscripción a la comida</h3>
