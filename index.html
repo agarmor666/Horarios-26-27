@@ -37,7 +37,7 @@ footer{padding:18px;text-align:center;color:#64748b;font-size:.88rem;background:
 .res-menu>p:nth-of-type(1){font-size:1.7rem;color:#92400e;font-weight:900}
 .res-form-card{background:white}.res-form-card form{display:grid;gap:16px}
 .res-field{display:grid;gap:6px}.res-field label{font-weight:750}.res-field textarea,.res-field input,.res-field select{display:block;width:100%;padding:11px 12px;border:1px solid #cbd5e1;border-radius:10px;background:white;font:inherit}
-.res-field[hidden]{display:none!important}.res-nota{background:#eff6ff;border-radius:10px;padding:12px;color:#1e40af}
+.res-field[hidden],#resAlternativa[hidden],#resObsWrap[hidden]{display:none!important}.res-nota{background:#eff6ff;border-radius:10px;padding:12px;color:#1e40af}
 #resSubmit:disabled{opacity:.55;cursor:not-allowed}
 @media(max-width:750px){.res-layout{grid-template-columns:1fr}}
 
@@ -98,12 +98,16 @@ footer{padding:18px;text-align:center;color:#64748b;font-size:.88rem;background:
 <div class="res-field" id="resClaveWrap" hidden><label for="resClave">Clave de inscripción *</label><input id="resClave" name="clave" maxlength="90" autocomplete="off" disabled placeholder="Clave recibida por correo"></div>
 <div class="res-field"><label for="resAsistencia">¿Te apuntas a la comida? *</label><select id="resAsistencia" name="asistencia" required><option value="Sí, asistiré">Sí, asistiré</option><option value="Por ahora no podré asistir">Por ahora no podré asistir</option></select></div>
 <div class="res-field"><label for="resPlato">Plato principal elegido *</label><select id="resPlato" required><option value="">Selecciona tu plato…</option><option value="Bacalao, beurre blanc y bilbaína">Bacalao, beurre blanc y bilbaína</option><option value="Pluma de cerdo ibérico marinada en miso">Pluma de cerdo ibérico marinada en miso</option><option value="Necesito una alternativa">Necesito una alternativa (consúltala con el restaurante)</option></select></div>
-<div class="res-field"><label for="resNecesidad">Necesidades alimentarias relacionadas con el menú Superior *</label><select id="resNecesidad" name="necesidad" required><option value="Ninguna">Ninguna</option><option value="Alergia alimentaria">Alergia alimentaria (p. ej., pescado, marisco, huevo, lácteos, frutos secos)</option><option value="Intolerancia alimentaria">Intolerancia alimentaria (p. ej., gluten o lactosa)</option><option value="Menú vegetariano">Solicito alternativa vegetariana</option><option value="Menú vegano">Solicito alternativa vegana</option><option value="Otra adaptación">Otra adaptación del menú</option></select></div>
-<p class="hint" style="margin:0">El menú incluye platos con pescado, zamburiñas, quesos, jamón y cerdo. Los ejemplos no constituyen una lista completa de alérgenos: las adaptaciones deberán confirmarse con el restaurante.</p>
-<div class="res-field"><label for="resDetalle">Alimentos a evitar o adaptación necesaria (opcional)</label><textarea id="resDetalle" name="detalle" maxlength="500" rows="3" placeholder="Indica alimento, plato o ingrediente a evitar (p. ej., zamburiñas, queso, pescado)"></textarea></div>
-<div class="res-field"><label for="resObservaciones">Observaciones sobre el menú (opcional)</label><textarea id="resObservaciones" name="observaciones" maxlength="500" rows="2"></textarea></div>
+<div id="resAlternativa" hidden>
+<div class="res-field"><label for="resNecesidad">¿Qué adaptación del menú necesitas? *</label><select id="resNecesidad" name="necesidad" disabled><option value="">Selecciona el motivo…</option><option value="Alergia alimentaria">Alergia alimentaria</option><option value="Intolerancia alimentaria">Intolerancia alimentaria</option><option value="Menú vegetariano">Alternativa vegetariana</option><option value="Menú vegano">Alternativa vegana</option><option value="Otra adaptación">Otra adaptación</option></select></div>
+<p class="hint" style="margin:8px 0">El menú incluye pescado, marisco, lácteos y elaboraciones con otros posibles alérgenos. La adaptación debe confirmarse con el restaurante.</p>
+<div class="res-field"><label for="resDetalle">Indica los alimentos que debes evitar o la alternativa que necesitas *</label><textarea id="resDetalle" name="detalle" maxlength="500" rows="3" disabled placeholder="Solo los ingredientes o cambios necesarios para preparar el menú"></textarea></div>
+</div>
+<div class="res-field" id="resObsWrap" hidden><label for="resObservaciones">Otras observaciones sobre la adaptación (opcional)</label><textarea id="resObservaciones" name="observaciones" maxlength="500" rows="2" disabled></textarea></div>
 <div style="display:none" aria-hidden="true"><label for="resWeb">Web</label><input id="resWeb" type="text" name="sitio_web" tabindex="-1" autocomplete="off"></div>
-<div class="res-nota">💶 <strong>Pago: 46 €.</strong> El dinero se puede ir dejando en lo de <strong>Nila</strong>. Dirección actualizará el estado <strong>Pendiente / Pagado</strong> en la hoja privada; no es necesario marcarlo aquí.</div>
+<div class="res-nota">💶 <strong>Menú: 46 €.</strong> El dinero se puede ir dejando en <strong>Ludenila</strong>. Si ya lo has entregado, puedes indicarlo aquí; la organización comprobará el pago antes de marcarlo como confirmado.</div>
+<div class="res-field"><label for="resPago">Estado de entrega del dinero</label><select id="resPago" name="pagoDeclarado"><option value="Pendiente">Todavía no he entregado el dinero</option><option value="Entregado, pendiente de comprobar">He entregado 46 € en Ludenila</option></select></div>
+<p class="hint">Si surge una situación sobrevenida, puedes solicitar la baja desde «¿Qué deseas hacer?». Si el pago ya está confirmado, la organización revisará la devolución.</p>
 <p id="resMessage" class="hint" role="status" aria-live="polite">El envío se activará al conectar el servicio de registro del colegio.</p>
 <input id="resAccionHidden" type="hidden" name="accion" value="alta"><button id="resSubmit" class="action" type="submit" disabled>Registrar inscripción</button>
 </form>
@@ -251,24 +255,35 @@ const resClaveWrap=document.getElementById('resClaveWrap');
 const resClave=document.getElementById('resClave');
 const resAccionHidden=document.getElementById('resAccionHidden');
 const resCorreo=document.getElementById('resCorreo');
+const resPlato=document.getElementById('resPlato');
+const resAlternativa=document.getElementById('resAlternativa');
+const resNecesidad=document.getElementById('resNecesidad');
+const resDetalle=document.getElementById('resDetalle');
+const resObs=document.getElementById('resObservaciones');
+const resObsWrap=document.getElementById('resObsWrap');
+const resPago=document.getElementById('resPago');
 function cambiarOperacionReserva(){
- const accion=resOperacion.value, alta=accion==='alta', baja=accion==='baja';
+ const accion=resOperacion.value,alta=accion==='alta',baja=accion==='baja';
  resAccionHidden.value=accion;
- resClaveWrap.hidden=alta;
- resClave.disabled=alta;resClave.required=!alta;
+ resClaveWrap.hidden=alta;resClave.disabled=alta;resClave.required=!alta;
  document.getElementById('resAsistencia').value=baja?'Por ahora no podré asistir':'Sí, asistiré';
- document.getElementById('resAsistencia').disabled=baja;
- // Nombre y correo se requieren para buscar la reserva; al cancelar no se exigen platos ni alergias.
- ['resPlato','resNecesidad'].forEach(id=>{document.getElementById(id).required=!baja;document.getElementById(id).disabled=baja;});
- ['resDetalle','resObservaciones'].forEach(id=>{document.getElementById(id).disabled=baja;});
+ // En la baja el valor de asistencia debe seguir enviándose.
+ document.getElementById('resAsistencia').readOnly=baja;
+ resPlato.disabled=baja;resPlato.required=!baja;
+ resPago.disabled=baja;
+ actualizarAlternativa();
  resSubmit.textContent=alta?'Registrar inscripción':baja?'Solicitar baja':'Guardar modificaciones';
 }
+function actualizarAlternativa(){
+ const activa=resOperacion.value!=='baja'&&resPlato.value==='Necesito una alternativa';
+ resAlternativa.hidden=!activa;resObsWrap.hidden=!activa;
+ resNecesidad.disabled=!activa;resNecesidad.required=activa;
+ resDetalle.disabled=!activa;resDetalle.required=activa;
+ resObs.disabled=!activa;
+ if(!activa){resNecesidad.value='';resDetalle.value='';resObs.value='';}
+}
+resPlato.addEventListener('change',actualizarAlternativa);
 resOperacion.addEventListener('change',cambiarOperacionReserva);
-const resPlato=document.getElementById('resPlato');
-const resObs=document.getElementById('resObservaciones');
-resPlato.addEventListener('change',()=>{resPlato.dataset.platoElegido=resPlato.value;});
-/* La información del plato se envía en el campo de observaciones existente,
-   compatible con el registro actual de la hoja. */
 /* URL de implementación del servicio Apps Script (web app, NO formulario de Google). */
 const RESERVAS_BACKEND_URL='';
 const resForm=document.getElementById('resForm'),resSubmit=document.getElementById('resSubmit'),resMsg=document.getElementById('resMessage');
@@ -281,11 +296,10 @@ resForm.addEventListener('submit',ev=>{
   if(resSubmit.disabled||!resForm.action||!RESERVAS_BACKEND_URL){ev.preventDefault();return;}
   if(resNombreSelect.value==='__otro__'&&!resOtroNombre.value.trim()){ev.preventDefault();resOtroNombre.reportValidity();return;}
   if(resOperacion.value!=="baja"&&!resPlato.value){ev.preventDefault();resPlato.reportValidity();return;}
-  // Guardamos el plato seleccionado en Observaciones para que la hoja actual lo recoja.
-  if(resOperacion.value!=='baja'){
-    let base=resObs.value.replace(/^Plato principal: [^\n]*\n?/,'');
-    resObs.value='Plato principal: '+resPlato.value+(base?'\n'+base:'');
-  }
+  // Registrar el plato con independencia de que haya una adaptación.
+  let platoHidden=resForm.querySelector('input[name="plato"]');
+  if(!platoHidden){platoHidden=document.createElement('input');platoHidden.type='hidden';platoHidden.name='plato';resForm.appendChild(platoHidden);}
+  platoHidden.value=resOperacion.value==='baja'?'':resPlato.value;
   resSubmit.disabled=true;resMsg.textContent='Enviando inscripción…';
 });
 window.addEventListener('message',ev=>{
