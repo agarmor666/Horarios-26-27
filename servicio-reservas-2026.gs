@@ -91,6 +91,6 @@ function doPost(e){
   }finally{lock.releaseLock();}
  }catch(err){console.error(err);mensaje='No se completó la solicitud. Comprueba el correo y la clave o consulta con dirección.';}
  const data=JSON.stringify({tipo:'reserva-bartolome-flores',ok:ok,mensaje:mensaje}).replace(/</g,'\\u003c');
- const html='<!doctype html><html><body><script>window.parent.postMessage('+data+','+JSON.stringify(RES_ALLOWED_ORIGIN)+');<\\/script></body></html>';
+ const html='<!doctype html><html><body><script>window.parent.postMessage('+data+','+JSON.stringify(RES_ALLOWED_ORIGIN)+');</scr'+'ipt></body></html>';
  return HtmlService.createHtmlOutput(html).setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
 }
