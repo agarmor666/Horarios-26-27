@@ -37,7 +37,7 @@ footer{padding:18px;text-align:center;color:#64748b;font-size:.88rem;background:
 .res-menu>p:nth-of-type(1){font-size:1.7rem;color:#92400e;font-weight:900}
 .res-form-card{background:white}.res-form-card form{display:grid;gap:16px}
 .res-field{display:grid;gap:6px}.res-field label{font-weight:750}.res-field textarea,.res-field input,.res-field select{display:block;width:100%;padding:11px 12px;border:1px solid #cbd5e1;border-radius:10px;background:white;font:inherit}
-.res-nota{background:#eff6ff;border-radius:10px;padding:12px;color:#1e40af}
+.res-field[hidden]{display:none!important}.res-nota{background:#eff6ff;border-radius:10px;padding:12px;color:#1e40af}
 #resSubmit:disabled{opacity:.55;cursor:not-allowed}
 @media(max-width:750px){.res-layout{grid-template-columns:1fr}}
 
@@ -90,13 +90,16 @@ footer{padding:18px;text-align:center;color:#64748b;font-size:.88rem;background:
 <div class="res-form-card">
 <h3>✍️ Inscripción a la comida</h3>
 <form id="resForm" method="POST" target="resTransport">
-<div class="res-field"><label for="resNombre">Nombre y apellidos *</label><input id="resNombre" name="nombre" required maxlength="120" autocomplete="name"></div>
+<div class="res-field"><label for="resNombre">Nombre y apellidos *</label><select id="resNombre" name="nombre" required><option value="">Selecciona tu nombre…</option></select></div>
+<div class="res-field" id="resOtroWrap" hidden><label for="resOtroNombre">Otro compañero/a: nombre y apellidos *</label><input id="resOtroNombre" maxlength="120" placeholder="Escribe el nombre completo" autocomplete="name" disabled></div>
 <div class="res-field"><label for="resAsistencia">¿Te apuntas a la comida? *</label><select id="resAsistencia" name="asistencia" required><option value="Sí, asistiré">Sí, asistiré</option><option value="Por ahora no podré asistir">Por ahora no podré asistir</option></select></div>
-<div class="res-field"><label for="resNecesidad">Necesidades alimentarias *</label><select id="resNecesidad" name="necesidad" required><option value="Ninguna">Ninguna</option><option value="Alergia alimentaria">Alergia alimentaria</option><option value="Intolerancia alimentaria">Intolerancia alimentaria</option><option value="Menú vegetariano">Menú vegetariano</option><option value="Menú vegano">Menú vegano</option><option value="Otra adaptación">Otra adaptación</option></select></div>
-<div class="res-field"><label for="resDetalle">Alimentos a evitar o adaptación necesaria (opcional)</label><textarea id="resDetalle" name="detalle" maxlength="500" rows="3" placeholder="Solo la información imprescindible para adaptar el menú"></textarea></div>
+<div class="res-field"><label for="resPlato">Plato principal elegido *</label><select id="resPlato" required><option value="">Selecciona tu plato…</option><option value="Bacalao, beurre blanc y bilbaína">Bacalao, beurre blanc y bilbaína</option><option value="Pluma de cerdo ibérico marinada en miso">Pluma de cerdo ibérico marinada en miso</option><option value="Necesito una alternativa">Necesito una alternativa (consúltala con el restaurante)</option></select></div>
+<div class="res-field"><label for="resNecesidad">Necesidades alimentarias relacionadas con el menú Superior *</label><select id="resNecesidad" name="necesidad" required><option value="Ninguna">Ninguna</option><option value="Alergia alimentaria">Alergia alimentaria (p. ej., pescado, marisco, huevo, lácteos, frutos secos)</option><option value="Intolerancia alimentaria">Intolerancia alimentaria (p. ej., gluten o lactosa)</option><option value="Menú vegetariano">Solicito alternativa vegetariana</option><option value="Menú vegano">Solicito alternativa vegana</option><option value="Otra adaptación">Otra adaptación del menú</option></select></div>
+<p class="hint" style="margin:0">El menú incluye platos con pescado, zamburiñas, quesos, jamón y cerdo. Los ejemplos no constituyen una lista completa de alérgenos: las adaptaciones deberán confirmarse con el restaurante.</p>
+<div class="res-field"><label for="resDetalle">Alimentos a evitar o adaptación necesaria (opcional)</label><textarea id="resDetalle" name="detalle" maxlength="500" rows="3" placeholder="Indica alimento, plato o ingrediente a evitar (p. ej., zamburiñas, queso, pescado)"></textarea></div>
 <div class="res-field"><label for="resObservaciones">Observaciones sobre el menú (opcional)</label><textarea id="resObservaciones" name="observaciones" maxlength="500" rows="2"></textarea></div>
 <div style="display:none" aria-hidden="true"><label for="resWeb">Web</label><input id="resWeb" type="text" name="sitio_web" tabindex="-1" autocomplete="off"></div>
-<div class="res-nota">💶 El estado del pago se gestiona en la hoja privada: <strong>Pendiente / Pagado</strong>. No se marca desde este formulario.</div>
+<div class="res-nota">💶 <strong>Pago: 46 €.</strong> El dinero se puede ir dejando en lo de <strong>Nila</strong>. Dirección actualizará el estado <strong>Pendiente / Pagado</strong> en la hoja privada; no es necesario marcarlo aquí.</div>
 <p id="resMessage" class="hint" role="status" aria-live="polite">El envío se activará al conectar el servicio de registro del colegio.</p>
 <button id="resSubmit" class="action" type="submit" disabled>Registrar inscripción</button>
 </form>
@@ -221,6 +224,29 @@ sel.addEventListener('change',()=>render(+sel.value));search.addEventListener('i
 document.querySelectorAll('.nav button').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('.nav button').forEach(x=>x.classList.remove('active'));b.classList.add('active');const k=b.dataset.k;viewer.style.display='none';stats.style.display='none';recess.style.display='none';calendar.style.display='none';document.getElementById('reservations').style.display='none';if(k==='reservations'){document.getElementById('reservations').style.display='block';return}if(k==='stats'){stats.style.display='block';return}if(k==='recess'){recess.style.display='block';return}if(k==='calendar'){calendar.style.display='block';renderCalendar();return}viewer.style.display='block';kind=k;search.value='';fill()}));
 ng.textContent=H.g.length;nt.textContent=H.t.length;ns.textContent=H.s.length;initCalendar();fill();
 
+/* Personal del centro: listado ya utilizado por el portal en el apartado Profesorado. */
+const resNombreSelect=document.getElementById('resNombre');
+const resOtroWrap=document.getElementById('resOtroWrap');
+const resOtroNombre=document.getElementById('resOtroNombre');
+const nombresCentro=[...new Set((H.t||[]).map(x=>String(x).trim()).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'es'));
+nombresCentro.forEach(nombre=>{const opt=document.createElement('option');opt.value=nombre;opt.textContent=nombre;resNombreSelect.appendChild(opt)});
+const opcionOtros=document.createElement('option');opcionOtros.value='__otro__';opcionOtros.textContent='Otros · Mi nombre no aparece';resNombreSelect.appendChild(opcionOtros);
+function sincronizarNombreReserva(){
+ const otro=resNombreSelect.value==='__otro__';
+ resOtroWrap.hidden=!otro;
+ resOtroNombre.disabled=!otro;
+ resOtroNombre.required=otro;
+ resNombreSelect.name=otro?'':'nombre';
+ resOtroNombre.name=otro?'nombre':'';
+ if(!otro)resOtroNombre.value='';
+}
+resNombreSelect.addEventListener('change',sincronizarNombreReserva);
+sincronizarNombreReserva();
+const resPlato=document.getElementById('resPlato');
+const resObs=document.getElementById('resObservaciones');
+resPlato.addEventListener('change',()=>{resPlato.dataset.platoElegido=resPlato.value;});
+/* La información del plato se envía en el campo de observaciones existente,
+   compatible con el registro actual de la hoja. */
 /* URL de implementación del servicio Apps Script (web app, NO formulario de Google). */
 const RESERVAS_BACKEND_URL='';
 const resForm=document.getElementById('resForm'),resSubmit=document.getElementById('resSubmit'),resMsg=document.getElementById('resMessage');
@@ -231,6 +257,11 @@ if(/^https:\/\/script\.google\.com\/macros\/s\/[a-zA-Z0-9_-]+\/exec$/.test(RESER
 }
 resForm.addEventListener('submit',ev=>{
   if(resSubmit.disabled||!resForm.action||!RESERVAS_BACKEND_URL){ev.preventDefault();return;}
+  if(resNombreSelect.value==='__otro__'&&!resOtroNombre.value.trim()){ev.preventDefault();resOtroNombre.reportValidity();return;}
+  if(!resPlato.value){ev.preventDefault();resPlato.reportValidity();return;}
+  // Guardamos el plato seleccionado en Observaciones para que la hoja actual lo recoja.
+  let base=resObs.value.replace(/^Plato principal: [^\n]*\n?/,'');
+  resObs.value='Plato principal: '+resPlato.value+(base?'\n'+base:'');
   resSubmit.disabled=true;resMsg.textContent='Enviando inscripción…';
 });
 window.addEventListener('message',ev=>{
