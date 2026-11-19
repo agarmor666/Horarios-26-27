@@ -47,18 +47,19 @@ function doPost(e){
    }
    const admin=Session.getEffectiveUser().getEmail();
    const asunto='Comida Navidad · '+(action==='alta'?'Nueva inscripción':action==='modificar'?'Inscripción modificada':'Baja solicitada');
-   let plato=String(p.observaciones||'').match(/Plato principal: ([^\n]+)/);
-   plato=plato?plato[1]:'Sin especificar';
+   let plato=String(p.plato||'').trim().slice(0,150)||'Sin especificar';
+   const entregado=String(p.pagoDeclarado||'')==='Entregado, pendiente de comprobar';
+   const pagoDeclarado=entregado?'Entregado, pendiente de comprobar':'Pendiente';
    if(action==='alta'){
      if(keyRow!==-1)throw Error('Ya hay una inscripción para este nombre y correo; usa Modificar');
      if(!['Sí, asistiré','Por ahora no podré asistir'].includes(p.asistencia))throw Error('Asistencia inválida');
      const token=Utilities.getUuid()+'-'+Utilities.getUuid();
      const fila=control.getLastRow()+1;
-     control.appendRow([new Date(),resSafe(nombre,120),p.asistencia,p.asistencia==='Sí, asistiré'?'Pendiente':'No procede',p.asistencia==='Sí, asistiré'?RES_PRICE:0,resSafe(p.necesidad,150),resSafe([p.detalle,p.observaciones].filter(Boolean).join(' · '),1100)]);
+     control.appendRow([new Date(),resSafe(nombre,120),p.asistencia,p.asistencia==='Sí, asistiré'?pagoDeclarado:'No procede',p.asistencia==='Sí, asistiré'?RES_PRICE:0,resSafe(p.necesidad||'Ninguna',150),resSafe(['Plato principal: '+plato,p.detalle,p.observaciones].filter(Boolean).join(' · '),1100)]);
      claves.appendRow([nombre,correo,fila,resHash(token),new Date(),new Date()]);
-     historial.appendRow([new Date(),'Alta',nombre,correo,plato,'Pendiente']);
+     historial.appendRow([new Date(),'Alta',nombre,correo,plato,pagoDeclarado]);
      resSend(correo,'Clave de tu inscripción · Comida de Navidad','Tu inscripción se ha recibido.\nNombre: '+nombre+'\nClave personal para modificar o cancelar: '+token+'\nGuarda esta clave. No la compartas.\nLa reserva definitiva se comunicará más adelante.');
-     resSend(admin,asunto,'Inscripción de: '+nombre+'\nCorreo: '+correo+'\nAsistencia: '+p.asistencia+'\nPlato: '+plato+'\nConsulta las restricciones alimentarias en la hoja privada.');
+     resSend(admin,asunto,'Inscripción de: '+nombre+'\nCorreo: '+correo+'\nAsistencia: '+p.asistencia+'\nPlato: '+plato+'\nEntrega declarada: '+pagoDeclarado+'\nConfirma los pagos con Ludenila antes de marcar Pagado. Consulta las restricciones alimentarias en la hoja privada.');
      mensaje='✅ Inscripción registrada. Revisa tu correo para guardar la clave de modificación o baja.';
    }else{
      if(keyRow===-1)throw Error('No existe una inscripción con esos datos');
@@ -76,11 +77,14 @@ function doPost(e){
        mensaje='✅ Baja solicitada y comunicada a la organización.';
      }else{
        if(!['Sí, asistiré','Por ahora no podré asistir'].includes(p.asistencia))throw Error('Asistencia inválida');
-       const nuevo=[p.asistencia,resSafe(p.necesidad,150),resSafe([p.detalle,p.observaciones].filter(Boolean).join(' · '),1100)];
+       const nuevo=[p.asistencia,resSafe(p.necesidad||'Ninguna',150),resSafe(['Plato principal: '+plato,p.detalle,p.observaciones].filter(Boolean).join(' · '),1100)];
        control.getRange(row,3).setValue(nuevo[0]);control.getRange(row,6).setValue(nuevo[1]);control.getRange(row,7).setValue(nuevo[2]);
        if(nuevo[0]!=='Sí, asistiré'&&pago!=='Pagado'){control.getRange(row,4).setValue('No procede');control.getRange(row,5).setValue(0);}
-       if(nuevo[0]==='Sí, asistiré'&&pago==='No procede'){control.getRange(row,4).setValue('Pendiente');control.getRange(row,5).setValue(RES_PRICE);}
-       historial.appendRow([new Date(),'Modificación',nombre,correo,plato,pago]);
+       if(nuevo[0]==='Sí, asistiré'&&pago!=='Pagado'){
+         control.getRange(row,4).setValue(pagoDeclarado);
+         control.getRange(row,5).setValue(RES_PRICE);
+       }
+       historial.appendRow([new Date(),'Modificación',nombre,correo,plato,pagoDeclarado]);
        resSend(admin,asunto,'Inscripción modificada: '+nombre+'\nCorreo: '+correo+'\nAsistencia: '+p.asistencia+'\nPlato: '+plato+'\nConsulta detalles alimentarios en la hoja privada.');
        resSend(correo,'Inscripción modificada · Comida de Navidad','Se ha registrado la modificación de tu inscripción a la comida de Navidad.');
        mensaje='✅ Modificación registrada y comunicada.';
