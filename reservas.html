@@ -30,7 +30,7 @@ header{background:linear-gradient(135deg,#eef2ff,#fff1f2 55%,#ecfeff);padding:22
 <script>
 // Configuración: sustituir por la URL de respuesta publicada del Google Forms.
 // No colocar aquí el enlace de edición ni el enlace a la hoja de cálculo.
-const FORMULARIO_URL = "";
+const FORMULARIO_URL = "https://docs.google.com/forms/d/e/1FAIpQLSfgW9g8qCZ4bDe1YB0Fq3nF_BC_Fugzq0m1qsbuuhCkCfYNIA/viewform";
 if(/^https:\/\/docs\.google\.com\/forms\/d\/(?:e\/)?[^/]+\/viewform(?:\?|$)/.test(FORMULARIO_URL)){
  const a=document.createElement("a");a.className="cta";a.href=FORMULARIO_URL;a.target="_blank";a.rel="noopener noreferrer";a.textContent="✍️ Apuntarme a la comida";
  const target=document.getElementById("formulario");target.replaceChildren(a);
