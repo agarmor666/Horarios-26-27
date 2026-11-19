@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Reservas · CEIP Bartolomé Flores</title>
+<style>
+*{box-sizing:border-box}body{margin:0;min-height:100vh;background:linear-gradient(135deg,#6657d9,#7c3aed 42%,#ec4899);font-family:Inter,"Segoe UI",Arial,sans-serif;color:#243447}
+.wrap{max-width:900px;margin:auto;padding:18px}.shell{background:#fff;border-radius:22px;overflow:hidden;box-shadow:0 20px 60px #0003}
+header{background:linear-gradient(135deg,#eef2ff,#fff1f2 55%,#ecfeff);padding:22px;text-align:center}.brand{display:grid;grid-template-columns:100px 1fr 85px;align-items:center;gap:8px}.brand img{width:100%;max-height:88px;object-fit:contain}h1{font-size:clamp(1.2rem,3vw,1.8rem);margin:0}header p{margin:6px 0;color:#64748b}.nav{padding:12px 22px;background:#f8fafc;border-block:1px solid #e2e8f0}.nav a{display:inline-block;background:#334155;color:#fff;text-decoration:none;border-radius:9px;padding:10px 18px;font-weight:700}main{padding:24px}h2{font-size:1.55rem;margin:0 0 14px}p{line-height:1.55}.event{background:#f8fafc;border:1px solid #e2e8f0;border-radius:16px;padding:18px;margin:18px 0}.event p{margin:9px 0}.price{font-weight:800;color:#166534}.cta{display:inline-block;background:#15803d;color:white;border-radius:12px;padding:13px 20px;text-decoration:none;font-weight:800}.pending{background:#fff7ed;border:1px solid #fed7aa;color:#92400e;border-radius:12px;padding:15px;font-weight:600}.small{font-size:.9rem;color:#64748b}footer{text-align:center;padding:18px;background:#f8fafc;color:#64748b;font-size:.85rem}@media(max-width:600px){.wrap{padding:8px}.brand{grid-template-columns:58px 1fr 54px}main{padding:16px}}
+</style>
+</head>
+<body>
+<div class="wrap"><div class="shell">
+<header><div class="brand"><img src="logo-mojacar.png" alt="Mojácar"><div><h1>CEIP BARTOLOMÉ FLORES</h1><p>Mojácar · Reservas del profesorado</p></div><img src="escudo-colegio.png" alt="Escudo del colegio"></div></header>
+<nav class="nav"><a href="./index.html">← Volver al portal</a></nav>
+<main>
+<h2>🎄 Comida de Navidad 2026</h2>
+<p>Inscripción del profesorado para organizar la reserva con el restaurante.</p>
+<div class="event">
+<p>📅 <strong>Viernes 18 de diciembre de 2026</strong></p>
+<p>🕛 <strong>A mediodía</strong> · Hora exacta pendiente de confirmar</p>
+<p>📍 <strong>Jardines de La Mata</strong> · Mojácar</p>
+<p>🍽️ <strong>Menú n.º 2: Superior</strong> · <span class="price">46 € por persona</span></p>
+</div>
+<div id="formulario"><div class="pending">La inscripción electrónica está pendiente de activación. Cuando se publique el formulario, aparecerá aquí el botón para apuntarse.</div></div>
+<p class="small">En el formulario podrás indicar si asistirás y comunicar alergias, intolerancias u otras adaptaciones alimentarias necesarias para el menú. No incluyas diagnósticos ni otros datos médicos innecesarios.</p>
+<p class="small">La inscripción será provisional. Más adelante se comunicará la fecha límite de confirmación definitiva.</p>
+</main><footer>CEIP Bartolomé Flores · Mojácar</footer>
+</div></div>
+<script>
+// Configuración: sustituir por la URL de respuesta publicada del Google Forms.
+// No colocar aquí el enlace de edición ni el enlace a la hoja de cálculo.
+const FORMULARIO_URL = "";
+if(/^https:\/\/docs\.google\.com\/forms\/d\/(?:e\/)?[^/]+\/viewform(?:\?|$)/.test(FORMULARIO_URL)){
+ const a=document.createElement("a");a.className="cta";a.href=FORMULARIO_URL;a.target="_blank";a.rel="noopener noreferrer";a.textContent="✍️ Apuntarme a la comida";
+ const target=document.getElementById("formulario");target.replaceChildren(a);
+}
+</script>
+</body></html>
