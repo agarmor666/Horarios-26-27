@@ -262,7 +262,7 @@ function sincronizarNombreReserva(){
 resNombreSelect.addEventListener('change',sincronizarNombreReserva);
 sincronizarNombreReserva();
 /* URL del servicio Apps Script a publicar (no es Google Forms). */
-const RESERVAS_BACKEND_URL='';
+const RESERVAS_BACKEND_URL='https://script.google.com/macros/s/AKfycbwYTLRvtvLNqSmM-QXf03jiQb03YKviQFUGaPNAhDvIgWWf6DTnROv3_7VbVziRNieg/exec';
 const resForm=document.getElementById('resForm'),resSubmit=document.getElementById('resSubmit'),resMsg=document.getElementById('resMessage');
 if(/^https:\/\/script\.google\.com\/macros\/s\/[a-zA-Z0-9_-]+\/exec$/.test(RESERVAS_BACKEND_URL)){
  resForm.action=RESERVAS_BACKEND_URL;resSubmit.disabled=false;
