@@ -268,6 +268,7 @@ if(/^https:\/\/script\.google\.com\/macros\/s\/[a-zA-Z0-9_-]+\/exec$/.test(RESER
  resForm.action=RESERVAS_BACKEND_URL;resSubmit.disabled=false;
  resMsg.textContent='La inscripción se guardará en el registro privado del colegio.';
 }
+let resEnvioPendiente=false,resConfirmacionRecibida=false;
 resForm.addEventListener('submit',ev=>{
  if(resSubmit.disabled||!RESERVAS_BACKEND_URL){ev.preventDefault();return;}
  if(resNombreSelect.value==='__otro__'&&!resOtroNombre.value.trim()){ev.preventDefault();resOtroNombre.reportValidity();return;}
