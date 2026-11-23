@@ -71,6 +71,6 @@ function doPost(e){
   }finally{lock.releaseLock()}
  }catch(err){console.error(err);mensaje='No se ha completado. Si ya estás inscrito o necesitas corregir algo, consulta con dirección.'}
  const payload=JSON.stringify({tipo:'reserva-bartolome-flores',ok:ok,mensaje:mensaje}).replace(/</g,'\\u003c');
- const html='<!doctype html><html><body><script>window.parent.postMessage('+payload+','+JSON.stringify(RES_ALLOWED_ORIGIN)+');</scr'+'ipt></body></html>';
+ const html='<!doctype html><html><body><script>try{window.top.postMessage('+payload+','+JSON.stringify(RES_ALLOWED_ORIGIN)+');}catch(e){}try{window.parent.postMessage('+payload+','+JSON.stringify(RES_ALLOWED_ORIGIN)+');}catch(e){}</scr'+'ipt></body></html>';
  return HtmlService.createHtmlOutput(html).setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
 }
