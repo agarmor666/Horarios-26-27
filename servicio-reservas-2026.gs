@@ -41,9 +41,9 @@ function doPost(e){
     }
     const plato=String(p.plato||'').trim().slice(0,150);
     const alternativa=plato==='Necesito una alternativa';
-    const necesidad=alternativa?resText(p.necesidad,150):'Ninguna';
-    const detalle=alternativa?resText(p.detalle,500):'';
-    const observaciones=alternativa?resText(p.observaciones,500):'';
+    const detalle=resText(p.detalle,500);
+    const necesidad=detalle?(alternativa?'Adaptación solicitada':'Restricción alimentaria indicada'):(alternativa?'Adaptación pendiente de concretar':'Ninguna');
+    const observaciones='';
     const entrega=String(p.pagoDeclarado||'')==='Entregado, pendiente de comprobar'?'Entregado, pendiente de comprobar':'Pendiente';
     const admin=Session.getEffectiveUser().getEmail();
     let aviso='';
@@ -51,7 +51,7 @@ function doPost(e){
       if(coinciden.length)throw Error('Ya existe una inscripción con este nombre; consulta a dirección para corregirla');
       if(p.asistencia!=='Sí, asistiré')throw Error('Solo se admiten altas de asistentes');
       if(!plato)throw Error('Selecciona el plato');
-      if(alternativa&&(!necesidad||!detalle))throw Error('Detalla la alternativa');
+      // La nota alimentaria es opcional incluso si se solicita una alternativa.
       control.appendRow([new Date(),resText(nombre,120),'Sí, asistiré',entrega,RES_PRICE,necesidad,resText(['Plato principal: '+plato,detalle,observaciones].filter(Boolean).join(' · '),1100)]);
       historial.appendRow([new Date(),'Alta',resText(nombre,120),resText(plato,150),entrega]);
       aviso='Nueva inscripción: '+nombre+'\nPlato: '+plato+'\nPago declarado: '+entrega+'\nVerifica el cobro con Mila. Restricciones alimentarias en la hoja privada.';
