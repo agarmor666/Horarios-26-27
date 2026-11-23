@@ -93,10 +93,21 @@ document.addEventListener('DOMContentLoaded',()=>{
  if(/^https:\/\/script\.google\.com\/macros\/s\/[A-Za-z0-9_-]+\/exec$/.test(backendUrl)){
   form.action=backendUrl;btn.disabled=false;msg.textContent='Completa los datos y pulsa Apuntarme.';
  }
- form.addEventListener('submit',e=>{if(btn.disabled||!backendUrl){e.preventDefault();return;}btn.disabled=true;msg.textContent='Enviando inscripción…'});
+ let envioPendiente=false, confirmacionRecibida=false;
+ form.addEventListener('submit',e=>{
+   if(btn.disabled||!backendUrl){e.preventDefault();return;}
+   envioPendiente=true;confirmacionRecibida=false;btn.disabled=true;msg.textContent='Enviando inscripción…';
+   setTimeout(()=>{
+     if(envioPendiente&&!confirmacionRecibida){
+       msg.textContent='⚠️ No hemos recibido confirmación del registro. Comprueba con dirección que aparece en la hoja antes de volver a enviarlo.';
+       envioPendiente=false;
+     }
+   },15000);
+ });
  window.addEventListener('message',e=>{
    if(e.origin!=='https://script.google.com'&&!e.origin.endsWith('.googleusercontent.com'))return;
    if(!e.data||e.data.tipo!=='reserva-bartolome-flores')return;
+   confirmacionRecibida=true;envioPendiente=false;
    if(e.data.ok){form.reset();sync()}
    msg.textContent=e.data.mensaje||(e.data.ok?'Inscripción registrada.':'No ha sido posible guardar la inscripción.');
    btn.disabled=false;
