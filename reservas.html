@@ -1,39 +1,106 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Reservas · CEIP Bartolomé Flores</title>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Comida de Navidad · Reservas · CEIP Bartolomé Flores</title>
 <style>
-*{box-sizing:border-box}body{margin:0;min-height:100vh;background:linear-gradient(135deg,#6657d9,#7c3aed 42%,#ec4899);font-family:Inter,"Segoe UI",Arial,sans-serif;color:#243447}
-.wrap{max-width:900px;margin:auto;padding:18px}.shell{background:#fff;border-radius:22px;overflow:hidden;box-shadow:0 20px 60px #0003}
-header{background:linear-gradient(135deg,#eef2ff,#fff1f2 55%,#ecfeff);padding:22px;text-align:center}.brand{display:grid;grid-template-columns:100px 1fr 85px;align-items:center;gap:8px}.brand img{width:100%;max-height:88px;object-fit:contain}h1{font-size:clamp(1.2rem,3vw,1.8rem);margin:0}header p{margin:6px 0;color:#64748b}.nav{padding:12px 22px;background:#f8fafc;border-block:1px solid #e2e8f0}.nav a{display:inline-block;background:#334155;color:#fff;text-decoration:none;border-radius:9px;padding:10px 18px;font-weight:700}main{padding:24px}h2{font-size:1.55rem;margin:0 0 14px}p{line-height:1.55}.event{background:#f8fafc;border:1px solid #e2e8f0;border-radius:16px;padding:18px;margin:18px 0}.event p{margin:9px 0}.price{font-weight:800;color:#166534}.cta{display:inline-block;background:#15803d;color:white;border-radius:12px;padding:13px 20px;text-decoration:none;font-weight:800}.pending{background:#fff7ed;border:1px solid #fed7aa;color:#92400e;border-radius:12px;padding:15px;font-weight:600}.small{font-size:.9rem;color:#64748b}footer{text-align:center;padding:18px;background:#f8fafc;color:#64748b;font-size:.85rem}@media(max-width:600px){.wrap{padding:8px}.brand{grid-template-columns:58px 1fr 54px}main{padding:16px}}
+*{box-sizing:border-box}
+body{margin:0;background:linear-gradient(135deg,#6657d9,#7c3aed 42%,#ec4899);font-family:Inter,"Segoe UI",Arial,sans-serif;color:#243447;min-height:100vh}
+.wrap{max-width:1100px;margin:auto;padding:16px}
+.shell{background:#fff;border-radius:22px;overflow:hidden;box-shadow:0 18px 50px #0003}
+header{background:linear-gradient(135deg,#eef2ff,#fff1f2 55%,#ecfeff);text-align:center;padding:22px}
+h1{font-size:clamp(1.3rem,3.2vw,2rem);margin:0}header p{margin:8px 0 0;color:#64748b}
+nav{background:#f8fafc;padding:12px 22px;border-bottom:1px solid #e2e8f0}
+nav a{color:#334155;font-weight:700}
+main{padding:24px}
+h2{font-size:1.6rem;margin:0 0 10px}h3{margin:0 0 12px}
+.layout{display:grid;grid-template-columns:1.25fr .75fr;gap:16px;margin:18px 0}
+.event,.menu,.form-card{border:1px solid #dbe3ec;border-radius:16px;padding:20px;background:#f8fafc}
+.event p{margin:12px 0;line-height:1.5}
+.menu{background:#fff9ef;text-align:center}
+.menu a{display:block;text-decoration:none}
+.menu img{width:100%;height:auto;max-height:370px;object-fit:contain;border-radius:10px}
+.menu small{color:#64748b}
+.form-card{background:#fff;max-width:800px}
+form{display:grid;gap:16px}
+.field{display:grid;gap:6px}
+label{font-weight:750}
+input,select,textarea{width:100%;padding:12px;border:1px solid #cbd5e1;border-radius:10px;font:inherit;background:white}
+textarea{resize:vertical}
+button{background:#15803d;color:white;border:0;border-radius:10px;padding:13px 20px;font:inherit;font-weight:800}
+button:disabled{opacity:.58;cursor:not-allowed}
+.hint{color:#64748b;font-size:.93rem;line-height:1.5}
+.notice{background:#fff7ed;color:#92400e;border:1px solid #fed7aa;padding:12px;border-radius:10px}
+[hidden]{display:none!important}
+footer{text-align:center;padding:18px;background:#f8fafc;color:#64748b;font-size:.85rem}
+@media(max-width:730px){.layout{grid-template-columns:1fr}.wrap{padding:7px}main{padding:16px}.menu img{max-height:290px}}
 </style>
+<script src="meta.js" defer></script>
 </head>
 <body>
 <div class="wrap"><div class="shell">
-<header><div class="brand"><img src="logo-mojacar.png" alt="Mojácar"><div><h1>CEIP BARTOLOMÉ FLORES</h1><p>Mojácar · Reservas del profesorado</p></div><img src="escudo-colegio.png" alt="Escudo del colegio"></div></header>
-<nav class="nav"><a href="./index.html">← Volver al portal</a></nav>
+<header><h1>CEIP BARTOLOMÉ FLORES</h1><p>Mojácar · Reservas del profesorado</p></header>
+<nav><a href="./index.html">← Volver al portal</a></nav>
 <main>
 <h2>🎄 Comida de Navidad 2026</h2>
-<p>Inscripción del profesorado para organizar la reserva con el restaurante.</p>
-<div class="event">
+<p>Inscripción del profesorado para realizar una primera reserva en el restaurante.</p>
+<div class="layout">
+<section class="event">
+<h3>🍽️ Datos de la comida</h3>
 <p>📅 <strong>Viernes 18 de diciembre de 2026</strong></p>
-<p>🕛 <strong>A mediodía</strong> · Hora exacta pendiente de confirmar</p>
-<p>📍 <strong>Jardines de La Mata</strong> · Mojácar</p>
-<p>🍽️ <strong>Menú n.º 2: Superior</strong> · <span class="price">46 € por persona</span></p>
+<p>🕛 <strong>A mediodía</strong> · hora pendiente de confirmar</p>
+<p>📍 <strong>Jardines de La Mata · Mojácar</strong></p>
+<p>🍴 <strong>Menú Superior · 46 € por persona</strong></p>
+</section>
+<section class="menu">
+<h3>Menú Superior</h3>
+<a href="menu-navidad-superior.svg" target="_blank" rel="noopener noreferrer" aria-label="Ampliar el menú"><img src="menu-navidad-superior.svg" alt="Menú Superior · 46 €"></a>
+<small>Pulsa el menú para consultarlo en grande</small>
+</section>
 </div>
-<div id="formulario"><div class="pending">La inscripción electrónica está pendiente de activación. Cuando se publique el formulario, aparecerá aquí el botón para apuntarse.</div></div>
-<p class="small">En el formulario podrás indicar si asistirás y comunicar alergias, intolerancias u otras adaptaciones alimentarias necesarias para el menú. No incluyas diagnósticos ni otros datos médicos innecesarios.</p>
-<p class="small">La inscripción será provisional. Más adelante se comunicará la fecha límite de confirmación definitiva.</p>
+<section class="form-card" id="formulario">
+<h3>✍️ Apúntate a la comida</h3>
+<p class="hint">Selecciona tu nombre, el plato principal y, si lo necesitas, indica una alergia o intolerancia. No se pide correo electrónico.</p>
+<form id="resForm" method="POST" target="resTransport">
+<div class="field"><label for="resNombre">Nombre y apellidos *</label><select id="resNombre" name="nombre" required><option value="">Selecciona tu nombre…</option></select></div>
+<div class="field" id="otroWrap" hidden><label for="resOtroNombre">Otro compañero/a *</label><input id="resOtroNombre" maxlength="120" placeholder="Nombre y apellidos" disabled></div>
+<div class="field"><label for="resPlato">Plato principal *</label><select id="resPlato" name="plato" required>
+<option value="">Selecciona tu plato…</option>
+<option value="Bacalao, beurre blanc y bilbaína">Bacalao, beurre blanc y bilbaína</option>
+<option value="Pluma de cerdo ibérico marinada en miso">Pluma de cerdo ibérico marinada en miso</option>
+<option value="Necesito una alternativa">Necesito una alternativa</option>
+</select></div>
+<div class="field"><label for="resDetalle">Alergias, intolerancias o adaptación alimentaria (opcional)</label><textarea id="resDetalle" name="detalle" rows="2" maxlength="500" placeholder="Solo los alimentos a evitar o adaptación necesaria"></textarea></div>
+<input type="hidden" name="accion" value="alta"><input type="hidden" name="asistencia" value="Sí, asistiré">
+<div hidden><label for="resWeb">Web</label><input id="resWeb" name="sitio_web" tabindex="-1" autocomplete="off"></div>
+<div id="resMessage" role="status" aria-live="polite" class="notice">El registro está pendiente de activación. No se pueden enviar inscripciones todavía.</div>
+<button type="submit" id="resSubmit" disabled>Apuntarme</button>
+</form>
+<iframe name="resTransport" title="Envío de inscripción" hidden></iframe>
+</section>
 </main><footer>CEIP Bartolomé Flores · Mojácar</footer>
 </div></div>
 <script>
-// Configuración: sustituir por la URL de respuesta publicada del Google Forms.
-// No colocar aquí el enlace de edición ni el enlace a la hoja de cálculo.
-const FORMULARIO_URL = "https://docs.google.com/forms/d/e/1FAIpQLSfgW9g8qCZ4bDelYB0Fq3nF_BC_FugzqOm1qsbuuhCkCfYNIA/viewform";
-if(/^https:\/\/docs\.google\.com\/forms\/d\/(?:e\/)?[^/]+\/viewform(?:\?|$)/.test(FORMULARIO_URL)){
- const a=document.createElement("a");a.className="cta";a.href=FORMULARIO_URL;a.target="_blank";a.rel="noopener noreferrer";a.textContent="✍️ Apuntarme a la comida";
- const target=document.getElementById("formulario");target.replaceChildren(a);
-}
+document.addEventListener('DOMContentLoaded',()=>{
+ const select=document.getElementById('resNombre'),otro=document.getElementById('resOtroNombre'),wrap=document.getElementById('otroWrap');
+ const nombres=[...new Set((window.H&&H.t||[]).map(x=>String(x).trim()).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'es'));
+ nombres.forEach(n=>{const option=document.createElement('option');option.value=n;option.textContent=n;select.appendChild(option)});
+ const opt=document.createElement('option');opt.value='__otro__';opt.textContent='Otros · Mi nombre no aparece';select.appendChild(opt);
+ function sync(){const isOtro=select.value==='__otro__';wrap.hidden=!isOtro;otro.disabled=!isOtro;otro.required=isOtro;select.name=isOtro?'':'nombre';otro.name=isOtro?'nombre':''}
+ select.addEventListener('change',sync);sync();
+ const backendUrl='';
+ const form=document.getElementById('resForm'),btn=document.getElementById('resSubmit'),msg=document.getElementById('resMessage');
+ if(/^https:\/\/script\.google\.com\/macros\/s\/[A-Za-z0-9_-]+\/exec$/.test(backendUrl)){
+  form.action=backendUrl;btn.disabled=false;msg.textContent='Completa los datos y pulsa Apuntarme.';
+ }
+ form.addEventListener('submit',e=>{if(btn.disabled||!backendUrl){e.preventDefault();return;}btn.disabled=true;msg.textContent='Enviando inscripción…'});
+ window.addEventListener('message',e=>{
+   if(e.origin!=='https://script.google.com'&&!e.origin.endsWith('.googleusercontent.com'))return;
+   if(!e.data||e.data.tipo!=='reserva-bartolome-flores')return;
+   if(e.data.ok){form.reset();sync()}
+   msg.textContent=e.data.mensaje||(e.data.ok?'Inscripción registrada.':'No ha sido posible guardar la inscripción.');
+   btn.disabled=false;
+ });
+});
 </script>
 </body></html>
