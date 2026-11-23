@@ -88,7 +88,7 @@ document.addEventListener('DOMContentLoaded',()=>{
  const opt=document.createElement('option');opt.value='__otro__';opt.textContent='Otros · Mi nombre no aparece';select.appendChild(opt);
  function sync(){const isOtro=select.value==='__otro__';wrap.hidden=!isOtro;otro.disabled=!isOtro;otro.required=isOtro;select.name=isOtro?'':'nombre';otro.name=isOtro?'nombre':''}
  select.addEventListener('change',sync);sync();
- const backendUrl='';
+ const backendUrl='https://script.google.com/macros/s/AKfycbwYTLRvtvLNqSmM-QXf03jiQb03YKviQFUGaPNAhDvIgWWf6DTnROv3_7VbVziRNieg/exec';
  const form=document.getElementById('resForm'),btn=document.getElementById('resSubmit'),msg=document.getElementById('resMessage');
  if(/^https:\/\/script\.google\.com\/macros\/s\/[A-Za-z0-9_-]+\/exec$/.test(backendUrl)){
   form.action=backendUrl;btn.disabled=false;msg.textContent='Completa los datos y pulsa Apuntarme.';
