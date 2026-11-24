@@ -136,7 +136,6 @@ function doPost(e){
     const admin=RES_ADMIN_EMAIL.trim();
     let aviso='';
     let urlRevision='https://docs.google.com/spreadsheets/d/'+RES_SPREADSHEET_ID+'/edit#gid='+RES_CONTROL_GID;
-    let urlRevisionPago='';
     if(accion==='alta'){
       if(coinciden.length)throw Error('Ya existe una inscripción con este nombre; consulta a dirección para corregirla');
       if(p.asistencia!=='Sí, asistiré')throw Error('Solo se admiten altas de asistentes');
@@ -159,8 +158,7 @@ function doPost(e){
       solicitudes.appendRow([new Date(),tipo,resText(nombre,120),resText(plato,150),necesidad,resText([p.detalleBaja,detalle,observaciones].filter(Boolean).join(' · '),1100),entrega,'Pendiente de comprobar']);
       historial.appendRow([new Date(),tipo,resText(nombre,120),resText(plato,150),entrega]);
       urlRevision='https://docs.google.com/spreadsheets/d/'+RES_SPREADSHEET_ID+'/edit#gid='+RES_SOLICITUDES_GID+'&range=H'+solicitudes.getLastRow();
-      if(accion==='pago')urlRevisionPago='https://docs.google.com/spreadsheets/d/'+RES_SPREADSHEET_ID+'/edit#gid='+RES_CONTROL_GID+'&range=D'+coinciden[0];
-      aviso=tipo+': '+nombre+'\nEstado actual del pago: '+pagoActual+'\nRevisar la pestaña Solicitudes de cambios.\nConfirmar el cobro con Nila y marcar Pagado SOLO en Control de pagos.\nPara una baja, revisar la situación y marcarla manualmente en Control de pagos; no borrar la fila.\nNo se ha alterado automáticamente la inscripción.';
+      aviso=tipo+': '+nombre+'\nEstado actual del pago: '+pagoActual+'\nLa solicitud está pendiente de revisión por dirección.';
       mensaje=accion==='pago'?'✅ Aviso de entrega recibido. Dirección comprobará con Nila el pago de 46 € antes de marcarlo como pagado.':accion==='baja'?'✅ Solicitud de baja enviada. Dirección la revisará antes de anular la reserva.':'✅ Modificación solicitada. Dirección comprobará los cambios.';
     }
     ok=true;
@@ -168,19 +166,22 @@ function doPost(e){
       try{
         const sujeto='Comida de Navidad · '+(accion==='alta'?'Alta':accion==='baja'?'Baja solicitada':accion==='pago'?'Pago declarado':'Modificación solicitada');
         const instruccion=accion==='pago'
-          ? 'Comprueba la entrega con Nila. Después abre la hoja y marca Confirmada o Rechazada en la solicitud. Si está confirmado, marca Pagado en Control de pagos.'
+          ? 'Comprueba con Nila los 46 €. Pulsa el botón, abre el desplegable de la columna H y elige Confirmada o Rechazada. Al elegir Confirmada, el activador actualizará Pagado automáticamente en Control de pagos.'
           : accion==='baja'
-          ? 'Comprueba la baja sobrevenida y marca Confirmada o Rechazada en Solicitudes de cambios. Modifica manualmente la asistencia en Control de pagos.'
+          ? 'Revisa la causa sobrevenida y elige Confirmada o Rechazada en la columna H. Las bajas no alteran automáticamente el listado de asistentes.'
           : accion==='alta'
-          ? 'Revisa la inscripción; el importe permanece Pendiente hasta comprobar con Nila el pago.'
-          : 'Comprueba el cambio solicitado y valida o rechaza la solicitud antes de modificar la inscripción.';
+          ? 'Consulta la inscripción en la hoja privada. El pago permanecerá Pendiente hasta su comprobación.'
+          : 'Revisa el cambio solicitado y resuélvelo desde la hoja privada.';
+        const tituloBoton=accion==='pago'?'Confirmar o rechazar pago':
+          accion==='baja'?'Revisar solicitud de baja':
+          accion==='alta'?'Ver inscripción':'Revisar modificación';
+        const escaparHtml=v=>String(v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
         MailApp.sendEmail({
           to:admin,subject:sujeto,
-          body:aviso+'\\n\\nPARA REVISAR ESTA SOLICITUD:\\n'+urlRevision+'\\n\\n'+instruccion,
-          htmlBody:'<p>'+aviso.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\\n/g,'<br>')+'</p>'+
-            '<p><a href="'+urlRevision+'" style="display:inline-block;background:#1d4ed8;color:#fff;padding:12px 18px;border-radius:8px;text-decoration:none;font-weight:bold">Revisar y resolver solicitud en la hoja privada</a></p>'+
-            (urlRevisionPago?'<p><a href="'+urlRevisionPago+'" style="display:inline-block;background:#15803d;color:#fff;padding:12px 18px;border-radius:8px;text-decoration:none;font-weight:bold">Abrir casilla Pagado de este compañero</a></p>':'')+
-            '<p>'+instruccion+'</p>',
+          body:aviso+'\\n\\n'+instruccion+'\\n\\nAbrir solicitud: '+urlRevision,
+          htmlBody:'<p>'+escaparHtml(aviso).replace(/\\n/g,'<br>')+'</p>'+
+            '<p><a href="'+urlRevision+'" style="display:inline-block;background:#1d4ed8;color:#fff;padding:12px 18px;border-radius:8px;text-decoration:none;font-weight:bold">'+tituloBoton+'</a></p>'+
+            '<p>'+escaparHtml(instruccion)+'</p>',
           name:'Reservas Bartolomé Flores'
         });
       }catch(mailErr){console.error('Aviso email no enviado: '+mailErr)}
