@@ -3,8 +3,8 @@
  const ok=new URLSearchParams(location.search).get('estado')==='ok';
  const mensaje=ok?'Inscripción registrada correctamente.':'No se ha podido completar la inscripción. Consulta con dirección antes de repetirla.';
  const payload={tipo:'reserva-bartolome-flores',ok:ok,mensaje:mensaje};
- try{window.parent.postMessage(payload,location.origin);}catch(e){}
- try{window.top.postMessage(payload,location.origin);}catch(e){}
+ try{window.parent.postMessage(payload,'*');}catch(e){}
+ try{window.top.postMessage(payload,'*');}catch(e){}
  document.body.textContent=mensaje;
 })();
 </script></body></html>
