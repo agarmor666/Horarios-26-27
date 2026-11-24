@@ -105,7 +105,7 @@ document.addEventListener('DOMContentLoaded',()=>{
    },15000);
  });
  window.addEventListener('message',e=>{
-   if(e.origin!=='https://script.google.com'&&!e.origin.endsWith('.googleusercontent.com'))return;
+   if(e.origin!=='https://agarmor666.github.io'&&e.origin!=='https://script.google.com'&&!e.origin.endsWith('.googleusercontent.com'))return;
    if(!e.data||e.data.tipo!=='reserva-bartolome-flores')return;
    confirmacionRecibida=true;envioPendiente=false;
    if(e.data.ok){form.reset();sync()}
