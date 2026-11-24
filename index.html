@@ -93,9 +93,11 @@ footer{padding:18px;text-align:center;color:#64748b;font-size:.88rem;background:
 <form id="resForm" method="POST" target="resTransport">
 <div class="res-field"><label for="resNombre">Nombre y apellidos *</label><select id="resNombre" name="nombre" required><option value="">Selecciona tu nombre…</option></select></div>
 <div class="res-field" id="resOtroWrap" hidden><label for="resOtroNombre">Nombre y apellidos (Otros) *</label><input id="resOtroNombre" maxlength="120" placeholder="Escribe tu nombre completo" autocomplete="name" disabled></div>
+<div class="res-field"><label for="resModo">¿Qué quieres hacer?</label><select id="resModo"><option value="alta">Apuntarme a la comida</option><option value="pago">Ya estoy inscrito: avisar que he entregado 46 € a Mila</option><option value="baja">Ya estoy inscrito: solicitar baja por causa sobrevenida</option></select></div>
+<div id="resBajaNota" class="res-field" hidden><label for="resMotivoBaja">Motivo de baja (opcional, sin datos médicos)</label><textarea id="resMotivoBaja" maxlength="280" rows="2" placeholder="Breve explicación si deseas añadirla"></textarea></div>
 <div class="res-field"><label for="resPlato">Plato principal *</label><select id="resPlato" name="plato" required><option value="">Selecciona tu plato…</option><option value="Bacalao, beurre blanc y bilbaína">Bacalao, beurre blanc y bilbaína</option><option value="Pluma de cerdo ibérico marinada en miso">Pluma de cerdo ibérico marinada en miso</option><option value="Necesito una alternativa">Necesito una alternativa</option></select></div>
 <div class="res-field"><label for="resDetalle">¿Alguna alergia, intolerancia o adaptación alimentaria? (opcional)</label><textarea id="resDetalle" name="detalle" maxlength="500" rows="2" placeholder="Indica solamente los alimentos a evitar o la adaptación necesaria"></textarea></div>
-<input type="hidden" name="accion" value="alta">
+<input id="resAccion" type="hidden" name="accion" value="alta"><input id="resPagoDeclarado" type="hidden" name="pagoDeclarado" value="Pendiente">
 <input type="hidden" name="asistencia" value="Sí, asistiré">
 <div style="display:none" aria-hidden="true"><label for="resWeb">Web</label><input id="resWeb" type="text" name="sitio_web" tabindex="-1" autocomplete="off"></div>
 <p id="resMessage" class="hint" role="status" aria-live="polite">El envío se activará al conectar el servicio de registro del colegio.</p>
@@ -261,6 +263,21 @@ function sincronizarNombreReserva(){
 }
 resNombreSelect.addEventListener('change',sincronizarNombreReserva);
 sincronizarNombreReserva();
+const resModo=document.getElementById('resModo'),resPlatoSelect=document.getElementById('resPlato'),resDetalleCampo=document.getElementById('resDetalle');
+const resMotivoBaja=document.getElementById('resMotivoBaja'),resBajaNota=document.getElementById('resBajaNota');
+function cambiarModoReserva(){
+ const alta=resModo.value==='alta',baja=resModo.value==='baja';
+ document.getElementById('resAccion').value=resModo.value;
+ document.getElementById('resPagoDeclarado').value=resModo.value==='pago'?'Entregado, pendiente de comprobar':'Pendiente';
+ resPlatoSelect.closest('.res-field').hidden=!alta;
+ resDetalleCampo.closest('.res-field').hidden=!alta;
+ resBajaNota.hidden=!baja;
+ resPlatoSelect.required=alta;resPlatoSelect.disabled=!alta;resDetalleCampo.disabled=!alta;
+ const boton=document.getElementById('resSubmit');
+ boton.textContent=alta?'Apuntarme':baja?'Solicitar baja':'Avisar que he entregado el dinero';
+}
+resModo.addEventListener('change',cambiarModoReserva);
+cambiarModoReserva();
 /* URL del servicio Apps Script a publicar (no es Google Forms). */
 const RESERVAS_BACKEND_URL='https://script.google.com/macros/s/AKfycbwYTLRvtvLNqSmM-QXf03jiQb03YKviQFUGaPNAhDvIgWWf6DTnROv3_7VbVziRNieg/exec';
 const resForm=document.getElementById('resForm'),resSubmit=document.getElementById('resSubmit'),resMsg=document.getElementById('resMessage');
@@ -274,6 +291,11 @@ resIframe.addEventListener('load',()=>{if(resEnvioPendiente&&!resConfirmacionRec
 resForm.addEventListener('submit',ev=>{
  if(resSubmit.disabled||!RESERVAS_BACKEND_URL){ev.preventDefault();return;}
  if(resNombreSelect.value==='__otro__'&&!resOtroNombre.value.trim()){ev.preventDefault();resOtroNombre.reportValidity();return;}
+ if(resModo.value==='baja'){
+  let h=resForm.querySelector('input[name="detalleBaja"]');
+  if(!h){h=document.createElement('input');h.type='hidden';h.name='detalleBaja';resForm.appendChild(h)}
+  h.value=resMotivoBaja.value;
+ }
  resEnvioPendiente=true;resConfirmacionRecibida=false;
  resSubmit.disabled=true;resMsg.textContent='Enviando inscripción…';
  setTimeout(()=>{if(resEnvioPendiente&&!resConfirmacionRecibida){resMsg.textContent='La solicitud se ha enviado, pero el navegador no ha recibido confirmación. Consulta con dirección antes de repetirla.';resEnvioPendiente=false;}},15000);
@@ -282,7 +304,7 @@ window.addEventListener('message',ev=>{
  if(ev.origin!=='https://agarmor666.github.io'&&ev.origin!=='https://script.google.com'&&!ev.origin.endsWith('.googleusercontent.com'))return;
  if(!ev.data||ev.data.tipo!=='reserva-bartolome-flores')return;
  resEnvioPendiente=false;resConfirmacionRecibida=true;
- if(ev.data.ok){resForm.reset();sincronizarNombreReserva();}
+ if(ev.data.ok){resForm.reset();sincronizarNombreReserva();cambiarModoReserva();}
  resMsg.textContent=ev.data.mensaje||(ev.data.ok?'✅ Inscripción registrada.':'No se pudo registrar la inscripción.');
  resSubmit.disabled=false;
 });
