@@ -8,6 +8,8 @@
 const RES_SPREADSHEET_ID='1JnCKPdOCrBFpeubBtAdcYznZ733JTrGFZXGRoXI_Mbk';
 const RES_ALLOWED_ORIGIN='https://agarmor666.github.io';
 const RES_PRICE=46;
+const RES_CONTROL_GID='0';
+const RES_SOLICITUDES_GID='589909757';
 // Opcional: escribe aquí el correo de dirección para recibir avisos.
 // Dejar vacío no bloquea ninguna inscripción.
 const RES_ADMIN_EMAIL='antoniogarrido@bartolomeflores.com';
@@ -56,6 +58,7 @@ function doPost(e){
     const entrega=String(p.pagoDeclarado||'')==='Entregado, pendiente de comprobar'?'Entregado, pendiente de comprobar':'Pendiente';
     const admin=RES_ADMIN_EMAIL.trim();
     let aviso='';
+    let urlRevision='https://docs.google.com/spreadsheets/d/'+RES_SPREADSHEET_ID+'/edit#gid='+RES_CONTROL_GID;
     if(accion==='alta'){
       if(coinciden.length)throw Error('Ya existe una inscripción con este nombre; consulta a dirección para corregirla');
       if(p.asistencia!=='Sí, asistiré')throw Error('Solo se admiten altas de asistentes');
@@ -63,6 +66,7 @@ function doPost(e){
       // La nota alimentaria es opcional incluso si se solicita una alternativa.
       control.appendRow([new Date(),resText(nombre,120),'Sí, asistiré',entrega,RES_PRICE,necesidad,resText(['Plato principal: '+plato,detalle,observaciones].filter(Boolean).join(' · '),1100)]);
       historial.appendRow([new Date(),'Alta',resText(nombre,120),resText(plato,150),entrega]);
+      urlRevision+='&range=D'+control.getLastRow();
       aviso='Nueva inscripción: '+nombre+'\nPlato: '+plato+'\nPago declarado: '+entrega+'\nVerifica el cobro con Mila. Restricciones alimentarias en la hoja privada.';
       mensaje='✅ Inscripción registrada. El pago seguirá pendiente de comprobación por la organización.';
     }else{
@@ -76,11 +80,31 @@ function doPost(e){
       if(accion==='pago' && p.pagoDeclarado!=='Entregado, pendiente de comprobar')throw Error('Debes indicar que has entregado el dinero');
       solicitudes.appendRow([new Date(),tipo,resText(nombre,120),resText(plato,150),necesidad,resText([p.detalleBaja,detalle,observaciones].filter(Boolean).join(' · '),1100),entrega,'Pendiente de comprobar']);
       historial.appendRow([new Date(),tipo,resText(nombre,120),resText(plato,150),entrega]);
+      urlRevision='https://docs.google.com/spreadsheets/d/'+RES_SPREADSHEET_ID+'/edit#gid='+RES_SOLICITUDES_GID+'&range=H'+solicitudes.getLastRow();
       aviso=tipo+': '+nombre+'\nEstado actual del pago: '+pagoActual+'\nRevisar la pestaña Solicitudes de cambios.\nConfirmar el cobro con Mila y marcar Pagado SOLO en Control de pagos.\nPara una baja, revisar la situación y marcarla manualmente en Control de pagos; no borrar la fila.\nNo se ha alterado automáticamente la inscripción.';
       mensaje=accion==='pago'?'✅ Aviso de entrega recibido. Dirección comprobará con Mila el pago de 46 € antes de marcarlo como pagado.':accion==='baja'?'✅ Solicitud de baja enviada. Dirección la revisará antes de anular la reserva.':'✅ Modificación solicitada. Dirección comprobará los cambios.';
     }
     ok=true;
-    if(admin){try{MailApp.sendEmail({to:admin,subject:'Comida de Navidad · '+(accion==='alta'?'Alta':accion==='baja'?'Baja solicitada':accion==='pago'?'Pago declarado':'Modificación solicitada'),body:aviso+'\n\nHoja privada de control:\nhttps://docs.google.com/spreadsheets/d/'+RES_SPREADSHEET_ID+'/edit',name:'Reservas Bartolomé Flores'})}catch(mailErr){console.error('Aviso email no enviado: '+mailErr)}}
+    if(admin){
+      try{
+        const sujeto='Comida de Navidad · '+(accion==='alta'?'Alta':accion==='baja'?'Baja solicitada':accion==='pago'?'Pago declarado':'Modificación solicitada');
+        const instruccion=accion==='pago'
+          ? 'Comprueba la entrega con Mila. Después abre la hoja y marca Confirmada o Rechazada en la solicitud. Si está confirmado, marca Pagado en Control de pagos.'
+          : accion==='baja'
+          ? 'Comprueba la baja sobrevenida y marca Confirmada o Rechazada en Solicitudes de cambios. Modifica manualmente la asistencia en Control de pagos.'
+          : accion==='alta'
+          ? 'Revisa la inscripción; el importe permanece Pendiente hasta comprobar con Mila el pago.'
+          : 'Comprueba el cambio solicitado y valida o rechaza la solicitud antes de modificar la inscripción.';
+        MailApp.sendEmail({
+          to:admin,subject:sujeto,
+          body:aviso+'\\n\\nPARA REVISAR ESTA SOLICITUD:\\n'+urlRevision+'\\n\\n'+instruccion,
+          htmlBody:'<p>'+aviso.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\\n/g,'<br>')+'</p>'+
+            '<p><a href="'+urlRevision+'" style="display:inline-block;background:#1d4ed8;color:#fff;padding:12px 18px;border-radius:8px;text-decoration:none;font-weight:bold">Revisar y resolver solicitud en la hoja privada</a></p>'+
+            '<p>'+instruccion+'</p>',
+          name:'Reservas Bartolomé Flores'
+        });
+      }catch(mailErr){console.error('Aviso email no enviado: '+mailErr)}
+    }
   }finally{lock.releaseLock()}
  }catch(err){console.error(err);mensaje='No se ha completado. Si ya estás inscrito o necesitas corregir algo, consulta con dirección.'}
  // El mensaje directo desde Apps Script puede quedar atrapado en
