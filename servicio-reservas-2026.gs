@@ -59,6 +59,7 @@ function doPost(e){
     const admin=RES_ADMIN_EMAIL.trim();
     let aviso='';
     let urlRevision='https://docs.google.com/spreadsheets/d/'+RES_SPREADSHEET_ID+'/edit#gid='+RES_CONTROL_GID;
+    let urlRevisionPago='';
     if(accion==='alta'){
       if(coinciden.length)throw Error('Ya existe una inscripción con este nombre; consulta a dirección para corregirla');
       if(p.asistencia!=='Sí, asistiré')throw Error('Solo se admiten altas de asistentes');
@@ -81,6 +82,7 @@ function doPost(e){
       solicitudes.appendRow([new Date(),tipo,resText(nombre,120),resText(plato,150),necesidad,resText([p.detalleBaja,detalle,observaciones].filter(Boolean).join(' · '),1100),entrega,'Pendiente de comprobar']);
       historial.appendRow([new Date(),tipo,resText(nombre,120),resText(plato,150),entrega]);
       urlRevision='https://docs.google.com/spreadsheets/d/'+RES_SPREADSHEET_ID+'/edit#gid='+RES_SOLICITUDES_GID+'&range=H'+solicitudes.getLastRow();
+      if(accion==='pago')urlRevisionPago='https://docs.google.com/spreadsheets/d/'+RES_SPREADSHEET_ID+'/edit#gid='+RES_CONTROL_GID+'&range=D'+coinciden[0];
       aviso=tipo+': '+nombre+'\nEstado actual del pago: '+pagoActual+'\nRevisar la pestaña Solicitudes de cambios.\nConfirmar el cobro con Mila y marcar Pagado SOLO en Control de pagos.\nPara una baja, revisar la situación y marcarla manualmente en Control de pagos; no borrar la fila.\nNo se ha alterado automáticamente la inscripción.';
       mensaje=accion==='pago'?'✅ Aviso de entrega recibido. Dirección comprobará con Mila el pago de 46 € antes de marcarlo como pagado.':accion==='baja'?'✅ Solicitud de baja enviada. Dirección la revisará antes de anular la reserva.':'✅ Modificación solicitada. Dirección comprobará los cambios.';
     }
@@ -100,6 +102,7 @@ function doPost(e){
           body:aviso+'\\n\\nPARA REVISAR ESTA SOLICITUD:\\n'+urlRevision+'\\n\\n'+instruccion,
           htmlBody:'<p>'+aviso.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\\n/g,'<br>')+'</p>'+
             '<p><a href="'+urlRevision+'" style="display:inline-block;background:#1d4ed8;color:#fff;padding:12px 18px;border-radius:8px;text-decoration:none;font-weight:bold">Revisar y resolver solicitud en la hoja privada</a></p>'+
+            (urlRevisionPago?'<p><a href="'+urlRevisionPago+'" style="display:inline-block;background:#15803d;color:#fff;padding:12px 18px;border-radius:8px;text-decoration:none;font-weight:bold">Abrir casilla Pagado de este compañero</a></p>':'')+
             '<p>'+instruccion+'</p>',
           name:'Reservas Bartolomé Flores'
         });
