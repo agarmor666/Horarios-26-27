@@ -32,7 +32,7 @@ function resLogSheet(book,name,headers){
  * Ejecutar UNA SOLA VEZ desde Apps Script y autorizar:
  * Instala el activador que observa las confirmaciones de dirección
  * en la hoja "Solicitudes de cambios", columna H.
- * No ejecuta automáticamente ninguna baja ni acepta pagos declarados.
+ * La acción confirmada determina si se marca Pagado o se archiva una baja.
  */
 function instalarAutomatizacionPagos() {
   const idFuncion='alEditarSolicitudPago';
@@ -50,56 +50,86 @@ function instalarAutomatizacionPagos() {
 }
 
 /**
- * Al seleccionar "Confirmada" en H de "Solicitudes de cambios",
- * solo si la acción en B es "Entrega de dinero declarada",
- * busca una única inscripción por nombre y marca Pagado en
- * Control de pagos (columna D). No modifica otras solicitudes.
+ * Un único activador ya instalado: alEditarSolicitudPago.
+ *
+ * - Si H = Confirmada y B = Entrega de dinero declarada:
+ *   D en Control de pagos pasa a Pagado.
+ * - Si H = Confirmada y B = Baja por causa sobrevenida:
+ *   mueve el registro íntegro a Bajas confirmadas y lo quita
+ *   del listado activo de Control de pagos.
+ *
+ * Al rechazar una solicitud no se modifica el registro.
+ * Nunca borra la trazabilidad: la solicitud queda en su hoja
+ * y la ficha original se conserva en Bajas confirmadas.
  */
 function alEditarSolicitudPago(e) {
   if (!e || !e.range) return;
-  const editada=e.range;
-  const hoja=editada.getSheet();
-  if (hoja.getName()!=='Solicitudes de cambios' ||
-      editada.getColumn()!==8 || editada.getNumColumns()!==1 ||
-      editada.getNumRows()!==1 || editada.getRow()<2) return;
-  if (String(editada.getValue()).trim()!=='Confirmada') return;
+  const celda=e.range;
+  const solicitudes=celda.getSheet();
+  if (solicitudes.getName()!=='Solicitudes de cambios' ||
+      celda.getColumn()!==8 || celda.getNumColumns()!==1 ||
+      celda.getNumRows()!==1 || celda.getRow()<2) return;
+  if (String(celda.getValue()).trim()!=='Confirmada') return;
 
   const bloqueo=LockService.getScriptLock();
-  if (!bloqueo.tryLock(15000)) throw Error('No se pudo bloquear el control de pagos');
+  if (!bloqueo.tryLock(15000)) throw Error('No se puede acceder al registro ahora');
   try {
-    const fila=editada.getRow();
-    const datos=hoja.getRange(fila,1,1,8).getValues()[0];
-    const accion=String(datos[1]||'').trim();
-    if (accion!=='Entrega de dinero declarada') return;
+    const filaSolicitud=celda.getRow();
+    const solicitud=solicitudes.getRange(filaSolicitud,1,1,8).getValues()[0];
+    const accion=String(solicitud[1]||'').trim();
+    if (accion!=='Entrega de dinero declarada' &&
+        accion!=='Baja por causa sobrevenida') return;
 
-    const nombre=String(datos[2]||'').trim();
-    if (!nombre) throw Error('Solicitud sin nombre (fila '+fila+')');
+    const nombre=String(solicitud[2]||'').trim();
     const libro=e.source;
     const control=libro.getSheetByName('Control de pagos');
-    if (!control) throw Error('No existe Control de pagos');
-    const filas=control.getLastRow();
-    const nombres=filas>1?
-      control.getRange(2,2,filas-1,1).getValues():[];
-    const coinciden=[];
-    nombres.forEach((arr,i)=>{
-      if (String(arr[0]||'').trim().toLocaleLowerCase('es')===
-          nombre.toLocaleLowerCase('es')) coinciden.push(i+2);
+    if (!control || !nombre) throw Error('Datos de solicitud incompletos');
+    const last=control.getLastRow();
+    const registros=last>1?control.getRange(2,1,last-1,7).getValues():[];
+    const posiciones=[];
+    const normalizar=v=>String(v||'').trim().toLocaleLowerCase('es');
+    registros.forEach((fila,i)=>{
+      if(normalizar(fila[1])===normalizar(nombre)) posiciones.push(i+2);
     });
-    if (coinciden.length!==1) {
-      const error='No se pudo actualizar el pago: '+coinciden.length+
-        ' inscripciones coincidentes. Revisar manualmente.';
-      editada.setNote(error);
-      throw Error(error+' Nombre: '+nombre);
+    if(posiciones.length!==1){
+      // Nunca eliminar ni pagar a una persona ambiguamente identificada.
+      const mensaje='Revisión manual: '+posiciones.length+
+        ' inscripciones coincidentes para '+nombre;
+      celda.setNote(mensaje);
+      throw Error(mensaje);
     }
-    const row=coinciden[0];
-    const asistencia=String(control.getRange(row,3).getValue()).trim();
-    if (asistencia!=='Sí, asistiré') {
-      editada.setNote('No se ha actualizado el pago: asistencia no activa.');
-      throw Error('La asistencia no está activa para '+nombre);
+
+    const filaControl=posiciones[0];
+    const registro=control.getRange(filaControl,1,1,7).getValues()[0];
+    if (String(registro[2]).trim()!=='Sí, asistiré'){
+      celda.setNote('No se ha realizado el cambio: el asistente no figura como activo.');
+      throw Error('Asistencia no activa: '+nombre);
     }
-    const pago=control.getRange(row,4);
-    if (String(pago.getValue())!=='Pagado') pago.setValue('Pagado');
-    editada.setNote('Pago confirmado y sincronizado con Control de pagos, fila '+row+'.');
+
+    if(accion==='Entrega de dinero declarada'){
+      if(String(registro[3]).trim()!=='Pagado'){
+        control.getRange(filaControl,4).setValue('Pagado');
+      }
+      celda.setNote('Pago confirmado y sincronizado automáticamente con Control de pagos.');
+      return;
+    }
+
+    // Baja aprobada: no perder la ficha ni el posible dinero entregado.
+    const bajas=resLogSheet(libro,'Bajas confirmadas',[
+      'Fecha de baja','Fecha de inscripción','Nombre y apellidos',
+      'Asistencia al solicitar baja','Pago al solicitar baja',
+      'Importe (€)','Necesidad alimentaria','Observaciones del menú',
+      'Estado de devolución','Fila solicitud'
+    ]);
+    const estadoDevolucion=String(registro[3]).trim()==='Pagado'?
+      'Revisar devolución de 46 € con Nila':'No procede';
+    bajas.appendRow([
+      new Date(),...registro,estadoDevolucion,filaSolicitud
+    ]);
+    // Archivar primero; eliminar solo después de conservar la ficha.
+    control.deleteRow(filaControl);
+    celda.setNote('Baja confirmada: se ha archivado en Bajas confirmadas.'+
+      (estadoDevolucion==='No procede'?'':' Revisar devolución con Nila.'));
   } finally {
     bloqueo.releaseLock();
   }
@@ -168,7 +198,7 @@ function doPost(e){
         const instruccion=accion==='pago'
           ? 'Comprueba con Nila los 46 €. Pulsa el botón, abre el desplegable de la columna H y elige Confirmada o Rechazada. Al elegir Confirmada, el activador actualizará Pagado automáticamente en Control de pagos.'
           : accion==='baja'
-          ? 'Revisa la causa sobrevenida y elige Confirmada o Rechazada en la columna H. Las bajas no alteran automáticamente el listado de asistentes.'
+          ? 'Comprueba la causa sobrevenida. Al elegir Confirmada en la columna H, la inscripción se retirará de Control de pagos y se conservará en Bajas confirmadas. Si ya había pagado, revisa su devolución con Nila. Rechazada no altera la inscripción.'
           : accion==='alta'
           ? 'Consulta la inscripción en la hoja privada. El pago permanecerá Pendiente hasta su comprobación.'
           : 'Revisa el cambio solicitado y resuélvelo desde la hoja privada.';
