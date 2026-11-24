@@ -275,7 +275,7 @@ resForm.addEventListener('submit',ev=>{
  resSubmit.disabled=true;resMsg.textContent='Enviando inscripción…';
 });
 window.addEventListener('message',ev=>{
- if(ev.origin!=='https://script.google.com'&&!ev.origin.endsWith('.googleusercontent.com'))return;
+ if(ev.origin!=='https://agarmor666.github.io'&&ev.origin!=='https://script.google.com'&&!ev.origin.endsWith('.googleusercontent.com'))return;
  if(!ev.data||ev.data.tipo!=='reserva-bartolome-flores')return;
  if(ev.data.ok){resForm.reset();sincronizarNombreReserva();}
  resMsg.textContent=ev.data.mensaje||(ev.data.ok?'✅ Inscripción registrada.':'No se pudo registrar la inscripción.');
