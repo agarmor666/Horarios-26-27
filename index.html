@@ -269,14 +269,19 @@ if(/^https:\/\/script\.google\.com\/macros\/s\/[a-zA-Z0-9_-]+\/exec$/.test(RESER
  resMsg.textContent='La inscripción se guardará en el registro privado del colegio.';
 }
 let resEnvioPendiente=false,resConfirmacionRecibida=false;
+const resIframe=document.getElementById('resTransport');
+resIframe.addEventListener('load',()=>{if(resEnvioPendiente&&!resConfirmacionRecibida)resMsg.textContent='Solicitud procesada por el servicio. Si no recibes confirmación definitiva, consulta con dirección antes de repetirla.';});
 resForm.addEventListener('submit',ev=>{
  if(resSubmit.disabled||!RESERVAS_BACKEND_URL){ev.preventDefault();return;}
  if(resNombreSelect.value==='__otro__'&&!resOtroNombre.value.trim()){ev.preventDefault();resOtroNombre.reportValidity();return;}
+ resEnvioPendiente=true;resConfirmacionRecibida=false;
  resSubmit.disabled=true;resMsg.textContent='Enviando inscripción…';
+ setTimeout(()=>{if(resEnvioPendiente&&!resConfirmacionRecibida){resMsg.textContent='La solicitud se ha enviado, pero el navegador no ha recibido confirmación. Consulta con dirección antes de repetirla.';resEnvioPendiente=false;}},15000);
 });
 window.addEventListener('message',ev=>{
  if(ev.origin!=='https://agarmor666.github.io'&&ev.origin!=='https://script.google.com'&&!ev.origin.endsWith('.googleusercontent.com'))return;
  if(!ev.data||ev.data.tipo!=='reserva-bartolome-flores')return;
+ resEnvioPendiente=false;resConfirmacionRecibida=true;
  if(ev.data.ok){resForm.reset();sincronizarNombreReserva();}
  resMsg.textContent=ev.data.mensaje||(ev.data.ok?'✅ Inscripción registrada.':'No se pudo registrar la inscripción.');
  resSubmit.disabled=false;
