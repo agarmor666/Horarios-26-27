@@ -10,7 +10,7 @@ const RES_ALLOWED_ORIGIN='https://agarmor666.github.io';
 const RES_PRICE=46;
 // Opcional: escribe aquí el correo de dirección para recibir avisos.
 // Dejar vacío no bloquea ninguna inscripción.
-const RES_ADMIN_EMAIL='';
+const RES_ADMIN_EMAIL='antoniogarrido@bartolomeflores.com';
 function resText(v,max){
   let s=String(v||'').trim().slice(0,max||500);
   return /^[=+@\-]/.test(s)?"'"+s:s;
@@ -27,7 +27,7 @@ function doPost(e){
   if(p.sitio_web)throw Error('Solicitud inválida');
   const accion=String(p.accion||'alta');
   const nombre=String(p.nombre||'').trim();
-  if(!['alta','modificar','baja'].includes(accion))throw Error('Acción incorrecta');
+  if(!['alta','modificar','baja','pago'].includes(accion))throw Error('Acción incorrecta');
   if(!nombre||nombre.length>120)throw Error('Nombre obligatorio');
   const book=SpreadsheetApp.openById(RES_SPREADSHEET_ID);
   const control=book.getSheetByName('Control de pagos');
@@ -64,13 +64,17 @@ function doPost(e){
       // Dirección confirma manualmente cambios, pagos y posibles devoluciones.
       if(coinciden.length!==1)throw Error('No se ha localizado una inscripción única para este nombre');
       if(accion==='modificar'&&!plato)throw Error('Selecciona el plato a modificar');
-      solicitudes.appendRow([new Date(),accion==='baja'?'Baja por causa sobrevenida':'Modificación',resText(nombre,120),resText(plato,150),necesidad,resText([detalle,observaciones].filter(Boolean).join(' · '),1100),entrega,'Pendiente de comprobar']);
-      historial.appendRow([new Date(),accion==='baja'?'Baja solicitada':'Cambio solicitado',resText(nombre,120),resText(plato,150),entrega]);
-      aviso=(accion==='baja'?'Solicitud de baja por causa sobrevenida':'Solicitud de modificación')+': '+nombre+'\nRevisar pestaña Solicitudes de cambios. No se ha alterado la inscripción ni el pago.';
-      mensaje=accion==='baja'?'✅ Solicitud de baja enviada. Dirección verificará la causa sobrevenida y confirmará la baja.':'✅ Solicitud de modificación enviada. Dirección comprobará los cambios.';
+      const tipo=accion==='baja'?'Baja por causa sobrevenida':accion==='pago'?'Entrega de dinero declarada':'Modificación';
+      const pagoActual=String(datos[coinciden[0]-1][3]||'');
+      if(accion==='pago' && pagoActual==='Pagado')throw Error('El pago ya consta confirmado');
+      if(accion==='pago' && p.pagoDeclarado!=='Entregado, pendiente de comprobar')throw Error('Debes indicar que has entregado el dinero');
+      solicitudes.appendRow([new Date(),tipo,resText(nombre,120),resText(plato,150),necesidad,resText([detalle,observaciones].filter(Boolean).join(' · '),1100),entrega,'Pendiente de comprobar']);
+      historial.appendRow([new Date(),tipo,resText(nombre,120),resText(plato,150),entrega]);
+      aviso=tipo+': '+nombre+'\nEstado actual del pago: '+pagoActual+'\nRevisar la pestaña Solicitudes de cambios.\nConfirmar el cobro con Mila y marcar Pagado SOLO en Control de pagos.\nNo se ha alterado automáticamente la inscripción.';
+      mensaje=accion==='pago'?'✅ Aviso de entrega recibido. Dirección comprobará con Mila el pago de 46 € antes de marcarlo como pagado.':accion==='baja'?'✅ Solicitud de baja enviada. Dirección la revisará antes de anular la reserva.':'✅ Modificación solicitada. Dirección comprobará los cambios.';
     }
     ok=true;
-    if(admin){try{MailApp.sendEmail({to:admin,subject:'Comida de Navidad · '+(accion==='alta'?'Alta':accion==='baja'?'Baja solicitada':'Modificación solicitada'),body:aviso,name:'Reservas Bartolomé Flores'})}catch(mailErr){console.error('Aviso email no enviado: '+mailErr)}}
+    if(admin){try{MailApp.sendEmail({to:admin,subject:'Comida de Navidad · '+(accion==='alta'?'Alta':accion==='baja'?'Baja solicitada':accion==='pago'?'Pago declarado':'Modificación solicitada'),body:aviso+'\n\nHoja privada de control:\nhttps://docs.google.com/spreadsheets/d/'+RES_SPREADSHEET_ID+'/edit',name:'Reservas Bartolomé Flores'})}catch(mailErr){console.error('Aviso email no enviado: '+mailErr)}}
   }finally{lock.releaseLock()}
  }catch(err){console.error(err);mensaje='No se ha completado. Si ya estás inscrito o necesitas corregir algo, consulta con dirección.'}
  // El mensaje directo desde Apps Script puede quedar atrapado en
