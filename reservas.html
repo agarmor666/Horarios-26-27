@@ -94,12 +94,18 @@ document.addEventListener('DOMContentLoaded',()=>{
   form.action=backendUrl;btn.disabled=false;msg.textContent='Completa los datos y pulsa Apuntarme.';
  }
  let envioPendiente=false, confirmacionRecibida=false;
+ const iframeEnvio=document.querySelector('iframe[name="resTransport"]');
+ iframeEnvio.addEventListener('load',()=>{
+   if(envioPendiente&&!confirmacionRecibida){
+     msg.textContent='Solicitud procesada por el servicio de inscripciones. Si no ves confirmación definitiva, comprueba con dirección que figura en la lista antes de repetirla.';
+   }
+ });
  form.addEventListener('submit',e=>{
    if(btn.disabled||!backendUrl){e.preventDefault();return;}
    envioPendiente=true;confirmacionRecibida=false;btn.disabled=true;msg.textContent='Enviando inscripción…';
    setTimeout(()=>{
      if(envioPendiente&&!confirmacionRecibida){
-       msg.textContent='⚠️ No hemos recibido confirmación del registro. Comprueba con dirección que aparece en la hoja antes de volver a enviarlo.';
+       msg.textContent='La solicitud se ha enviado, pero este navegador no puede verificar la confirmación. Consulta con dirección antes de intentar enviarla de nuevo.';
        envioPendiente=false;
      }
    },15000);
