@@ -11,6 +11,12 @@ const RES_PRICE=46;
 // Opcional: escribe aquí el correo de dirección para recibir avisos.
 // Dejar vacío no bloquea ninguna inscripción.
 const RES_ADMIN_EMAIL='antoniogarrido@bartolomeflores.com';
+
+/** Ejecutar una vez desde el editor para autorizar MailApp y comprobar avisos. */
+function autorizarNotificaciones(){
+  MailApp.sendEmail({to:RES_ADMIN_EMAIL,subject:'Prueba de avisos · Comida de Navidad',body:'Los avisos de las inscripciones, entregas a Mila y bajas se enviarán a esta cuenta.'});
+}
+
 function resText(v,max){
   let s=String(v||'').trim().slice(0,max||500);
   return /^[=+@\-]/.test(s)?"'"+s:s;
@@ -68,9 +74,9 @@ function doPost(e){
       const pagoActual=String(datos[coinciden[0]-1][3]||'');
       if(accion==='pago' && pagoActual==='Pagado')throw Error('El pago ya consta confirmado');
       if(accion==='pago' && p.pagoDeclarado!=='Entregado, pendiente de comprobar')throw Error('Debes indicar que has entregado el dinero');
-      solicitudes.appendRow([new Date(),tipo,resText(nombre,120),resText(plato,150),necesidad,resText([detalle,observaciones].filter(Boolean).join(' · '),1100),entrega,'Pendiente de comprobar']);
+      solicitudes.appendRow([new Date(),tipo,resText(nombre,120),resText(plato,150),necesidad,resText([p.detalleBaja,detalle,observaciones].filter(Boolean).join(' · '),1100),entrega,'Pendiente de comprobar']);
       historial.appendRow([new Date(),tipo,resText(nombre,120),resText(plato,150),entrega]);
-      aviso=tipo+': '+nombre+'\nEstado actual del pago: '+pagoActual+'\nRevisar la pestaña Solicitudes de cambios.\nConfirmar el cobro con Mila y marcar Pagado SOLO en Control de pagos.\nNo se ha alterado automáticamente la inscripción.';
+      aviso=tipo+': '+nombre+'\nEstado actual del pago: '+pagoActual+'\nRevisar la pestaña Solicitudes de cambios.\nConfirmar el cobro con Mila y marcar Pagado SOLO en Control de pagos.\nPara una baja, revisar la situación y marcarla manualmente en Control de pagos; no borrar la fila.\nNo se ha alterado automáticamente la inscripción.';
       mensaje=accion==='pago'?'✅ Aviso de entrega recibido. Dirección comprobará con Mila el pago de 46 € antes de marcarlo como pagado.':accion==='baja'?'✅ Solicitud de baja enviada. Dirección la revisará antes de anular la reserva.':'✅ Modificación solicitada. Dirección comprobará los cambios.';
     }
     ok=true;
