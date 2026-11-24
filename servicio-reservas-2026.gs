@@ -73,7 +73,10 @@ function doPost(e){
     if(admin){try{MailApp.sendEmail({to:admin,subject:'Comida de Navidad · '+(accion==='alta'?'Alta':accion==='baja'?'Baja solicitada':'Modificación solicitada'),body:aviso,name:'Reservas Bartolomé Flores'})}catch(mailErr){console.error('Aviso email no enviado: '+mailErr)}}
   }finally{lock.releaseLock()}
  }catch(err){console.error(err);mensaje='No se ha completado. Si ya estás inscrito o necesitas corregir algo, consulta con dirección.'}
- const payload=JSON.stringify({tipo:'reserva-bartolome-flores',ok:ok,mensaje:mensaje}).replace(/</g,'\\u003c');
- const html='<!doctype html><html><body><script>try{window.top.postMessage('+payload+','+JSON.stringify(RES_ALLOWED_ORIGIN)+');}catch(e){}try{window.parent.postMessage('+payload+','+JSON.stringify(RES_ALLOWED_ORIGIN)+');}catch(e){}</scr'+'ipt></body></html>';
+ // El mensaje directo desde Apps Script puede quedar atrapado en
+ // un iframe de Google. Redirigimos el marco a una página del mismo
+ // origen que el portal para recibir una confirmación verificable.
+ const pagina='https://agarmor666.github.io/Horarios-26-27/respuesta-reservas.html?estado='+(ok?'ok':'error');
+ const html='<!doctype html><html><head><meta http-equiv="refresh" content="1;url='+pagina+'"></head><body><script>window.location.replace('+JSON.stringify(pagina)+');</scr'+'ipt><p>Procesando respuesta...</p></body></html>';
  return HtmlService.createHtmlOutput(html).setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
 }
