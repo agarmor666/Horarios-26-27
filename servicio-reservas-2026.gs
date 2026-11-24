@@ -8,6 +8,9 @@
 const RES_SPREADSHEET_ID='1JnCKPdOCrBFpeubBtAdcYznZ733JTrGFZXGRoXI_Mbk';
 const RES_ALLOWED_ORIGIN='https://agarmor666.github.io';
 const RES_PRICE=46;
+// Opcional: escribe aquí el correo de dirección para recibir avisos.
+// Dejar vacío no bloquea ninguna inscripción.
+const RES_ADMIN_EMAIL='';
 function resText(v,max){
   let s=String(v||'').trim().slice(0,max||500);
   return /^[=+@\-]/.test(s)?"'"+s:s;
@@ -45,7 +48,7 @@ function doPost(e){
     const necesidad=detalle?(alternativa?'Adaptación solicitada':'Restricción alimentaria indicada'):(alternativa?'Adaptación pendiente de concretar':'Ninguna');
     const observaciones='';
     const entrega=String(p.pagoDeclarado||'')==='Entregado, pendiente de comprobar'?'Entregado, pendiente de comprobar':'Pendiente';
-    const admin=Session.getEffectiveUser().getEmail();
+    const admin=RES_ADMIN_EMAIL.trim();
     let aviso='';
     if(accion==='alta'){
       if(coinciden.length)throw Error('Ya existe una inscripción con este nombre; consulta a dirección para corregirla');
